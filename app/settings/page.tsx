@@ -34,16 +34,21 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const [portalError, setPortalError] = useState<string | null>(null);
+
   const handleManageSubscription = async () => {
     setPortalLoading(true);
+    setPortalError(null);
     try {
       const res = await fetch("/api/stripe/portal", { method: "POST" });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        setPortalError(data.error ?? "Something went wrong");
       }
     } catch {
-      // silently fail
+      setPortalError("Failed to connect");
     } finally {
       setPortalLoading(false);
     }
@@ -84,6 +89,9 @@ export default function SettingsPage() {
                 >
                   {portalLoading ? "..." : t("settings_manage_subscription")}
                 </button>
+                {portalError && (
+                  <p className="mt-2 text-xs text-red-500">{portalError}</p>
+                )}
               </div>
             ) : (
               <Link
