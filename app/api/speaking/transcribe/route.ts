@@ -41,6 +41,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ text: transcription.text });
   } catch (error) {
     console.error("Transcription error:", error);
+
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await logApiCall({
+        supabase,
+        userId: user?.id ?? null,
+        callType: "transcribe",
+        model: "whisper-1",
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+      });
+    } catch {
+      // Don't let error logging break the error response
+    }
+
     return NextResponse.json(
       { error: "Failed to transcribe audio. Please try again." },
       { status: 500 }

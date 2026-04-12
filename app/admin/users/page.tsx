@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { downloadCsv } from "@/lib/csv-export";
 
 interface UserRecord {
   id: string;
   user_id: string;
+  email: string | null;
+  display_name: string | null;
   ui_language: string;
   feedback_language: string;
   plan_type: string;
@@ -17,10 +21,23 @@ interface UserRecord {
   };
 }
 
+type SortKey = "name" | "role" | "plan" | "writing" | "speaking" | "cost" | "joined";
+type SortDir = "asc" | "desc";
+
 export default function UsersPage() {
   const [users, setUsers] = useState<UserRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [planFilter, setPlanFilter] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("joined");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkUpdating, setBulkUpdating] = useState(false);
+  const perPage = 20;
+  const router = useRouter();
 
   useEffect(() => {
     fetchUsers();
@@ -54,6 +71,132 @@ export default function UsersPage() {
     setUpdating(null);
   };
 
+  // Filter, sort, paginate
+  const filtered = useMemo(() => {
+    let result = users;
+
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (u) =>
+          (u.email ?? "").toLowerCase().includes(q) ||
+          (u.display_name ?? "").toLowerCase().includes(q) ||
+          u.user_id.toLowerCase().includes(q)
+      );
+    }
+
+    if (roleFilter) result = result.filter((u) => (u.role ?? "user") === roleFilter);
+    if (planFilter) result = result.filter((u) => (u.plan_type ?? "free") === planFilter);
+
+    // Sort
+    result = [...result].sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case "name":
+          cmp = (a.display_name ?? a.email ?? "").localeCompare(b.display_name ?? b.email ?? "");
+          break;
+        case "role":
+          cmp = (a.role ?? "user").localeCompare(b.role ?? "user");
+          break;
+        case "plan":
+          cmp = (a.plan_type ?? "free").localeCompare(b.plan_type ?? "free");
+          break;
+        case "writing":
+          cmp = a.stats.writing - b.stats.writing;
+          break;
+        case "speaking":
+          cmp = a.stats.speaking - b.stats.speaking;
+          break;
+        case "cost":
+          cmp = a.stats.totalCost - b.stats.totalCost;
+          break;
+        case "joined":
+          cmp = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+
+    return result;
+  }, [users, search, roleFilter, planFilter, sortKey, sortDir]);
+
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
+
+  const toggleSelect = (userId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(userId)) next.delete(userId);
+      else next.add(userId);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === paginated.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(paginated.map((u) => u.user_id)));
+    }
+  };
+
+  const bulkUpdatePlan = async (plan: string) => {
+    setBulkUpdating(true);
+    const promises = [...selectedIds].map((uid) =>
+      fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: uid, updates: { plan_type: plan } }),
+      })
+    );
+    await Promise.all(promises);
+    setUsers((prev) =>
+      prev.map((u) =>
+        selectedIds.has(u.user_id) ? { ...u, plan_type: plan } : u
+      )
+    );
+    setSelectedIds(new Set());
+    setBulkUpdating(false);
+  };
+
+  const exportSelected = () => {
+    const selected = filtered.filter((u) => selectedIds.has(u.user_id));
+    downloadCsv(
+      "selected-users.csv",
+      ["Email", "Name", "Role", "Plan", "Writing", "Speaking", "API Cost", "Joined", "User ID"],
+      selected.map((u) => [
+        u.email ?? "",
+        u.display_name ?? "",
+        u.role ?? "user",
+        u.plan_type ?? "free",
+        String(u.stats.writing),
+        String(u.stats.speaking),
+        u.stats.totalCost.toFixed(4),
+        new Date(u.created_at).toISOString().split("T")[0],
+        u.user_id,
+      ])
+    );
+  };
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("desc");
+    }
+    setPage(1);
+  };
+
+  const SortHeader = ({ label, sortKeyVal }: { label: string; sortKeyVal: SortKey }) => (
+    <th
+      className="cursor-pointer px-4 py-3 select-none hover:text-gray-700"
+      onClick={() => toggleSort(sortKeyVal)}
+    >
+      {label} {sortKey === sortKeyVal ? (sortDir === "asc" ? "\u2191" : "\u2193") : ""}
+    </th>
+  );
+
   const formatCost = (cost: number) => `$${cost.toFixed(4)}`;
 
   if (loading) {
@@ -61,32 +204,140 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      {/* Header & Filters */}
+      <div className="flex flex-wrap items-center gap-3">
         <h2 className="text-lg font-semibold text-gray-900">User Management</h2>
-        <p className="text-sm text-gray-500">{users.length} users</p>
+        <input
+          type="text"
+          placeholder="Search email or name..."
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+        />
+        <select
+          value={roleFilter}
+          onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+        >
+          <option value="">All roles</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+        <select
+          value={planFilter}
+          onChange={(e) => { setPlanFilter(e.target.value); setPage(1); }}
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+        >
+          <option value="">All plans</option>
+          <option value="free">Free</option>
+          <option value="pro">Pro</option>
+        </select>
+        <span className="text-sm text-gray-500">{filtered.length} users</span>
+        <button
+          onClick={() => {
+            downloadCsv(
+              "users-export.csv",
+              ["Email", "Name", "Role", "Plan", "Writing", "Speaking", "API Cost", "UI Lang", "FB Lang", "Joined", "User ID"],
+              filtered.map((u) => [
+                u.email ?? "",
+                u.display_name ?? "",
+                u.role ?? "user",
+                u.plan_type ?? "free",
+                String(u.stats.writing),
+                String(u.stats.speaking),
+                u.stats.totalCost.toFixed(4),
+                u.ui_language,
+                u.feedback_language,
+                new Date(u.created_at).toISOString().split("T")[0],
+                u.user_id,
+              ])
+            );
+          }}
+          className="rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50"
+        >
+          Export CSV
+        </button>
       </div>
 
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm">
+          <span className="font-medium text-blue-700">{selectedIds.size} selected</span>
+          <button
+            onClick={() => bulkUpdatePlan("pro")}
+            disabled={bulkUpdating}
+            className="rounded bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
+          >
+            Set Pro
+          </button>
+          <button
+            onClick={() => bulkUpdatePlan("free")}
+            disabled={bulkUpdating}
+            className="rounded bg-gray-600 px-3 py-1 text-xs font-medium text-white hover:bg-gray-700 disabled:opacity-50"
+          >
+            Set Free
+          </button>
+          <button
+            onClick={exportSelected}
+            className="rounded border border-gray-300 bg-white px-3 py-1 text-xs text-gray-600 hover:bg-gray-50"
+          >
+            Export Selected
+          </button>
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            className="text-xs text-gray-500 hover:text-gray-700"
+          >
+            Clear selection
+          </button>
+        </div>
+      )}
+
+      {/* Table */}
       <div className="rounded-lg border border-gray-200 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200 text-left text-gray-500">
-                <th className="px-4 py-3">User ID</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Plan</th>
-                <th className="px-4 py-3">Writing</th>
-                <th className="px-4 py-3">Speaking</th>
-                <th className="px-4 py-3">API Cost</th>
+                <th className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={paginated.length > 0 && selectedIds.size === paginated.length}
+                    onChange={toggleSelectAll}
+                    className="rounded border-gray-300"
+                  />
+                </th>
+                <SortHeader label="User" sortKeyVal="name" />
+                <SortHeader label="Role" sortKeyVal="role" />
+                <SortHeader label="Plan" sortKeyVal="plan" />
+                <SortHeader label="Writing" sortKeyVal="writing" />
+                <SortHeader label="Speaking" sortKeyVal="speaking" />
+                <SortHeader label="API Cost" sortKeyVal="cost" />
                 <th className="px-4 py-3">Languages</th>
-                <th className="px-4 py-3">Joined</th>
+                <SortHeader label="Joined" sortKeyVal="joined" />
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {paginated.map((user) => (
                 <tr key={user.id} className="border-b border-gray-50">
-                  <td className="px-4 py-3 font-mono text-xs text-gray-700">
-                    {user.user_id.slice(0, 12)}...
+                  <td className="px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(user.user_id)}
+                      onChange={() => toggleSelect(user.user_id)}
+                      className="rounded border-gray-300"
+                    />
+                  </td>
+                  <td
+                    className="cursor-pointer px-4 py-3 hover:bg-gray-50"
+                    onClick={() => router.push(`/admin/users/${user.user_id}`)}
+                  >
+                    <div className="text-sm font-medium text-blue-600 hover:text-blue-800">
+                      {user.display_name ?? user.email ?? "Unknown"}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {user.email ?? user.user_id.slice(0, 12) + "..."}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <select
@@ -133,6 +384,29 @@ export default function UsersPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="rounded border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-500">
+            Page {page} of {totalPages}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="rounded border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }

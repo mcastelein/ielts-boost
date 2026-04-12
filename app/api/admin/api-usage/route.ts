@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/admin";
+import { getUserProfiles } from "@/lib/supabase/admin";
 
 export async function GET(request: Request) {
   const supabase = await createClient();
@@ -57,8 +58,13 @@ export async function GET(request: Request) {
     byDay[day].cost += log.estimated_cost_usd ?? 0;
   }
 
+  // Resolve user IDs to emails
+  const uniqueUserIds = Object.keys(byUser).filter((id) => id !== "anonymous");
+  const profiles = await getUserProfiles(uniqueUserIds);
+
   return NextResponse.json({
     logs,
+    profiles,
     summary: {
       totalCalls: logs?.length ?? 0,
       totalCost,

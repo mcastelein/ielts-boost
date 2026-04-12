@@ -5,18 +5,22 @@ import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { useLanguage } from "@/lib/language-context";
+import type { TranslationKey } from "@/lib/translations";
+import LanguageDropdown from "@/components/language-dropdown";
 
-const navLinks = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/writing", label: "Writing" },
-  { href: "/speaking", label: "Speaking" },
-  { href: "/history", label: "History" },
+const navLinks: { href: string; labelKey: TranslationKey }[] = [
+  { href: "/dashboard", labelKey: "nav_dashboard" },
+  { href: "/writing", labelKey: "nav_writing" },
+  { href: "/speaking", labelKey: "nav_speaking" },
+  { href: "/history", labelKey: "nav_history" },
 ];
 
 export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { locale, setLocale, t } = useLanguage();
 
   useEffect(() => {
     const supabase = createClient();
@@ -53,7 +57,7 @@ export default function Navbar() {
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 }`}
               >
-                {link.label}
+                {t(link.labelKey)}
               </Link>
             ))}
             {isAdmin && (
@@ -65,20 +69,25 @@ export default function Navbar() {
                     : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 }`}
               >
-                Admin
+                {t("nav_admin")}
               </Link>
             )}
           </div>
         </div>
-        <form action="/auth/signout" method="post">
-          <button
-            type="submit"
-            className="rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
-          >
-            Sign out
-          </button>
-        </form>
+        <div className="flex items-center gap-2">
+          {/* Language dropdown */}
+          <LanguageDropdown locale={locale} setLocale={setLocale} />
+          <form action="/auth/signout" method="post">
+            <button
+              type="submit"
+              className="rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+            >
+              {t("nav_signout")}
+            </button>
+          </form>
+        </div>
       </div>
     </nav>
   );
 }
+

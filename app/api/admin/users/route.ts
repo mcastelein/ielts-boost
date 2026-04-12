@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/admin";
+import { getUserProfiles } from "@/lib/supabase/admin";
+import { logAdminAction } from "@/lib/admin-audit";
 
 export async function GET() {
   const supabase = await createClient();
@@ -55,8 +57,13 @@ export async function GET() {
     }
   }
 
+  // Fetch email/name from auth
+  const profiles = await getUserProfiles(userIds);
+
   const users = settings?.map((s) => ({
     ...s,
+    email: profiles[s.user_id]?.email ?? null,
+    display_name: profiles[s.user_id]?.name ?? null,
     stats: countMap[s.user_id] ?? { writing: 0, speaking: 0, totalCost: 0 },
   }));
 
@@ -65,7 +72,7 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   const supabase = await createClient();
-  const { authorized } = await requireAdmin(supabase);
+  const { authorized, user: adminUser } = await requireAdmin(supabase);
 
   if (!authorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
@@ -98,6 +105,15 @@ export async function PATCH(request: Request) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  // Audit log
+  await logAdminAction({
+    supabase,
+    adminUserId: adminUser!.id,
+    action: "update_user",
+    targetUserId: userId,
+    details: { updates: safeUpdates },
+  });
 
   return NextResponse.json({ success: true });
 }

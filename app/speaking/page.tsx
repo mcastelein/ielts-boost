@@ -1,11 +1,17 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { SPEAKING_PROMPTS, type SpeakingPrompt } from "@/lib/speaking-prompts";
 import AudioRecorder from "@/components/audio-recorder";
+import { useLanguage } from "@/lib/language-context";
 
 interface SpeakingFeedback {
   estimated_band: number;
+  fluency_score: number;
+  lexical_score: number;
+  grammar_score: number;
+  pronunciation_score: number;
   fluency_coherence: string;
   lexical_resource: string;
   grammar_range: string;
@@ -29,7 +35,10 @@ export default function SpeakingPage() {
   const [inputMode, setInputMode] = useState<InputMode>("voice");
   const [transcriptReady, setTranscriptReady] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [saveWarning, setSaveWarning] = useState(false);
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
+  const router = useRouter();
+  const { t, feedbackLocale } = useLanguage();
 
   const prompts = SPEAKING_PROMPTS.filter((p) => p.part === selectedPart);
 
@@ -69,6 +78,7 @@ export default function SpeakingPage() {
     if (!currentPrompt || !response.trim() || isSubmitting) return;
     setIsSubmitting(true);
     setFeedback(null);
+    setSaveWarning(false);
 
     try {
       const res = await fetch("/api/speaking", {
@@ -78,11 +88,22 @@ export default function SpeakingPage() {
           prompt: currentPrompt.question,
           response: response.trim(),
           part: selectedPart,
+          feedbackLanguage: feedbackLocale,
         }),
       });
 
       const data = await res.json();
+
+      if (data.submission_id) {
+        router.push(`/speaking/${data.submission_id}`);
+        return;
+      }
+
+      // Unauthenticated or DB save failed — show inline
       setFeedback(data);
+      if (!data.submission_id) {
+        setSaveWarning(true);
+      }
     } catch (err) {
       console.error("Speaking submission failed:", err);
     } finally {
@@ -92,9 +113,9 @@ export default function SpeakingPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-bold">Speaking Practice</h1>
+      <h1 className="text-2xl font-bold">{t("speaking_title")}</h1>
       <p className="mt-1 text-sm text-gray-500">
-        Select a part, get a prompt, type your response, and get AI feedback.
+        {t("speaking_subtitle")}
       </p>
 
       {/* Part selector */}
@@ -115,7 +136,7 @@ export default function SpeakingPage() {
                 : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
             }`}
           >
-            Part {p}
+            {t("speaking_part")} {p}{t("speaking_part_suffix")}
           </button>
         ))}
       </div>
@@ -126,7 +147,7 @@ export default function SpeakingPage() {
           onClick={pickRandom}
           className="mt-6 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
         >
-          Get a Random Prompt
+          {t("speaking_get_prompt")}
         </button>
       )}
 
@@ -135,13 +156,13 @@ export default function SpeakingPage() {
         <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-blue-600">
-              Part {currentPrompt.part} — {currentPrompt.topic}
+              {t("speaking_part")} {currentPrompt.part}{t("speaking_part_suffix")} — {currentPrompt.topic}
             </span>
             <button
               onClick={pickRandom}
               className="text-xs text-blue-600 hover:underline"
             >
-              New prompt
+              {t("speaking_new_prompt")}
             </button>
           </div>
           <p className="mt-2 text-sm leading-relaxed text-blue-900">
@@ -167,7 +188,7 @@ export default function SpeakingPage() {
                 <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
                 <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
               </svg>
-              Voice
+              {t("speaking_voice")}
             </button>
             <button
               onClick={() => setInputMode("text")}
@@ -180,7 +201,7 @@ export default function SpeakingPage() {
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M4 7V4h16v3M9 20h6M12 4v16" />
               </svg>
-              Type
+              {t("speaking_type")}
             </button>
           </div>
 
@@ -194,7 +215,7 @@ export default function SpeakingPage() {
                 }}
               />
               <p className="mt-3 text-xs text-gray-400">
-                Record your response, then review the transcript before submitting
+                {t("speaking_record_note")}
               </p>
             </div>
           )}
@@ -203,7 +224,7 @@ export default function SpeakingPage() {
           {inputMode === "voice" && transcriptReady && (
             <div className="mt-4">
               <label className="text-xs font-medium text-gray-500">
-                Transcript — edit if needed before submitting
+                {t("speaking_transcript_edit")}
               </label>
               <textarea
                 value={response}
@@ -219,7 +240,7 @@ export default function SpeakingPage() {
                   }}
                   className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  Re-record
+                  {t("speaking_rerecord")}
                 </button>
               </div>
             </div>
@@ -230,7 +251,7 @@ export default function SpeakingPage() {
             <textarea
               value={response}
               onChange={(e) => setResponse(e.target.value)}
-              placeholder="Type your speaking response here..."
+              placeholder={t("speaking_placeholder")}
               className="mt-4 w-full rounded-lg border border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               rows={8}
             />
@@ -244,16 +265,22 @@ export default function SpeakingPage() {
                 disabled={isSubmitting}
                 className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "Evaluating..." : "Get Feedback"}
+                {isSubmitting ? t("speaking_submitting") : t("speaking_submit")}
               </button>
             </div>
           )}
         </>
       )}
 
-      {/* Feedback display */}
+      {/* Feedback display (fallback for unauthenticated users) */}
       {feedback && (
         <div className="mt-6 space-y-4">
+          {saveWarning && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              {t("common_save_warning")}
+            </div>
+          )}
+
           {/* Band estimate */}
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="flex items-center gap-4">
@@ -261,9 +288,9 @@ export default function SpeakingPage() {
                 {feedback.estimated_band}
               </div>
               <div>
-                <h3 className="font-semibold">Estimated Band</h3>
+                <h3 className="font-semibold">{t("speaking_estimated_band")}</h3>
                 <p className="text-xs text-gray-500">
-                  Based on text response only (pronunciation not assessed)
+                  {t("speaking_text_only_note")}
                 </p>
               </div>
             </div>
@@ -272,43 +299,27 @@ export default function SpeakingPage() {
           {/* Criteria */}
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="text-xs font-medium text-gray-500">
-                Fluency & Coherence
-              </p>
-              <p className="mt-1 text-sm text-gray-700">
-                {feedback.fluency_coherence}
-              </p>
+              <p className="text-xs font-medium text-gray-500">{t("speaking_fluency")}</p>
+              <p className="mt-1 text-sm text-gray-700">{feedback.fluency_coherence}</p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="text-xs font-medium text-gray-500">
-                Lexical Resource
-              </p>
-              <p className="mt-1 text-sm text-gray-700">
-                {feedback.lexical_resource}
-              </p>
+              <p className="text-xs font-medium text-gray-500">{t("speaking_lexical")}</p>
+              <p className="mt-1 text-sm text-gray-700">{feedback.lexical_resource}</p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="text-xs font-medium text-gray-500">
-                Grammatical Range
-              </p>
-              <p className="mt-1 text-sm text-gray-700">
-                {feedback.grammar_range}
-              </p>
+              <p className="text-xs font-medium text-gray-500">{t("speaking_grammar")}</p>
+              <p className="mt-1 text-sm text-gray-700">{feedback.grammar_range}</p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="text-xs font-medium text-gray-500">
-                Pronunciation
-              </p>
-              <p className="mt-1 text-sm text-gray-700 italic">
-                {feedback.pronunciation_note}
-              </p>
+              <p className="text-xs font-medium text-gray-500">{t("speaking_pronunciation")}</p>
+              <p className="mt-1 text-sm text-gray-700 italic">{feedback.pronunciation_note}</p>
             </div>
           </div>
 
           {/* Strengths & Weaknesses */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-xl border border-gray-200 bg-white p-5">
-              <h3 className="font-semibold text-green-700">Strengths</h3>
+              <h3 className="font-semibold text-green-700">{t("speaking_strengths")}</h3>
               <ul className="mt-2 space-y-1 text-sm text-gray-700">
                 {feedback.strengths.map((s, i) => (
                   <li key={i} className="flex gap-2">
@@ -318,7 +329,7 @@ export default function SpeakingPage() {
               </ul>
             </div>
             <div className="rounded-xl border border-gray-200 bg-white p-5">
-              <h3 className="font-semibold text-red-700">Weaknesses</h3>
+              <h3 className="font-semibold text-red-700">{t("speaking_weaknesses")}</h3>
               <ul className="mt-2 space-y-1 text-sm text-gray-700">
                 {feedback.weaknesses.map((w, i) => (
                   <li key={i} className="flex gap-2">
@@ -332,7 +343,7 @@ export default function SpeakingPage() {
           {/* Improved response with TTS */}
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Stronger Response</h3>
+              <h3 className="font-semibold">{t("speaking_stronger")}</h3>
               <button
                 onClick={() => playTTS(feedback.improved_response)}
                 disabled={isSpeaking}
@@ -343,14 +354,14 @@ export default function SpeakingPage() {
                     <svg className="h-3.5 w-3.5 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
                     </svg>
-                    Playing...
+                    {t("speaking_playing")}
                   </>
                 ) : (
                   <>
                     <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
                     </svg>
-                    Listen
+                    {t("speaking_listen")}
                   </>
                 )}
               </button>
@@ -362,9 +373,7 @@ export default function SpeakingPage() {
 
           {/* Better phrases */}
           <div className="rounded-xl border border-blue-200 bg-blue-50 p-5">
-            <h3 className="font-semibold text-blue-800">
-              Better Phrases to Use
-            </h3>
+            <h3 className="font-semibold text-blue-800">{t("speaking_better_phrases")}</h3>
             <ul className="mt-2 space-y-1 text-sm text-blue-900">
               {feedback.better_phrases.map((phrase, i) => (
                 <li key={i}>• {phrase}</li>
@@ -376,9 +385,7 @@ export default function SpeakingPage() {
           {feedback.follow_up_question && (
             <div className="rounded-xl border border-purple-200 bg-purple-50 p-5">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-purple-800">
-                  Examiner Follow-up
-                </h3>
+                <h3 className="font-semibold text-purple-800">{t("speaking_followup")}</h3>
                 <button
                   onClick={() => playTTS(feedback.follow_up_question!)}
                   disabled={isSpeaking}
@@ -389,14 +396,14 @@ export default function SpeakingPage() {
                       <svg className="h-3.5 w-3.5 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
                       </svg>
-                      Playing...
+                      {t("speaking_playing")}
                     </>
                   ) : (
                     <>
                       <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
                       </svg>
-                      Listen
+                      {t("speaking_listen")}
                     </>
                   )}
                 </button>
@@ -416,7 +423,7 @@ export default function SpeakingPage() {
                 }}
                 className="mt-3 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
               >
-                Answer This
+                {t("speaking_answer_this")}
               </button>
             </div>
           )}
@@ -430,7 +437,7 @@ export default function SpeakingPage() {
             }}
             className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
-            Try Again
+            {t("speaking_try_again")}
           </button>
         </div>
       )}

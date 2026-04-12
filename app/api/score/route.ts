@@ -98,6 +98,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ ...feedback, submission_id: submissionId });
   } catch (error) {
     console.error("Scoring error:", error);
+
+    // Log the failed call
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await logApiCall({
+        supabase,
+        userId: user?.id ?? null,
+        callType: "writing_score",
+        model: "claude-sonnet-4-20250514",
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+        metadata: { taskType, feedbackLanguage },
+      });
+    } catch {
+      // Don't let error logging break the error response
+    }
+
     return NextResponse.json(
       { error: "Failed to score essay. Please try again." },
       { status: 500 }

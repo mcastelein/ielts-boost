@@ -81,6 +81,11 @@ create table speaking_submissions (
 create table speaking_feedback (
   id uuid primary key default gen_random_uuid(),
   submission_id uuid,
+  estimated_band numeric,
+  fluency_score numeric,
+  lexical_score numeric,
+  grammar_score numeric,
+  pronunciation_score numeric,
   feedback_json jsonb,
   created_at timestamp default now()
 );

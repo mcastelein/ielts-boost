@@ -27,6 +27,8 @@ interface LogApiCallParams {
   estimatedCostUsd?: number;
   durationMs?: number;
   metadata?: Record<string, unknown>;
+  success?: boolean;
+  errorMessage?: string;
 }
 
 export async function logApiCall({
@@ -39,6 +41,8 @@ export async function logApiCall({
   estimatedCostUsd,
   durationMs,
   metadata,
+  success = true,
+  errorMessage,
 }: LogApiCallParams) {
   // Calculate cost if not provided
   let cost = estimatedCostUsd;
@@ -49,6 +53,12 @@ export async function logApiCall({
     }
   }
 
+  const logMetadata = {
+    ...metadata,
+    success,
+    ...(errorMessage ? { error: errorMessage } : {}),
+  };
+
   try {
     await supabase.from("api_usage_log").insert({
       user_id: userId,
@@ -58,7 +68,7 @@ export async function logApiCall({
       output_tokens: outputTokens ?? null,
       estimated_cost_usd: cost ?? null,
       duration_ms: durationMs ?? null,
-      metadata: metadata ?? null,
+      metadata: logMetadata,
     });
   } catch (error) {
     // Don't let logging failures break the main flow

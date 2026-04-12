@@ -44,6 +44,22 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("TTS error:", error);
+
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await logApiCall({
+        supabase,
+        userId: user?.id ?? null,
+        callType: "tts",
+        model: "tts-1",
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+      });
+    } catch {
+      // Don't let error logging break the error response
+    }
+
     return NextResponse.json(
       { error: "Failed to generate speech" },
       { status: 500 }

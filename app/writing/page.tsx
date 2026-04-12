@@ -9,6 +9,7 @@ import {
   getRandomWritingPrompt,
 } from "@/lib/writing-prompts";
 import TaskChart from "@/components/TaskChart";
+import { useLanguage } from "@/lib/language-context";
 
 interface SentenceCorrection {
   original: string;
@@ -68,6 +69,7 @@ function clearSession() {
 }
 
 export default function WritingPage() {
+  const { t, feedbackLocale } = useLanguage();
   const [taskType, setTaskType] = useState("task2");
   const [inputMode, setInputMode] = useState<InputMode>("text");
   const [essay, setEssay] = useState("");
@@ -96,7 +98,7 @@ export default function WritingPage() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const endTimeRef = useRef<number | null>(null);
 
-  const selectedTask = TASK_TYPES.find((t) => t.value === taskType)!;
+  const selectedTask = TASK_TYPES.find((task) => task.value === taskType)!;
 
   // Check for existing session on mount
   useEffect(() => {
@@ -301,6 +303,7 @@ export default function WritingPage() {
           inputType: extractedText ? "image" : "text",
           promptTopic: selectedPrompt?.topic ?? null,
           timeUsedSeconds,
+          feedbackLanguage: feedbackLocale,
         }),
       });
 
@@ -334,11 +337,11 @@ export default function WritingPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-bold">Writing Practice</h1>
+      <h1 className="text-2xl font-bold">{t("writing_title")}</h1>
       <p className="mt-1 text-sm text-gray-500">
         {step === "setup"
-          ? "Choose a task type and prompt, then start your timed practice."
-          : "Write your essay and submit for AI feedback."}
+          ? t("writing_setup_subtitle")
+          : t("writing_writing_subtitle")}
       </p>
 
       {/* ── Continue session banner ── */}
@@ -347,18 +350,18 @@ export default function WritingPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-blue-800">
-                You have an unfinished writing session
+                {t("writing_unfinished")}
               </p>
               <p className="mt-0.5 text-xs text-blue-600">
                 {pendingSession.prompt?.topic ?? "Own topic"} &middot;{" "}
                 {(() => {
                   const remaining = Math.max(0, Math.round((pendingSession.endTime - Date.now()) / 1000));
-                  if (remaining <= 0) return "Time\u2019s up";
+                  if (remaining <= 0) return t("writing_times_up");
                   const m = Math.floor(remaining / 60);
                   const s = remaining % 60;
                   return `${m}:${s.toString().padStart(2, "0")} remaining`;
                 })()}
-                {pendingSession.essay && ` \u00b7 ${pendingSession.essay.trim().split(/\\s+/).length} words`}
+                {pendingSession.essay && ` \u00b7 ${pendingSession.essay.trim().split(/\\s+/).length} ${t("writing_words")}`}
               </p>
             </div>
             <div className="flex gap-2">
@@ -366,13 +369,13 @@ export default function WritingPage() {
                 onClick={handleDiscardSession}
                 className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
               >
-                Discard
+                {t("writing_discard")}
               </button>
               <button
                 onClick={handleContinueSession}
                 className="rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
               >
-                Continue
+                {t("writing_continue")}
               </button>
             </div>
           </div>
@@ -384,28 +387,28 @@ export default function WritingPage() {
         <>
           {/* Task type selector */}
           <div className="mt-6 flex gap-2">
-            {TASK_TYPES.map((t) => (
+            {TASK_TYPES.map((task) => (
               <button
-                key={t.value}
+                key={task.value}
                 onClick={() => {
-                  setTaskType(t.value);
+                  setTaskType(task.value);
                   setSelectedPrompt(null);
                   setShowPromptList(false);
                 }}
                 className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  taskType === t.value
+                  taskType === task.value
                     ? "bg-blue-600 text-white"
                     : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                 }`}
               >
-                {t.label} ({t.timeMinutes} min)
+                {task.label} ({task.timeMinutes} {t("common_min")})
               </button>
             ))}
           </div>
 
           {/* Prompt selection */}
           <div className="mt-6 space-y-3">
-            <h2 className="text-sm font-semibold text-gray-700">Choose a prompt</h2>
+            <h2 className="text-sm font-semibold text-gray-700">{t("writing_choose_prompt")}</h2>
 
             <div className="flex gap-2">
               <button
@@ -418,7 +421,7 @@ export default function WritingPage() {
                 }}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
-                Random Prompt
+                {t("writing_random_prompt")}
               </button>
               <button
                 onClick={() => {
@@ -431,7 +434,7 @@ export default function WritingPage() {
                     : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
                 }`}
               >
-                Browse Prompts
+                {t("writing_browse_prompts")}
               </button>
               <button
                 onClick={() => {
@@ -445,7 +448,7 @@ export default function WritingPage() {
                     : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
                 }`}
               >
-                Own Topic
+                {t("writing_own_topic")}
               </button>
             </div>
 
@@ -492,7 +495,7 @@ export default function WritingPage() {
 
             {useOwnTopic && (
               <p className="text-sm text-gray-500 italic">
-                You&apos;ll write on your own topic. The timer will still run.
+                {t("writing_own_topic_note")}
               </p>
             )}
           </div>
@@ -503,7 +506,7 @@ export default function WritingPage() {
             disabled={!selectedPrompt && !useOwnTopic}
             className="mt-6 w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Start Writing ({selectedTask.timeMinutes} min)
+            {t("writing_start")} ({selectedTask.timeMinutes} {t("common_min")})
           </button>
         </>
       )}
@@ -517,7 +520,7 @@ export default function WritingPage() {
               onClick={handleBackToSetup}
               className="text-sm text-gray-500 hover:text-gray-700"
             >
-              &larr; Back
+              &larr; {t("writing_back")}
             </button>
 
             {timeLeft !== null && (
@@ -530,7 +533,7 @@ export default function WritingPage() {
                     : "text-gray-800"
                 }`}
               >
-                {timeLeft > 0 ? formatTime(timeLeft) : "Time\u2019s up"}
+                {timeLeft > 0 ? formatTime(timeLeft) : t("writing_times_up")}
               </span>
             )}
 
@@ -566,7 +569,7 @@ export default function WritingPage() {
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
-              Type / Paste
+              {t("writing_type_paste")}
             </button>
             <button
               onClick={() => setInputMode("upload")}
@@ -576,7 +579,7 @@ export default function WritingPage() {
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
-              Upload Image / PDF
+              {t("writing_upload")}
             </button>
           </div>
 
@@ -585,7 +588,7 @@ export default function WritingPage() {
             <textarea
               value={essay}
               onChange={(e) => setEssay(e.target.value)}
-              placeholder={`Write your ${selectedTask.label} essay here (minimum ${selectedTask.minWords} words)...`}
+              placeholder={`${t("writing_placeholder")} (${t("writing_min_words")} ${selectedTask.minWords} ${t("writing_words")})...`}
               className="mt-4 w-full rounded-lg border border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               rows={16}
             />
@@ -600,10 +603,10 @@ export default function WritingPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   <p className="mt-2 text-sm font-medium text-gray-600">
-                    Click to upload image or PDF
+                    {t("writing_click_upload")}
                   </p>
                   <p className="mt-1 text-xs text-gray-400">
-                    JPG, PNG, WebP, or PDF
+                    {t("writing_file_types")}
                   </p>
                   <input
                     ref={fileInputRef}
@@ -629,14 +632,14 @@ export default function WritingPage() {
                         onClick={clearFile}
                         className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50"
                       >
-                        Remove
+                        {t("writing_remove")}
                       </button>
                       <button
                         onClick={handleUploadAndExtract}
                         disabled={isExtracting}
                         className="rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
                       >
-                        {isExtracting ? "Extracting text..." : "Extract Text"}
+                        {isExtracting ? t("writing_extracting") : t("writing_extract")}
                       </button>
                     </div>
                   </div>
@@ -649,7 +652,7 @@ export default function WritingPage() {
           {extractedText !== null && (
             <div className="mt-4">
               <p className="text-sm font-medium text-gray-700">
-                Extracted text — review and edit before submitting:
+                {t("writing_extracted_review")}
               </p>
               <textarea
                 value={extractedText}
@@ -668,11 +671,11 @@ export default function WritingPage() {
                   isBelowMin ? "text-amber-600" : "text-gray-500"
                 }`}
               >
-                {wordCount} words
+                {wordCount} {t("writing_words")}
               </span>
               {isBelowMin && (
                 <span className="text-xs text-amber-600">
-                  (minimum {selectedTask.minWords} for {selectedTask.label})
+                  ({t("writing_min_words")} {selectedTask.minWords} — {selectedTask.label})
                 </span>
               )}
             </div>
@@ -682,21 +685,21 @@ export default function WritingPage() {
               disabled={!activeText.trim() || isSubmitting}
               className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Submitting..." : "Submit for Feedback"}
+              {isSubmitting ? t("writing_submitting") : t("writing_submit")}
             </button>
           </div>
 
           {/* Time's up notice */}
           {timeLeft === 0 && (
             <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              Time&apos;s up! You can still edit and submit your essay.
+              {t("writing_times_up_note")}
             </div>
           )}
 
           {/* Usage limit error */}
           {error && (
             <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
-              <h3 className="font-semibold text-amber-800">Daily Limit Reached</h3>
+              <h3 className="font-semibold text-amber-800">{t("writing_daily_limit")}</h3>
               <p className="mt-1 text-sm text-amber-700">{error}</p>
             </div>
           )}
@@ -705,26 +708,26 @@ export default function WritingPage() {
           {result && (
             <div ref={resultRef} className="mt-8 space-y-6">
               <div className="rounded-xl border border-gray-200 bg-white p-6">
-                <h2 className="text-lg font-semibold">Estimated Band Score</h2>
+                <h2 className="text-lg font-semibold">{t("feedback_band_score")}</h2>
                 <div className="mt-4 flex items-center gap-6">
                   <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 text-3xl font-bold text-white">
                     {result.overall_band}
                   </div>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
                     <div>
-                      <span className="text-gray-500">Task Achievement:</span>{" "}
+                      <span className="text-gray-500">{t("feedback_task_achievement")}:</span>{" "}
                       <span className="font-semibold">{result.task_score}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Coherence:</span>{" "}
+                      <span className="text-gray-500">{t("feedback_coherence")}:</span>{" "}
                       <span className="font-semibold">{result.coherence_score}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Lexical Resource:</span>{" "}
+                      <span className="text-gray-500">{t("feedback_lexical")}:</span>{" "}
                       <span className="font-semibold">{result.lexical_score}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Grammar:</span>{" "}
+                      <span className="text-gray-500">{t("feedback_grammar")}:</span>{" "}
                       <span className="font-semibold">{result.grammar_score}</span>
                     </div>
                   </div>
@@ -733,7 +736,7 @@ export default function WritingPage() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-xl border border-gray-200 bg-white p-5">
-                  <h3 className="font-semibold text-green-700">Strengths</h3>
+                  <h3 className="font-semibold text-green-700">{t("feedback_strengths")}</h3>
                   <ul className="mt-2 space-y-1 text-sm text-gray-700">
                     {result.feedback.strengths.map((s, i) => (
                       <li key={i} className="flex gap-2">
@@ -743,7 +746,7 @@ export default function WritingPage() {
                   </ul>
                 </div>
                 <div className="rounded-xl border border-gray-200 bg-white p-5">
-                  <h3 className="font-semibold text-red-700">Weaknesses</h3>
+                  <h3 className="font-semibold text-red-700">{t("feedback_weaknesses")}</h3>
                   <ul className="mt-2 space-y-1 text-sm text-gray-700">
                     {result.feedback.weaknesses.map((w, i) => (
                       <li key={i} className="flex gap-2">
@@ -755,7 +758,7 @@ export default function WritingPage() {
               </div>
 
               <div className="rounded-xl border border-gray-200 bg-white p-5">
-                <h3 className="font-semibold">Sentence Corrections</h3>
+                <h3 className="font-semibold">{t("feedback_corrections")}</h3>
                 <div className="mt-3 space-y-4">
                   {result.feedback.sentence_corrections.map((c, i) => (
                     <div key={i} className="text-sm">
@@ -768,14 +771,14 @@ export default function WritingPage() {
               </div>
 
               <div className="rounded-xl border border-gray-200 bg-white p-5">
-                <h3 className="font-semibold">Higher-Band Rewrite Example</h3>
+                <h3 className="font-semibold">{t("feedback_rewrite")}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-gray-700 italic">
                   {result.feedback.rewrite_example}
                 </p>
               </div>
 
               <div className="rounded-xl border border-blue-200 bg-blue-50 p-5">
-                <h3 className="font-semibold text-blue-800">Top 3 Things to Improve</h3>
+                <h3 className="font-semibold text-blue-800">{t("feedback_top3")}</h3>
                 <ol className="mt-2 list-decimal list-inside space-y-1 text-sm text-blue-900">
                   {result.feedback.top_3_improvements.map((tip, i) => (
                     <li key={i}>{tip}</li>

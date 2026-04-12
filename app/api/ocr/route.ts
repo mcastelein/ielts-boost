@@ -87,6 +87,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ text: textBlock.text });
   } catch (error) {
     console.error("OCR error:", error);
+
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await logApiCall({
+        supabase,
+        userId: user?.id ?? null,
+        callType: "ocr",
+        model: "claude-sonnet-4-20250514",
+        success: false,
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+      });
+    } catch {
+      // Don't let error logging break the error response
+    }
+
     return NextResponse.json(
       { error: "Text extraction failed. Please try again." },
       { status: 500 }
