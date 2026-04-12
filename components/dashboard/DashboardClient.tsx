@@ -27,18 +27,18 @@ export default function DashboardClient({ writing, speaking }: DashboardClientPr
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("dashboard_title")}</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-xl font-bold sm:text-2xl">{t("dashboard_title")}</h1>
         <div className="flex gap-2">
           <Link
             href="/writing"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            className="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-center text-xs font-semibold text-white hover:bg-blue-700 sm:flex-none sm:px-4 sm:text-sm"
           >
             {t("dashboard_new_essay")}
           </Link>
           <Link
             href="/speaking"
-            className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
+            className="flex-1 rounded-lg bg-purple-600 px-3 py-2 text-center text-xs font-semibold text-white hover:bg-purple-700 sm:flex-none sm:px-4 sm:text-sm"
           >
             {t("dashboard_practice_speaking")}
           </Link>

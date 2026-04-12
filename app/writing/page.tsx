@@ -369,8 +369,8 @@ export default function WritingPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-bold">{t("writing_title")}</h1>
+    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-8">
+      <h1 className="text-xl font-bold sm:text-2xl">{t("writing_title")}</h1>
       <p className="mt-1 text-sm text-gray-500">
         {step === "setup"
           ? t("writing_setup_subtitle")
@@ -639,7 +639,7 @@ export default function WritingPage() {
               onChange={(e) => setEssay(e.target.value)}
               placeholder={`${t("writing_placeholder")} (${t("writing_min_words")} ${selectedTask!.minWords} ${t("writing_words")})...`}
               className="mt-4 w-full rounded-lg border border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              rows={16}
+              rows={10}
             />
           )}
 
@@ -756,13 +756,13 @@ export default function WritingPage() {
           {/* Inline results (fallback for unauthenticated users) */}
           {result && (
             <div ref={resultRef} className="mt-8 space-y-6">
-              <div className="rounded-xl border border-gray-200 bg-white p-6">
+              <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
                 <h2 className="text-lg font-semibold">{t("feedback_band_score")}</h2>
-                <div className="mt-4 flex items-center gap-6">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 text-3xl font-bold text-white">
+                <div className="mt-4 flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-600 text-2xl font-bold text-white sm:h-20 sm:w-20 sm:text-3xl">
                     {result.overall_band}
                   </div>
-                  <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                  <div className="grid w-full grid-cols-2 gap-x-4 gap-y-2 text-sm sm:gap-x-8">
                     <div>
                       <span className="text-gray-500">{t("feedback_task_achievement")}:</span>{" "}
                       <span className="font-semibold">{result.task_score}</span>

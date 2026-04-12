@@ -23,6 +23,7 @@ export default function Navbar() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [planType, setPlanType] = useState<string>("free");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { locale, setLocale, t } = useLanguage();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -53,6 +54,11 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   if (!user) return null;
 
   const avatarUrl = user.user_metadata?.avatar_url ?? user.user_metadata?.picture;
@@ -71,11 +77,13 @@ export default function Navbar() {
   return (
     <nav className="border-b border-gray-200 bg-white">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-        <div className="flex items-center gap-8">
+        {/* Left: Logo + desktop nav */}
+        <div className="flex items-center gap-4 md:gap-8">
           <Link href="/dashboard" className="text-lg font-bold text-gray-900">
             IELTS<span className="text-blue-600">Boost</span>
           </Link>
-          <div className="flex gap-1">
+          {/* Desktop nav links */}
+          <div className="hidden gap-1 md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -91,15 +99,17 @@ export default function Navbar() {
             ))}
           </div>
         </div>
+
+        {/* Right: actions */}
         <div className="flex items-center gap-2">
           {/* Language dropdown */}
           <LanguageDropdown locale={locale} setLocale={setLocale} />
 
-          {/* Upgrade to Pro */}
+          {/* Upgrade to Pro — hidden on very small screens */}
           {planType !== "pro" && (
             <Link
               href="/upgrade"
-              className="rounded-md bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+              className="hidden rounded-md bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90 sm:block"
             >
               {t("nav_upgrade")}
             </Link>
@@ -126,15 +136,28 @@ export default function Navbar() {
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1 w-56 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+              <div className="absolute right-0 top-full z-50 mt-1 w-52 rounded-lg border border-gray-200 bg-white py-1 shadow-lg sm:w-56">
                 {/* User info */}
                 <div className="border-b border-gray-100 px-4 py-3">
-                  <p className="text-sm font-medium text-gray-900">{displayName}</p>
-                  <p className="text-xs text-gray-500">{user.email}</p>
+                  <p className="truncate text-sm font-medium text-gray-900">{displayName}</p>
+                  <p className="truncate text-xs text-gray-500">{user.email}</p>
                 </div>
 
                 {/* Links */}
                 <div className="py-1">
+                  {/* Upgrade (shown in dropdown on mobile) */}
+                  {planType !== "pro" && (
+                    <Link
+                      href="/upgrade"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 sm:hidden"
+                    >
+                      <span>{t("nav_upgrade")}</span>
+                      <span className="ml-auto rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700">
+                        Pro
+                      </span>
+                    </Link>
+                  )}
                   <Link
                     href="/settings"
                     onClick={() => setDropdownOpen(false)}
@@ -171,8 +194,48 @@ export default function Navbar() {
               </div>
             )}
           </div>
+
+          {/* Mobile hamburger button */}
+          <button
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+            className="rounded-md p-1.5 text-gray-600 hover:bg-gray-100 md:hidden"
+          >
+            {mobileMenuOpen ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="border-t border-gray-200 bg-white px-4 pb-3 pt-2 md:hidden">
+          <div className="space-y-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`block rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
+                  pathname.startsWith(link.href)
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                {t(link.labelKey)}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

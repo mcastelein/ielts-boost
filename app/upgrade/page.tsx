@@ -77,16 +77,16 @@ export default function UpgradePage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-8">
+    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:py-8">
       {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-gray-900">{t("upgrade_title")}</h1>
-        <p className="mt-2 text-gray-600">{t("upgrade_subtitle")}</p>
+      <div className="mb-6 text-center sm:mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("upgrade_title")}</h1>
+        <p className="mt-2 text-sm text-gray-600 sm:text-base">{t("upgrade_subtitle")}</p>
       </div>
 
       {/* Current plan badge */}
-      <div className="mb-8 flex justify-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm">
+      <div className="mb-6 flex justify-center sm:mb-8">
+        <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 text-xs sm:px-4 sm:text-sm">
           <span className="text-gray-500">{t("upgrade_current_plan")}:</span>
           <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
             {t("upgrade_free_plan")}
@@ -96,7 +96,7 @@ export default function UpgradePage() {
       </div>
 
       {/* Pro features */}
-      <div className="mb-8 rounded-xl border border-blue-200 bg-blue-50 p-6">
+      <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50 p-4 sm:mb-8 sm:p-6">
         <h2 className="text-center text-lg font-semibold text-gray-900">
           {t("upgrade_pro_plan")}
         </h2>
@@ -119,7 +119,7 @@ export default function UpgradePage() {
 
       <div className="grid gap-6 sm:grid-cols-2">
         {/* International option */}
-        <div className="flex flex-col rounded-xl border-2 border-gray-200 bg-white p-6 transition-colors hover:border-blue-300">
+        <div className="flex flex-col rounded-xl border-2 border-gray-200 bg-white p-4 transition-colors hover:border-blue-300 sm:p-6">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -135,11 +135,11 @@ export default function UpgradePage() {
           </div>
 
           <div className="mb-6 flex items-baseline gap-1">
-            <span className="text-4xl font-bold text-gray-900">{t("upgrade_international_price")}</span>
+            <span className="text-3xl font-bold text-gray-900 sm:text-4xl">{t("upgrade_international_price")}</span>
             <span className="text-gray-500">{t("upgrade_international_period")}</span>
           </div>
 
-          <div className="mb-4 flex gap-2">
+          <div className="mb-4 flex flex-wrap gap-2">
             <PaymentIcon type="visa" />
             <PaymentIcon type="mastercard" />
             <PaymentIcon type="amex" />
@@ -156,7 +156,7 @@ export default function UpgradePage() {
         </div>
 
         {/* China option */}
-        <div className="flex flex-col rounded-xl border-2 border-gray-200 bg-white p-6 transition-colors hover:border-green-300">
+        <div className="flex flex-col rounded-xl border-2 border-gray-200 bg-white p-4 transition-colors hover:border-green-300 sm:p-6">
           <div className="mb-4 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -171,11 +171,11 @@ export default function UpgradePage() {
           </div>
 
           <div className="mb-6 flex items-baseline gap-1">
-            <span className="text-4xl font-bold text-gray-900">{t("upgrade_china_price")}</span>
+            <span className="text-3xl font-bold text-gray-900 sm:text-4xl">{t("upgrade_china_price")}</span>
             <span className="text-gray-500">{t("upgrade_china_period")}</span>
           </div>
 
-          <div className="mb-4 flex gap-2">
+          <div className="mb-4 flex flex-wrap gap-2">
             <PaymentIcon type="wechatpay" />
             <PaymentIcon type="alipay" />
           </div>

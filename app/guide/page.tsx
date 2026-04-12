@@ -19,19 +19,19 @@ export default function GuidePage() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">{t("guide_title")}</h1>
-        <p className="mt-2 text-gray-600">{t("guide_subtitle")}</p>
+    <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:py-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{t("guide_title")}</h1>
+        <p className="mt-2 text-sm text-gray-600 sm:text-base">{t("guide_subtitle")}</p>
       </div>
 
       {/* Section tabs */}
-      <div className="mb-8 flex gap-1 overflow-x-auto rounded-lg bg-gray-100 p-1">
+      <div className="mb-6 flex gap-1 overflow-x-auto rounded-lg bg-gray-100 p-1 sm:mb-8">
         {sections.map((section) => (
           <button
             key={section.id}
             onClick={() => setActiveSection(section.id)}
-            className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-4 py-2.5 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-1 whitespace-nowrap rounded-md px-3 py-2 text-xs font-medium transition-colors sm:gap-1.5 sm:px-4 sm:py-2.5 sm:text-sm ${
               activeSection === section.id
                 ? "bg-white text-blue-700 shadow-sm"
                 : "text-gray-600 hover:text-gray-900"
@@ -53,18 +53,18 @@ export default function GuidePage() {
       </div>
 
       {/* CTA */}
-      <div className="mt-12 rounded-xl bg-blue-50 p-8 text-center">
-        <h2 className="text-xl font-bold text-gray-900">{t("guide_practice_cta")}</h2>
-        <div className="mt-4 flex items-center justify-center gap-4">
+      <div className="mt-8 rounded-xl bg-blue-50 p-6 text-center sm:mt-12 sm:p-8">
+        <h2 className="text-lg font-bold text-gray-900 sm:text-xl">{t("guide_practice_cta")}</h2>
+        <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
           <Link
             href="/writing"
-            className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+            className="w-full rounded-lg bg-blue-600 px-6 py-3 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 sm:w-auto"
           >
             {t("guide_start_writing")}
           </Link>
           <Link
             href="/speaking"
-            className="rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
+            className="w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto"
           >
             {t("guide_start_speaking")}
           </Link>
@@ -76,7 +76,7 @@ export default function GuidePage() {
 
 function SectionCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-6">
       {children}
     </div>
   );
@@ -84,7 +84,7 @@ function SectionCard({ children }: { children: React.ReactNode }) {
 
 function SectionHeading({ icon, title }: { icon: string; title: string }) {
   return (
-    <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900">
+    <h2 className="flex items-center gap-2 text-lg font-bold text-gray-900 sm:text-xl">
       <span>{icon}</span>
       {title}
     </h2>

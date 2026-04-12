@@ -147,8 +147,8 @@ export default function SpeakingPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-bold">{t("speaking_title")}</h1>
+    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-8">
+      <h1 className="text-xl font-bold sm:text-2xl">{t("speaking_title")}</h1>
       <p className="mt-1 text-sm text-gray-500">
         {t("speaking_subtitle")}
       </p>
@@ -330,9 +330,9 @@ export default function SpeakingPage() {
           )}
 
           {/* Band estimate */}
-          <div className="rounded-xl border border-gray-200 bg-white p-5">
+          <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 text-2xl font-bold text-white">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xl font-bold text-white sm:h-16 sm:w-16 sm:text-2xl">
                 {feedback.estimated_band}
               </div>
               <div>

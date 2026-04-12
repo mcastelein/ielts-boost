@@ -73,8 +73,8 @@ export default function HistoryClient({
   ];
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-8">
-      <h1 className="text-2xl font-bold">{t("history_title")}</h1>
+    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-8">
+      <h1 className="text-xl font-bold sm:text-2xl">{t("history_title")}</h1>
 
       {/* Filter tabs */}
       <div className="mt-4 flex gap-1 rounded-lg bg-gray-100 p-1 w-fit">

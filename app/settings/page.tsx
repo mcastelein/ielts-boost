@@ -15,8 +15,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-8">
-      <h1 className="text-2xl font-bold">{t("settings_title")}</h1>
+    <div className="mx-auto w-full max-w-2xl px-4 py-6 sm:py-8">
+      <h1 className="text-xl font-bold sm:text-2xl">{t("settings_title")}</h1>
 
       <div className="mt-8 space-y-8">
         {/* UI Language */}

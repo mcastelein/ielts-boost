@@ -55,9 +55,9 @@ export default function LoginPage() {
       <div className="absolute right-4 top-4">
         <LanguageDropdown locale={locale} setLocale={setLocale} />
       </div>
-      <div className="w-full max-w-md space-y-6 rounded-2xl bg-white p-10 shadow-lg">
+      <div className="mx-4 w-full max-w-md space-y-6 rounded-2xl bg-white p-6 shadow-lg sm:mx-0 sm:p-10">
         <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
             IELTS<span className="text-blue-600">Boost</span>
           </h1>
           <p className="mt-3 text-gray-500">{t("login_tagline")}</p>

@@ -319,6 +319,23 @@ export const translations = {
   common_save_warning: { en: "Sign in to save this to your history", zh: "登录以保存到你的历史记录" },
   common_save_failed: { en: "Feedback could not be saved. It is displayed below but won't appear in your history.", zh: "反馈无法保存。已在下方显示但不会出现在历史记录中。" },
   common_min: { en: "min", zh: "分钟" },
+
+  // Feedback form page
+  feedback_form_title: { en: "Feedback", zh: "反馈" },
+  feedback_form_subtitle: { en: "Found a bug, have a feature request, or just want to share your thoughts? We'd love to hear from you.", zh: "发现了bug、有功能建议、或想分享你的想法？我们很乐意听取你的意见。" },
+  feedback_category: { en: "Category", zh: "类别" },
+  feedback_cat_bug: { en: "Bug Report", zh: "Bug报告" },
+  feedback_cat_feature: { en: "Feature Request", zh: "功能建议" },
+  feedback_cat_improvement: { en: "Improvement", zh: "改进建议" },
+  feedback_cat_other: { en: "Other", zh: "其他" },
+  feedback_subject: { en: "Subject", zh: "主题" },
+  feedback_subject_placeholder: { en: "Brief summary of your feedback", zh: "简要描述你的反馈" },
+  feedback_message: { en: "Message", zh: "详细内容" },
+  feedback_message_placeholder: { en: "Tell us more...", zh: "告诉我们更多..." },
+  feedback_submit: { en: "Send Feedback", zh: "发送反馈" },
+  feedback_sending: { en: "Sending...", zh: "发送中..." },
+  feedback_success: { en: "Thanks for your feedback! We'll review it soon.", zh: "感谢你的反馈！我们会尽快查看。" },
+  feedback_error: { en: "Failed to send feedback. Please try again.", zh: "发送失败，请重试。" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
