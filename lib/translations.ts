@@ -311,6 +311,28 @@ export const translations = {
   upgrade_feature_priority: { en: "Priority AI feedback", zh: "优先AI反馈" },
   upgrade_free_limit: { en: "2 writing + 2 speaking submissions per day", zh: "每天2次写作 + 2次口语提交" },
   upgrade_guarantee: { en: "Cancel anytime. No questions asked.", zh: "随时取消，无需理由。" },
+  upgrade_success_title: { en: "Welcome to Pro!", zh: "欢迎成为Pro会员！" },
+  upgrade_success_subtitle: { en: "Your account has been upgraded. You now have unlimited access to all features.", zh: "你的账户已升级。你现在可以无限使用所有功能。" },
+  upgrade_success_cta: { en: "Start Practicing", zh: "开始练习" },
+
+  // Pro benefits page
+  pro_welcome: { en: "Welcome to Your Pro Membership", zh: "欢迎加入Pro会员" },
+  pro_welcome_subtitle: { en: "You've unlocked the full power of IELTSBoost. Here's everything that's now available to you.", zh: "你已解锁IELTSBoost的全部功能。以下是你现在可以使用的所有内容。" },
+  pro_unlimited_writing_title: { en: "Unlimited Writing Practice", zh: "无限写作练习" },
+  pro_unlimited_writing_desc: { en: "Submit as many essays as you want — no daily limits. Practice Task 1 and Task 2 as much as you need to build confidence and consistency.", zh: "想提交多少篇作文都可以 — 没有每日限制。尽情练习任务一和任务二，建立信心和稳定性。" },
+  pro_unlimited_speaking_title: { en: "Unlimited Speaking Practice", zh: "无限口语练习" },
+  pro_unlimited_speaking_desc: { en: "Practice all three speaking parts without restrictions. Record, transcribe, and get instant AI feedback on every session.", zh: "不受限制地练习所有三个口语部分。录音、转写，每次练习都能获得即时AI反馈。" },
+  pro_deep_analysis_title: { en: "Weekly Deep Analysis Report", zh: "每周深度分析报告" },
+  pro_deep_analysis_desc: { en: "Every week, get a comprehensive report that analyzes all your submissions — identifying patterns, tracking progress, and giving you a personalized study plan.", zh: "每周获得一份综合报告，分析你所有的提交 — 识别规律、追踪进度，并为你提供个性化的学习计划。" },
+  pro_model_essays_title: { en: "Full Model Essay Generation", zh: "完整范文生成" },
+  pro_model_essays_desc: { en: "Get complete band 8-9 model essays for any prompt you practice, with annotations explaining exactly why each part scores high.", zh: "获取你练习过的任何题目的8-9分完整范文，并附有注释解释每个部分为什么得高分。" },
+  pro_pdf_title: { en: "PDF Report Export", zh: "PDF报告导出" },
+  pro_pdf_desc: { en: "Download polished PDF reports of your feedback, progress, and deep analysis. Share them with tutors or keep them for offline review.", zh: "下载精美的PDF反馈报告、进度报告和深度分析报告。可以分享给老师或离线复习。" },
+  pro_priority_title: { en: "Priority AI Feedback", zh: "优先AI反馈" },
+  pro_priority_desc: { en: "Your submissions are processed first. Get faster, more detailed feedback so you can iterate quickly during practice sessions.", zh: "你的提交将被优先处理。获得更快、更详细的反馈，让你在练习中快速迭代。" },
+  pro_ready: { en: "Ready to make the most of your Pro membership?", zh: "准备好充分利用你的Pro会员了吗？" },
+  pro_not_member: { en: "This page is for Pro members only.", zh: "此页面仅限Pro会员查看。" },
+  pro_not_member_cta: { en: "Upgrade to Pro", zh: "升级到Pro" },
 
   // Common
   common_signin: { en: "Please sign in", zh: "请登录" },
