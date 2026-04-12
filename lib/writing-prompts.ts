@@ -388,11 +388,46 @@ export const WRITING_PROMPTS: WritingPrompt[] = [
   },
 ];
 
+const USED_PROMPTS_KEY = "ieltsboost_used_prompts";
+
+function getUsedTopics(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(localStorage.getItem(USED_PROMPTS_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
+function markTopicUsed(topic: string) {
+  if (typeof window === "undefined") return;
+  const used = getUsedTopics();
+  if (!used.includes(topic)) {
+    used.push(topic);
+    localStorage.setItem(USED_PROMPTS_KEY, JSON.stringify(used));
+  }
+}
+
 export function getRandomWritingPrompt(
   taskType?: "task1" | "task2"
 ): WritingPrompt {
   const filtered = taskType
     ? WRITING_PROMPTS.filter((p) => p.taskType === taskType)
     : WRITING_PROMPTS;
-  return filtered[Math.floor(Math.random() * filtered.length)];
+
+  const usedTopics = getUsedTopics();
+  let available = filtered.filter((p) => !usedTopics.includes(p.topic));
+
+  // If all prompts have been used, reset history for this task type
+  if (available.length === 0) {
+    const resetTopics = usedTopics.filter(
+      (t) => !filtered.some((p) => p.topic === t)
+    );
+    localStorage.setItem(USED_PROMPTS_KEY, JSON.stringify(resetTopics));
+    available = filtered;
+  }
+
+  const chosen = available[Math.floor(Math.random() * available.length)];
+  markTopicUsed(chosen.topic);
+  return chosen;
 }

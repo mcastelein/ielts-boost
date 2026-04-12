@@ -29,7 +29,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900">3. 免费与付费服务</h2>
             <p className="mt-2">
-              本平台提供有限的免费使用额度和付费Pro订阅。免费用户每天可提交2篇写作。Pro用户享有无限使用权。订阅费用按月计费。具体价格请参见定价页面。
+              本平台提供有限的免费使用额度和付费Pro订阅。免费用户每个板块每天可提交3次（写作、口语、阅读和听力）。Pro用户享有无限使用权。订阅费用按月计费。具体价格请参见定价页面。
             </p>
           </section>
 
@@ -109,7 +109,7 @@ export default function TermsPage() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900">3. Free and Paid Services</h2>
           <p className="mt-2">
-            The Platform offers a limited free tier and a paid Pro subscription. Free users may submit up to 2 writing tasks per day. Pro subscribers receive unlimited access to all features. Subscriptions are billed monthly. See the pricing page for current rates.
+            The Platform offers a limited free tier and a paid Pro subscription. Free users may submit up to 3 tasks per section per day (Writing, Speaking, Reading, and Listening). Pro subscribers receive unlimited access to all features. Subscriptions are billed monthly. See the pricing page for current rates.
           </p>
         </section>
 

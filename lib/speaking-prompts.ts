@@ -113,9 +113,44 @@ export const SPEAKING_PROMPTS: SpeakingPrompt[] = [
   },
 ];
 
+const USED_SPEAKING_KEY = "ieltsboost_used_speaking";
+
+function getUsedSpeakingTopics(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(localStorage.getItem(USED_SPEAKING_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
+
+function markSpeakingTopicUsed(topic: string) {
+  if (typeof window === "undefined") return;
+  const used = getUsedSpeakingTopics();
+  if (!used.includes(topic)) {
+    used.push(topic);
+    localStorage.setItem(USED_SPEAKING_KEY, JSON.stringify(used));
+  }
+}
+
 export function getRandomPrompt(part?: 1 | 2 | 3): SpeakingPrompt {
   const filtered = part
     ? SPEAKING_PROMPTS.filter((p) => p.part === part)
     : SPEAKING_PROMPTS;
-  return filtered[Math.floor(Math.random() * filtered.length)];
+
+  const usedTopics = getUsedSpeakingTopics();
+  let available = filtered.filter((p) => !usedTopics.includes(p.topic));
+
+  // If all prompts for this part have been used, reset history for this part
+  if (available.length === 0) {
+    const resetTopics = usedTopics.filter(
+      (t) => !filtered.some((p) => p.topic === t)
+    );
+    localStorage.setItem(USED_SPEAKING_KEY, JSON.stringify(resetTopics));
+    available = filtered;
+  }
+
+  const chosen = available[Math.floor(Math.random() * available.length)];
+  markSpeakingTopicUsed(chosen.topic);
+  return chosen;
 }

@@ -171,6 +171,15 @@ export const translations = {
   settings_english: { en: "English", zh: "English" },
   settings_chinese: { en: "中文", zh: "中文" },
   settings_saved: { en: "Settings saved", zh: "设置已保存" },
+  settings_subscription: { en: "Subscription", zh: "订阅" },
+  settings_current_plan: { en: "Current Plan", zh: "当前套餐" },
+  settings_plan_free: { en: "Free", zh: "免费版" },
+  settings_plan_pro: { en: "Pro", zh: "Pro" },
+  settings_plan_free_desc: { en: "2 writing + 2 speaking submissions per day", zh: "每天2次写作 + 2次口语提交" },
+  settings_plan_pro_desc: { en: "Unlimited submissions and all Pro features", zh: "无限提交和所有Pro功能" },
+  settings_manage_subscription: { en: "Manage Subscription", zh: "管理订阅" },
+  settings_manage_desc: { en: "Update payment method, change plan, or cancel", zh: "更新支付方式、更改套餐或取消订阅" },
+  settings_upgrade_cta: { en: "Upgrade to Pro", zh: "升级到Pro" },
 
   // Dashboard cards
   dashboard_coming_soon: { en: "Coming Soon", zh: "即将推出" },
