@@ -117,7 +117,7 @@ export default function AudioRecorder({ onTranscript, disabled }: AudioRecorderP
       {state === "idle" && (
         <button
           onClick={startRecording}
-          className="flex items-center gap-2 rounded-full bg-red-500 px-5 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-red-600 hover:shadow-lg active:scale-95"
+          className="flex items-center gap-2 rounded-full bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-blue-600 hover:shadow-lg active:scale-95"
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
