@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { SPEAKING_PROMPTS, type SpeakingPrompt } from "@/lib/speaking-prompts";
 import AudioRecorder from "@/components/audio-recorder";
 import { useLanguage } from "@/lib/language-context";
+import { createClient } from "@/lib/supabase/client";
 
 interface SpeakingFeedback {
   estimated_band: number;
@@ -36,11 +37,45 @@ export default function SpeakingPage() {
   const [transcriptReady, setTranscriptReady] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [saveWarning, setSaveWarning] = useState(false);
+  const [usageInfo, setUsageInfo] = useState<{ allowed: boolean; used: number; limit: number } | null>(null);
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
   const { t, feedbackLocale } = useLanguage();
 
   const prompts = SPEAKING_PROMPTS.filter((p) => p.part === selectedPart);
+
+  // Check speaking usage limits on mount
+  useEffect(() => {
+    const checkUsage = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: settings } = await supabase
+        .from("user_settings")
+        .select("plan_type")
+        .eq("user_id", user.id)
+        .single();
+
+      if (settings?.plan_type === "pro") {
+        setUsageInfo({ allowed: true, used: 0, limit: Infinity });
+        return;
+      }
+
+      const today = new Date().toISOString().split("T")[0];
+      const { data: usage } = await supabase
+        .from("usage_tracking")
+        .select("speaking_count")
+        .eq("user_id", user.id)
+        .eq("date", today)
+        .single();
+
+      const used = usage?.speaking_count ?? 0;
+      const limit = 3;
+      setUsageInfo({ allowed: used < limit, used, limit });
+    };
+    checkUsage();
+  }, []);
 
   const playTTS = useCallback(async (text: string) => {
     try {
@@ -141,13 +176,26 @@ export default function SpeakingPage() {
         ))}
       </div>
 
+      {/* Usage limit reached banner */}
+      {usageInfo && !usageInfo.allowed && (
+        <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <h3 className="font-semibold text-amber-800">{t("writing_daily_limit")}</h3>
+          <p className="mt-1 text-sm text-amber-700">
+            You&apos;ve used {usageInfo.used}/{usageInfo.limit} free speaking submissions today. Upgrade to Pro for unlimited access.
+          </p>
+        </div>
+      )}
+
       {/* Get prompt button */}
       {!currentPrompt && (
         <button
           onClick={pickRandom}
-          className="mt-6 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+          disabled={usageInfo !== null && !usageInfo.allowed}
+          className="mt-6 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {t("speaking_get_prompt")}
+          {usageInfo && !usageInfo.allowed
+            ? `Daily limit reached (${usageInfo.used}/${usageInfo.limit})`
+            : t("speaking_get_prompt")}
         </button>
       )}
 

@@ -70,7 +70,7 @@ function clearSession() {
 
 export default function WritingPage() {
   const { t, feedbackLocale } = useLanguage();
-  const [taskType, setTaskType] = useState("task2");
+  const [taskType, setTaskType] = useState("");
   const [inputMode, setInputMode] = useState<InputMode>("text");
   const [essay, setEssay] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -80,6 +80,7 @@ export default function WritingPage() {
   const [extractedText, setExtractedText] = useState<string | null>(null);
   const [result, setResult] = useState<FeedbackResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [usageInfo, setUsageInfo] = useState<{ allowed: boolean; used: number; limit: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -98,15 +99,46 @@ export default function WritingPage() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const endTimeRef = useRef<number | null>(null);
 
-  const selectedTask = TASK_TYPES.find((task) => task.value === taskType)!;
+  const selectedTask = TASK_TYPES.find((task) => task.value === taskType);
 
-  // Check for existing session on mount
+  // Check for existing session and usage limits on mount
   useEffect(() => {
     const session = loadSession();
     if (session) {
       setPendingSession(session);
     }
     setSessionLoaded(true);
+
+    // Check writing usage limits
+    const checkUsage = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: settings } = await supabase
+        .from("user_settings")
+        .select("plan_type")
+        .eq("user_id", user.id)
+        .single();
+
+      if (settings?.plan_type === "pro") {
+        setUsageInfo({ allowed: true, used: 0, limit: Infinity });
+        return;
+      }
+
+      const today = new Date().toISOString().split("T")[0];
+      const { data: usage } = await supabase
+        .from("usage_tracking")
+        .select("writing_count")
+        .eq("user_id", user.id)
+        .eq("date", today)
+        .single();
+
+      const used = usage?.writing_count ?? 0;
+      const limit = 3;
+      setUsageInfo({ allowed: used < limit, used, limit });
+    };
+    checkUsage();
   }, []);
 
   // Persist essay text to session as user types
@@ -154,6 +186,7 @@ export default function WritingPage() {
   };
 
   const handleStartPractice = () => {
+    if (!selectedTask) return;
     const endTime = Date.now() + selectedTask.timeMinutes * 60 * 1000;
     endTimeRef.current = endTime;
     setStep("writing");
@@ -203,7 +236,7 @@ export default function WritingPage() {
 
   const activeText = extractedText ?? essay;
   const wordCount = activeText.trim() ? activeText.trim().split(/\s+/).length : 0;
-  const isBelowMin = wordCount > 0 && wordCount < selectedTask.minWords;
+  const isBelowMin = wordCount > 0 && selectedTask != null && wordCount < selectedTask.minWords;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -290,7 +323,7 @@ export default function WritingPage() {
     setTimerRunning(false);
     if (timerRef.current) clearInterval(timerRef.current);
     const timeUsedSeconds = endTimeRef.current
-      ? Math.max(0, Math.round((selectedTask.timeMinutes * 60) - Math.max(0, (endTimeRef.current - Date.now()) / 1000)))
+      ? Math.max(0, Math.round((selectedTask!.timeMinutes * 60) - Math.max(0, (endTimeRef.current - Date.now()) / 1000)))
       : null;
 
     try {
@@ -385,6 +418,16 @@ export default function WritingPage() {
       {/* ── STEP 1: Setup ── */}
       {step === "setup" && (
         <>
+          {/* Usage limit reached banner */}
+          {usageInfo && !usageInfo.allowed && (
+            <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+              <h3 className="font-semibold text-amber-800">{t("writing_daily_limit")}</h3>
+              <p className="mt-1 text-sm text-amber-700">
+                You&apos;ve used {usageInfo.used}/{usageInfo.limit} free writing submissions today. Upgrade to Pro for unlimited access.
+              </p>
+            </div>
+          )}
+
           {/* Task type selector */}
           <div className="mt-6 flex gap-2">
             {TASK_TYPES.map((task) => (
@@ -406,7 +449,8 @@ export default function WritingPage() {
             ))}
           </div>
 
-          {/* Prompt selection */}
+          {/* Prompt selection — only show after task type is chosen */}
+          {taskType && (
           <div className="mt-6 space-y-3">
             <h2 className="text-sm font-semibold text-gray-700">{t("writing_choose_prompt")}</h2>
 
@@ -499,15 +543,20 @@ export default function WritingPage() {
               </p>
             )}
           </div>
+          )}
 
           {/* Start button */}
-          <button
-            onClick={handleStartPractice}
-            disabled={!selectedPrompt && !useOwnTopic}
-            className="mt-6 w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {t("writing_start")} ({selectedTask.timeMinutes} {t("common_min")})
-          </button>
+          {taskType && (
+            <button
+              onClick={handleStartPractice}
+              disabled={(!selectedPrompt && !useOwnTopic) || (usageInfo !== null && !usageInfo.allowed)}
+              className="mt-6 w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {usageInfo && !usageInfo.allowed
+                ? `Daily limit reached (${usageInfo.used}/${usageInfo.limit})`
+                : `${t("writing_start")} (${selectedTask!.timeMinutes} ${t("common_min")})`}
+            </button>
+          )}
         </>
       )}
 
@@ -538,7 +587,7 @@ export default function WritingPage() {
             )}
 
             <span className="text-xs font-medium text-gray-400 uppercase">
-              {selectedTask.label}
+              {selectedTask!.label}
             </span>
           </div>
 
@@ -588,7 +637,7 @@ export default function WritingPage() {
             <textarea
               value={essay}
               onChange={(e) => setEssay(e.target.value)}
-              placeholder={`${t("writing_placeholder")} (${t("writing_min_words")} ${selectedTask.minWords} ${t("writing_words")})...`}
+              placeholder={`${t("writing_placeholder")} (${t("writing_min_words")} ${selectedTask!.minWords} ${t("writing_words")})...`}
               className="mt-4 w-full rounded-lg border border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               rows={16}
             />
@@ -675,7 +724,7 @@ export default function WritingPage() {
               </span>
               {isBelowMin && (
                 <span className="text-xs text-amber-600">
-                  ({t("writing_min_words")} {selectedTask.minWords} — {selectedTask.label})
+                  ({t("writing_min_words")} {selectedTask!.minWords} — {selectedTask!.label})
                 </span>
               )}
             </div>

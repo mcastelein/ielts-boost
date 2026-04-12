@@ -27,13 +27,23 @@ export async function GET(request: Request) {
 
         if (!existing) {
           const isAdmin = ADMIN_EMAILS.includes(user.email ?? "");
-          await supabase.from("user_settings").insert({
-            user_id: user.id,
-            ui_language: "en",
-            feedback_language: "en",
-            plan_type: "free",
-            role: isAdmin ? "admin" : "user",
-          });
+          const { error: insertError } = await supabase
+            .from("user_settings")
+            .insert({
+              user_id: user.id,
+              ui_language: "en",
+              feedback_language: "en",
+              plan_type: "free",
+              role: isAdmin ? "admin" : "user",
+            });
+          if (insertError) {
+            console.error(
+              "Failed to create user_settings for",
+              user.id,
+              user.email,
+              insertError
+            );
+          }
         }
       }
 

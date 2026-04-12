@@ -21,6 +21,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [planType, setPlanType] = useState<string>("free");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { locale, setLocale, t } = useLanguage();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -32,10 +33,11 @@ export default function Navbar() {
       if (data.user) {
         const { data: settings } = await supabase
           .from("user_settings")
-          .select("role")
+          .select("role, plan_type")
           .eq("user_id", data.user.id)
           .single();
         setIsAdmin(settings?.role === "admin");
+        setPlanType(settings?.plan_type ?? "free");
       }
     });
   }, []);
@@ -92,6 +94,16 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           {/* Language dropdown */}
           <LanguageDropdown locale={locale} setLocale={setLocale} />
+
+          {/* Upgrade to Pro */}
+          {planType !== "pro" && (
+            <Link
+              href="/upgrade"
+              className="rounded-md bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+            >
+              {t("nav_upgrade")}
+            </Link>
+          )}
 
           {/* Profile dropdown */}
           <div className="relative" ref={dropdownRef}>

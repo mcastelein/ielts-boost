@@ -14,6 +14,8 @@ create table user_settings (
   feedback_language text default 'en',
   plan_type text default 'free',
   role text default 'user',
+  stripe_customer_id text,
+  stripe_subscription_id text,
   created_at timestamp default now()
 );
 
