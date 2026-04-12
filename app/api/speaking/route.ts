@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { logApiCall } from "@/lib/api-logger";
+import { checkSpeakingUsage, incrementSpeakingUsage } from "@/lib/usage";
 
 const anthropic = new Anthropic();
 
@@ -62,6 +63,27 @@ export async function POST(request: Request) {
   const systemPrompt = feedbackLanguage === "zh" ? SPEAKING_SYSTEM_PROMPT_ZH : SPEAKING_SYSTEM_PROMPT_EN;
 
   try {
+    // Check usage limits
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const usage = await checkSpeakingUsage(supabase, user.id);
+      if (!usage.allowed) {
+        return NextResponse.json(
+          {
+            error: "daily_limit_reached",
+            message: `You've used ${usage.used}/${usage.limit} free speaking submissions today. Upgrade to Pro for unlimited access.`,
+            used: usage.used,
+            limit: usage.limit,
+          },
+          { status: 429 }
+        );
+      }
+    }
+
     const startTime = Date.now();
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
@@ -84,11 +106,6 @@ export async function POST(request: Request) {
     const feedback = JSON.parse(textBlock.text);
 
     // Save to DB if authenticated
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
     let submissionId: string | null = null;
     if (user) {
       // Try insert with new columns, fall back to original columns if they don't exist yet
@@ -147,6 +164,9 @@ export async function POST(request: Request) {
           }
         }
       }
+
+      // Increment speaking usage counter
+      await incrementSpeakingUsage(supabase, user.id);
     }
 
     // Log API usage
