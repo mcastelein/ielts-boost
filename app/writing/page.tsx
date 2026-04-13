@@ -335,6 +335,7 @@ export default function WritingPage() {
           taskType,
           inputType: extractedText ? "image" : "text",
           promptTopic: selectedPrompt?.topic ?? null,
+          promptText: selectedPrompt?.prompt ?? null,
           timeUsedSeconds,
           feedbackLanguage: feedbackLocale,
         }),

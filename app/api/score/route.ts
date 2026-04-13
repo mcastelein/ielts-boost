@@ -5,7 +5,7 @@ import { checkWritingUsage, incrementWritingUsage } from "@/lib/usage";
 import { logApiCall } from "@/lib/api-logger";
 
 export async function POST(request: Request) {
-  const { essay, taskType, feedbackLanguage, inputType, promptTopic, timeUsedSeconds } = await request.json();
+  const { essay, taskType, feedbackLanguage, inputType, promptTopic, promptText, timeUsedSeconds } = await request.json();
 
   if (!essay || !taskType) {
     return NextResponse.json(
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
 
     // Score the essay
     const startTime = Date.now();
-    const feedback = await scoreEssay(essay, taskType, feedbackLanguage);
+    const feedback = await scoreEssay(essay, taskType, feedbackLanguage, promptText || undefined);
     const durationMs = Date.now() - startTime;
 
     // Log API usage
@@ -64,6 +64,7 @@ export async function POST(request: Request) {
           final_text: essay,
           task_type: taskType,
           prompt_topic: promptTopic || null,
+          prompt_text: promptText || null,
           time_used_seconds: timeUsedSeconds || null,
         })
         .select("id")

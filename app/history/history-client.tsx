@@ -10,6 +10,7 @@ interface WritingItem {
   task_type: string;
   input_type: string;
   prompt_topic: string | null;
+  prompt_text: string | null;
   time_used_seconds: number | null;
   created_at: string;
   band: number | null;
@@ -154,6 +155,11 @@ export default function HistoryClient({
                       </span>
                     )}
                   </div>
+                  {item.prompt_text && (
+                    <p className="mt-1.5 text-xs text-gray-500 line-clamp-2">
+                      {item.prompt_text}
+                    </p>
+                  )}
                   <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
                     <span>
                       {new Date(item.created_at).toLocaleDateString()} at{" "}

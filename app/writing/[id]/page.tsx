@@ -26,10 +26,23 @@ export default async function WritingResultPage({
 
   if (!feedback) return notFound();
 
+  // Check if user is Pro for model answer access
+  const { data: { user } } = await supabase.auth.getUser();
+  let isPro = false;
+  if (user) {
+    const { data: settings } = await supabase
+      .from("user_settings")
+      .select("plan_type")
+      .eq("user_id", user.id)
+      .single();
+    isPro = settings?.plan_type === "pro";
+  }
+
   return (
     <WritingDetailClient
       submission={submission}
       feedback={feedback}
+      isPro={isPro}
     />
   );
 }

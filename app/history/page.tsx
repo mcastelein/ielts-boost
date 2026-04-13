@@ -14,7 +14,7 @@ export default async function HistoryPage() {
   const [writingResult, speakingResult, readingResult] = await Promise.all([
     supabase
       .from("writing_submissions")
-      .select("id, task_type, input_type, prompt_topic, time_used_seconds, created_at, writing_feedback(overall_band)")
+      .select("id, task_type, input_type, prompt_topic, prompt_text, time_used_seconds, created_at, writing_feedback(overall_band)")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(50),
@@ -38,6 +38,7 @@ export default async function HistoryPage() {
     task_type: s.task_type as string,
     input_type: s.input_type as string,
     prompt_topic: s.prompt_topic as string | null,
+    prompt_text: s.prompt_text as string | null,
     time_used_seconds: s.time_used_seconds as number | null,
     created_at: s.created_at as string,
     band: Array.isArray(s.writing_feedback) && s.writing_feedback.length > 0

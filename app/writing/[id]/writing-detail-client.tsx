@@ -15,12 +15,14 @@ interface FeedbackJson {
   sentence_corrections: SentenceCorrection[];
   rewrite_example: string;
   top_3_improvements: string[];
+  model_answer?: string;
 }
 
 interface Props {
   submission: {
     task_type: string;
     prompt_topic: string | null;
+    prompt_text: string | null;
     created_at: string;
     time_used_seconds: number | null;
     final_text: string;
@@ -33,9 +35,10 @@ interface Props {
     grammar_score: number;
     feedback_json: FeedbackJson;
   };
+  isPro: boolean;
 }
 
-export default function WritingDetailClient({ submission, feedback }: Props) {
+export default function WritingDetailClient({ submission, feedback, isPro }: Props) {
   const { t } = useLanguage();
   const fb = feedback.feedback_json;
 
@@ -70,6 +73,16 @@ export default function WritingDetailClient({ submission, feedback }: Props) {
           </>
         )}
       </div>
+
+      {/* Question / Prompt */}
+      {submission.prompt_text && (
+        <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
+          <p className="text-xs font-medium text-blue-600">{t("feedback_question")}</p>
+          <p className="mt-1 text-sm leading-relaxed text-blue-900">
+            {submission.prompt_text}
+          </p>
+        </div>
+      )}
 
       {/* Band scores */}
       <div className="mt-6 rounded-xl border border-gray-200 bg-white p-6">
@@ -154,6 +167,40 @@ export default function WritingDetailClient({ submission, feedback }: Props) {
           ))}
         </ol>
       </div>
+
+      {/* Model Answer (Pro only) */}
+      {fb.model_answer && (
+        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-5 relative">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-emerald-800">{t("feedback_model_answer")}</h3>
+            {!isPro && (
+              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                {t("feedback_pro_only")}
+              </span>
+            )}
+          </div>
+          {isPro ? (
+            <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-emerald-900">
+              {fb.model_answer}
+            </p>
+          ) : (
+            <div className="mt-2 relative">
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-emerald-900 line-clamp-3 blur-sm select-none">
+                {fb.model_answer}
+              </p>
+              <div className="mt-3 text-center">
+                <p className="text-sm text-gray-600">{t("feedback_upgrade_model")}</p>
+                <a
+                  href="/settings"
+                  className="mt-2 inline-block rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                >
+                  {t("feedback_upgrade_pro")}
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Original essay */}
       <div className="mt-4 rounded-xl border border-gray-200 bg-white p-5">

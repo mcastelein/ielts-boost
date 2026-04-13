@@ -118,6 +118,11 @@ export const translations = {
   feedback_rewrite: { en: "Higher-Band Rewrite Example", zh: "高分改写示例" },
   feedback_top3: { en: "Top 3 Things to Improve", zh: "最需改进的3项" },
   feedback_your_essay: { en: "Your Essay", zh: "你的作文" },
+  feedback_question: { en: "Question", zh: "题目" },
+  feedback_model_answer: { en: "Model Answer (Band 8-9)", zh: "范文（8-9分）" },
+  feedback_pro_only: { en: "Pro Only", zh: "仅限Pro" },
+  feedback_upgrade_model: { en: "Upgrade to Pro to see the full model answer", zh: "升级Pro查看完整范文" },
+  feedback_upgrade_pro: { en: "Upgrade to Pro", zh: "升级Pro" },
 
   // Speaking page
   speaking_title: { en: "Speaking Practice", zh: "口语练习" },
