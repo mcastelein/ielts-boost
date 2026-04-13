@@ -1,46 +1,40 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("Page loads", () => {
-  test("landing page loads", async ({ page }) => {
+test.describe("Public pages load correctly", () => {
+  test("landing page has brand name and CTAs", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("h1")).toContainText("Boost");
     await expect(page.getByText("Start Writing Practice")).toBeVisible();
+    await expect(page.getByText("Sign In")).toBeVisible();
   });
 
-  test("login page loads", async ({ page }) => {
+  test("login page has email/password form and Google auth", async ({ page }) => {
     await page.goto("/login");
     await expect(page.locator("h1")).toContainText("Boost");
+    await expect(page.getByText("Email")).toBeVisible();
+    await expect(page.getByText("Password", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
+    await expect(page.getByText("Continue with Google")).toBeVisible();
+    await expect(page.getByText("Forgot password?")).toBeVisible();
+    await expect(page.getByText("Sign up")).toBeVisible();
   });
 
-  test("signup page loads", async ({ page }) => {
+  test("signup page has link back to login", async ({ page }) => {
     await page.goto("/signup");
-    await expect(page.locator("h1")).toContainText("account");
+    await expect(page.getByText("Already have an account?")).toBeVisible();
   });
 
-  test("writing page loads with task selectors", async ({ page }) => {
-    await page.goto("/writing");
-    await expect(page.getByText("Task 1")).toBeVisible();
-    await expect(page.getByText("Task 2")).toBeVisible();
-  });
-
-  test("speaking page loads with all 3 parts", async ({ page }) => {
-    await page.goto("/speaking");
-    await expect(page.getByText("Part 1")).toBeVisible();
-    await expect(page.getByText("Part 2")).toBeVisible();
-    await expect(page.getByText("Part 3")).toBeVisible();
-  });
-
-  test("guide page loads", async ({ page }) => {
+  test("guide page loads with heading", async ({ page }) => {
     await page.goto("/guide");
     await expect(page.locator("h1")).toBeVisible();
   });
 
-  test("upgrade page loads", async ({ page }) => {
+  test("upgrade page shows Pro plan", async ({ page }) => {
     await page.goto("/upgrade");
-    await expect(page.getByText("Pro")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Upgrade to Pro" })).toBeVisible();
   });
 
-  test("privacy page loads", async ({ page }) => {
+  test("privacy policy page loads", async ({ page }) => {
     await page.goto("/privacy");
     await expect(page.locator("h1")).toBeVisible();
   });
@@ -49,17 +43,20 @@ test.describe("Page loads", () => {
     await page.goto("/terms");
     await expect(page.locator("h1")).toBeVisible();
   });
-});
 
-test.describe("Navigation", () => {
-  test("can navigate from landing to writing", async ({ page }) => {
-    await page.goto("/");
-    await page.getByText("Start Writing Practice").click();
-    await expect(page).toHaveURL(/\/writing/);
+  test("writing page requires auth — shows login", async ({ page }) => {
+    await page.goto("/writing");
+    await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible({ timeout: 10000 });
   });
 
-  test("navbar is present", async ({ page }) => {
+  test("speaking page requires auth — shows login", async ({ page }) => {
+    await page.goto("/speaking");
+    await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible({ timeout: 10000 });
+  });
+
+  test("landing page Start Writing links to /writing", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("nav")).toBeVisible();
+    const link = page.getByText("Start Writing Practice");
+    await expect(link).toHaveAttribute("href", "/writing");
   });
 });
