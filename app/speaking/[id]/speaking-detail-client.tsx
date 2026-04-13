@@ -63,12 +63,22 @@ export default function SpeakingDetailClient({
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t("speaking_title")}</h1>
-        <Link
-          href="/speaking"
-          className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
-          {t("speaking_new_practice")}
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/speaking"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            {t("speaking_new_practice")}
+          </Link>
+          {submission.part != null && submission.part < 3 && (
+            <Link
+              href={`/speaking?part=${submission.part + 1}`}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              {t("speaking_continue_part")} {submission.part + 1}{t("speaking_continue_part_suffix")}
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500">

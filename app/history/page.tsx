@@ -22,6 +22,7 @@ export default async function HistoryPage() {
       .from("speaking_submissions")
       .select("id, prompt, part, created_at, speaking_feedback(estimated_band, feedback_json)")
       .eq("user_id", user.id)
+      .neq("status", "draft")
       .order("created_at", { ascending: false })
       .limit(50),
     supabase

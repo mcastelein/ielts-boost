@@ -46,12 +46,22 @@ export default function WritingDetailClient({ submission, feedback, isPro }: Pro
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t("feedback_title")}</h1>
-        <Link
-          href="/writing"
-          className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
-          {t("feedback_new_essay")}
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/writing"
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            {t("feedback_new_essay")}
+          </Link>
+          {submission.task_type === "task1" && (
+            <Link
+              href="/writing?task=task2"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+            >
+              {t("writing_continue_task")} 2
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500">

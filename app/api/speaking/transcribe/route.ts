@@ -8,6 +8,8 @@ const openai = new OpenAI();
 export async function POST(request: Request) {
   const formData = await request.formData();
   const audioFile = formData.get("audio") as File | null;
+  const prompt = formData.get("prompt") as string | null;
+  const part = formData.get("part") as string | null;
 
   if (!audioFile) {
     return NextResponse.json({ error: "No audio file provided" }, { status: 400 });
@@ -38,7 +40,31 @@ export async function POST(request: Request) {
       metadata: { fileSizeBytes: audioFile.size },
     });
 
-    return NextResponse.json({ text: transcription.text });
+    // Save draft submission if user is authenticated
+    let draftId: string | null = null;
+    if (user && prompt) {
+      const row: Record<string, unknown> = {
+        user_id: user.id,
+        prompt,
+        response_text: transcription.text,
+        status: "draft",
+      };
+      if (part) row.part = parseInt(part, 10);
+
+      const { data: draft, error: draftError } = await supabase
+        .from("speaking_submissions")
+        .insert(row)
+        .select("id")
+        .single();
+
+      if (draftError) {
+        console.error("Failed to save draft:", draftError.message);
+      } else {
+        draftId = draft.id;
+      }
+    }
+
+    return NextResponse.json({ text: transcription.text, draft_id: draftId });
   } catch (error) {
     console.error("Transcription error:", error);
 

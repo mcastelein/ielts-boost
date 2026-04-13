@@ -3,13 +3,14 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 
 interface AudioRecorderProps {
-  onTranscript: (text: string) => void;
+  onTranscript: (text: string, draftId?: string | null) => void;
   disabled?: boolean;
+  extraFormData?: Record<string, string>;
 }
 
 type RecordingState = "idle" | "recording" | "recorded" | "transcribing";
 
-export default function AudioRecorder({ onTranscript, disabled }: AudioRecorderProps) {
+export default function AudioRecorder({ onTranscript, disabled, extraFormData }: AudioRecorderProps) {
   const [state, setState] = useState<RecordingState>("idle");
   const [elapsed, setElapsed] = useState(0);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -81,6 +82,11 @@ export default function AudioRecorder({ onTranscript, disabled }: AudioRecorderP
     try {
       const formData = new FormData();
       formData.append("audio", audioBlob.current, "recording.webm");
+      if (extraFormData) {
+        for (const [key, value] of Object.entries(extraFormData)) {
+          formData.append(key, value);
+        }
+      }
 
       const res = await fetch("/api/speaking/transcribe", {
         method: "POST",
@@ -90,7 +96,7 @@ export default function AudioRecorder({ onTranscript, disabled }: AudioRecorderP
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      onTranscript(data.text);
+      onTranscript(data.text, data.draft_id ?? null);
       // Reset after successful transcription
       if (audioUrl) URL.revokeObjectURL(audioUrl);
       setAudioUrl(null);
@@ -101,7 +107,7 @@ export default function AudioRecorder({ onTranscript, disabled }: AudioRecorderP
       console.error("Transcription failed:", err);
       setState("recorded"); // Go back so user can retry
     }
-  }, [audioUrl, onTranscript]);
+  }, [audioUrl, onTranscript, extraFormData]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState, useRef, useCallback, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SPEAKING_PROMPTS, type SpeakingPrompt } from "@/lib/speaking-prompts";
 import AudioRecorder from "@/components/audio-recorder";
 import { useLanguage } from "@/lib/language-context";
@@ -27,8 +27,20 @@ interface SpeakingFeedback {
 const PARTS = [1, 2, 3] as const;
 type InputMode = "voice" | "text";
 
-export default function SpeakingPage() {
-  const [selectedPart, setSelectedPart] = useState<1 | 2 | 3>(1);
+export default function SpeakingPageWrapper() {
+  return (
+    <Suspense>
+      <SpeakingPage />
+    </Suspense>
+  );
+}
+
+function SpeakingPage() {
+  const searchParams = useSearchParams();
+  const initialPart = Number(searchParams.get("part"));
+  const [selectedPart, setSelectedPart] = useState<1 | 2 | 3>(
+    initialPart === 1 || initialPart === 2 || initialPart === 3 ? initialPart : 1
+  );
   const [currentPrompt, setCurrentPrompt] = useState<SpeakingPrompt | null>(null);
   const [response, setResponse] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,18 +50,31 @@ export default function SpeakingPage() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [saveWarning, setSaveWarning] = useState(false);
   const [usageInfo, setUsageInfo] = useState<{ allowed: boolean; used: number; limit: number } | null>(null);
+  const [completedPrompts, setCompletedPrompts] = useState<Set<string>>(new Set());
+  const [draftId, setDraftId] = useState<string | null>(null);
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
   const { t, feedbackLocale } = useLanguage();
 
   const prompts = SPEAKING_PROMPTS.filter((p) => p.part === selectedPart);
 
-  // Check speaking usage limits on mount
+  // Check speaking usage limits and fetch completed prompts on mount
   useEffect(() => {
-    const checkUsage = async () => {
+    const init = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Fetch completed prompt questions to avoid repeats
+      const { data: submissions } = await supabase
+        .from("speaking_submissions")
+        .select("prompt")
+        .eq("user_id", user.id)
+        .eq("status", "completed");
+
+      if (submissions) {
+        setCompletedPrompts(new Set(submissions.map((s) => s.prompt)));
+      }
 
       const { data: settings } = await supabase
         .from("user_settings")
@@ -74,7 +99,7 @@ export default function SpeakingPage() {
       const limit = 3;
       setUsageInfo({ allowed: used < limit, used, limit });
     };
-    checkUsage();
+    init();
   }, []);
 
   const playTTS = useCallback(async (text: string) => {
@@ -101,19 +126,26 @@ export default function SpeakingPage() {
   }, []);
 
   const pickRandom = () => {
-    const filtered = prompts;
-    const pick = filtered[Math.floor(Math.random() * filtered.length)];
+    // Filter out prompts the user has already completed
+    let available = prompts.filter((p) => !completedPrompts.has(p.question));
+    // If all prompts for this part are done, allow any prompt again
+    if (available.length === 0) available = prompts;
+    const pick = available[Math.floor(Math.random() * available.length)];
     setCurrentPrompt(pick);
     setResponse("");
     setFeedback(null);
     setTranscriptReady(false);
+    setDraftId(null);
   };
+
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     if (!currentPrompt || !response.trim() || isSubmitting) return;
     setIsSubmitting(true);
     setFeedback(null);
     setSaveWarning(false);
+    setSubmitError(null);
 
     try {
       const res = await fetch("/api/speaking", {
@@ -124,10 +156,16 @@ export default function SpeakingPage() {
           response: response.trim(),
           part: selectedPart,
           feedbackLanguage: feedbackLocale,
+          draft_id: draftId,
         }),
       });
 
       const data = await res.json();
+
+      if (!res.ok) {
+        setSubmitError(data.message || data.error || "Failed to evaluate response. Please try again.");
+        return;
+      }
 
       if (data.submission_id) {
         router.push(`/speaking/${data.submission_id}`);
@@ -135,12 +173,15 @@ export default function SpeakingPage() {
       }
 
       // Unauthenticated or DB save failed — show inline
-      setFeedback(data);
-      if (!data.submission_id) {
+      if (data.estimated_band != null || data.strengths) {
+        setFeedback(data);
         setSaveWarning(true);
+      } else {
+        setSubmitError("Unexpected response from server. Please try again.");
       }
     } catch (err) {
       console.error("Speaking submission failed:", err);
+      setSubmitError("Network error. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -164,6 +205,7 @@ export default function SpeakingPage() {
               setResponse("");
               setFeedback(null);
               setTranscriptReady(false);
+              setDraftId(null);
             }}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               selectedPart === p
@@ -257,10 +299,15 @@ export default function SpeakingPage() {
           {inputMode === "voice" && !transcriptReady && (
             <div className="mt-4 flex flex-col items-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 py-10">
               <AudioRecorder
-                onTranscript={(text) => {
+                onTranscript={(text, savedDraftId) => {
                   setResponse(text);
                   setTranscriptReady(true);
+                  if (savedDraftId) setDraftId(savedDraftId);
                 }}
+                extraFormData={currentPrompt ? {
+                  prompt: currentPrompt.question,
+                  part: String(selectedPart),
+                } : undefined}
               />
               <p className="mt-3 text-xs text-gray-400">
                 {t("speaking_record_note")}
@@ -305,6 +352,13 @@ export default function SpeakingPage() {
               rows={8}
               spellCheck={false}
             />
+          )}
+
+          {/* Error message */}
+          {submitError && (
+            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {submitError}
+            </div>
           )}
 
           {/* Submit button - show when there's text to submit */}

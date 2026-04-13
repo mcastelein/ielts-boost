@@ -73,6 +73,7 @@ create table speaking_submissions (
   user_id uuid,
   prompt text,
   response_text text,
+  status text not null default 'completed',
   created_at timestamp default now()
 );
 

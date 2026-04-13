@@ -2,6 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 
 const FREE_DAILY_WRITING_LIMIT = 3;
 const FREE_DAILY_SPEAKING_LIMIT = 3;
+const FREE_DAILY_READING_LIMIT = 3;
 
 export async function checkWritingUsage(
   supabase: SupabaseClient,

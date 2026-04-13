@@ -120,6 +120,7 @@ export async function fetchSpeakingDashboardData(
       "id, prompt, part, created_at, speaking_feedback(estimated_band, fluency_score, lexical_score, grammar_score, pronunciation_score, feedback_json)"
     )
     .eq("user_id", userId)
+    .neq("status", "draft")
     .order("created_at", { ascending: true });
 
   const rows = (raw ?? []) as Array<{

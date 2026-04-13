@@ -155,6 +155,9 @@ export const translations = {
   speaking_answer_this: { en: "Answer This", zh: "回答这个问题" },
   speaking_try_again: { en: "Try Again", zh: "再试一次" },
   speaking_new_practice: { en: "New Practice", zh: "新练习" },
+  speaking_continue_part: { en: "Continue to Part", zh: "继续第" },
+  speaking_continue_part_suffix: { en: "", zh: "部分" },
+  writing_continue_task: { en: "Continue to Task", zh: "继续Task " },
   speaking_your_response: { en: "Your Response", zh: "你的回答" },
   speaking_prompt_label: { en: "Prompt", zh: "题目" },
 

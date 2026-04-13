@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState, useRef, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   WritingPrompt,
@@ -68,9 +68,19 @@ function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
-export default function WritingPage() {
+export default function WritingPageWrapper() {
+  return (
+    <Suspense>
+      <WritingPage />
+    </Suspense>
+  );
+}
+
+function WritingPage() {
   const { t, feedbackLocale } = useLanguage();
-  const [taskType, setTaskType] = useState("");
+  const searchParams = useSearchParams();
+  const initialTask = searchParams.get("task");
+  const [taskType, setTaskType] = useState(initialTask === "task1" || initialTask === "task2" ? initialTask : "");
   const [inputMode, setInputMode] = useState<InputMode>("text");
   const [essay, setEssay] = useState("");
   const [file, setFile] = useState<File | null>(null);

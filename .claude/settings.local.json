@@ -1,13 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run:*)",
-      "Bash(npm install:*)",
-      "WebSearch",
-      "WebFetch(domain:ielts.org)",
-      "WebFetch(domain:ielts.idp.com)",
-      "Bash(npx tsc:*)",
-      "Bash(npx next:*)"
+      "Bash(npx next:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

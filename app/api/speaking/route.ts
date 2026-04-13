@@ -51,7 +51,7 @@ const SPEAKING_SYSTEM_PROMPT_ZH = `你是一名雅思口语考官。请评估考
 请用清晰、自然、适合学生理解的中文表达。不要声称这是官方雅思评分。`;
 
 export async function POST(request: Request) {
-  const { prompt, response, part, feedbackLanguage = "en" } = await request.json();
+  const { prompt, response, part, feedbackLanguage = "en", draft_id } = await request.json();
 
   if (!prompt || !response) {
     return NextResponse.json(
@@ -108,39 +108,66 @@ export async function POST(request: Request) {
     // Save to DB if authenticated
     let submissionId: string | null = null;
     if (user) {
-      // Try insert with new columns, fall back to original columns if they don't exist yet
-      const submissionRow: Record<string, unknown> = {
-        user_id: user.id,
-        prompt,
-        response_text: response,
-      };
-      if (part != null) submissionRow.part = part;
+      // If we have a draft, update it; otherwise insert a new row
+      let finalSubmissionId: string | null = null;
 
-      let { data: submission, error: subError } = await supabase
-        .from("speaking_submissions")
-        .insert(submissionRow)
-        .select("id")
-        .single();
-
-      // If insert failed (likely due to missing 'part' column), retry without it
-      if (subError && part != null) {
-        console.warn("Speaking submission insert failed, retrying without part column:", subError.message);
-        ({ data: submission, error: subError } = await supabase
+      if (draft_id) {
+        // Update existing draft to completed
+        const { data: updated, error: updateError } = await supabase
           .from("speaking_submissions")
-          .insert({ user_id: user.id, prompt, response_text: response })
+          .update({ response_text: response, status: "completed" })
+          .eq("id", draft_id)
+          .eq("user_id", user.id)
           .select("id")
-          .single());
+          .single();
+
+        if (updateError) {
+          console.error("Failed to update draft:", updateError.message);
+        } else {
+          finalSubmissionId = updated.id;
+        }
       }
 
-      if (subError) {
-        console.error("Speaking submission insert failed:", subError.message);
+      // If no draft or draft update failed, insert a new row
+      if (!finalSubmissionId) {
+        const submissionRow: Record<string, unknown> = {
+          user_id: user.id,
+          prompt,
+          response_text: response,
+          status: "completed",
+        };
+        if (part != null) submissionRow.part = part;
+
+        let { data: submission, error: subError } = await supabase
+          .from("speaking_submissions")
+          .insert(submissionRow)
+          .select("id")
+          .single();
+
+        // If insert failed (likely due to missing column), retry without optional columns
+        if (subError && part != null) {
+          console.warn("Speaking submission insert failed, retrying without part column:", subError.message);
+          ({ data: submission, error: subError } = await supabase
+            .from("speaking_submissions")
+            .insert({ user_id: user.id, prompt, response_text: response, status: "completed" })
+            .select("id")
+            .single());
+        }
+
+        if (subError) {
+          console.error("Speaking submission insert failed:", subError.message);
+        }
+
+        if (submission) {
+          finalSubmissionId = submission.id;
+        }
       }
 
-      if (submission) {
-        submissionId = submission.id;
+      if (finalSubmissionId) {
+        submissionId = finalSubmissionId;
 
         const feedbackRow: Record<string, unknown> = {
-          submission_id: submission.id,
+          submission_id: finalSubmissionId,
           feedback_json: feedback,
         };
         // Only include extra columns if they have values — they may not exist in DB yet
@@ -156,7 +183,7 @@ export async function POST(request: Request) {
         if (fbError) {
           console.warn("Speaking feedback insert failed, retrying with minimal columns:", fbError.message);
           const { error: fbRetryError } = await supabase.from("speaking_feedback").insert({
-            submission_id: submission.id,
+            submission_id: finalSubmissionId,
             feedback_json: feedback,
           });
           if (fbRetryError) {
