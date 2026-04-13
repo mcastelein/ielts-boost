@@ -12,10 +12,10 @@ This is a service to help learners prepare for the IELTS exam. Users can develop
 
 IELTS has 4 sections:
 
-Listening — 4 parts, 40 questions, ~30 minutes. You listen to recordings (conversations, monologues) and answer questions.
-Reading — 3 passages, 40 questions, 60 minutes. Academic version uses complex texts; General Training uses more everyday content.
-Writing — 2 tasks, 60 minutes. Academic: describe a graph/chart + write an essay. General Training: write a letter + an essay.
-Speaking — 3 parts, 11–14 minutes. A face-to-face interview with an examiner: intro/interview, a short talk on a topic, then a discussion.
+ * Listening — 4 parts, 40 questions, ~30 minutes. You listen to recordings (conversations, monologues) and answer questions.
+ * Reading — 3 passages, 40 questions, 60 minutes. Academic version uses complex texts; General Training uses more everyday content.
+ * Writing — 2 tasks, 60 minutes. Academic: describe a graph/chart + write an essay. General Training: write a letter + an essay.
+ * Speaking — 3 parts, 11–14 minutes. A face-to-face interview with an examiner: intro/interview, a short talk on a topic, then a discussion.
 
 ## Site Structure
 
