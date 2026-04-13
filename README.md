@@ -1,6 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## What is IELTS-Boost?
+
+This is a service to help learners prepare for the IELTS exam. Users can develop their skills across Listening, Reading, Writing, and Speaking using the following cycle:
+
+1. Practice with real questions from previous IELTS exams
+2. Receive personalize AI feedback, along with a band score
+3. Track your progress using the history, and personalized dashboard, then repeat  
+
+## IELTS Structure
+
+<a href="https://www.youtube.com/watch?v=tOFm-zoI6-w"><img width="741" height="498" alt="image" src="https://github.com/user-attachments/assets/8762919d-0c4b-4493-80aa-1a5e48f264cc" /></a>
+
+IELTS has 4 sections:
+
+Listening — 4 parts, 40 questions, ~30 minutes. You listen to recordings (conversations, monologues) and answer questions.
+Reading — 3 passages, 40 questions, 60 minutes. Academic version uses complex texts; General Training uses more everyday content.
+Writing — 2 tasks, 60 minutes. Academic: describe a graph/chart + write an essay. General Training: write a letter + an essay.
+Speaking — 3 parts, 11–14 minutes. A face-to-face interview with an examiner: intro/interview, a short talk on a topic, then a discussion.
+
+## Site Structure
+
+Users can develop their skills within each of the 4 categories using the following cycle
+
+1. Answer questions
+
 
 ## Getting Started
+
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 First, run the development server:
 
