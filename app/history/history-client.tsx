@@ -24,16 +24,30 @@ interface SpeakingItem {
   band: number | null;
 }
 
-type HistoryItem = WritingItem | SpeakingItem;
-type FilterType = "all" | "writing" | "speaking";
+interface ReadingItem {
+  id: string;
+  type: "reading";
+  passage_title: string;
+  passage_slug: string;
+  time_used_seconds: number | null;
+  created_at: string;
+  band: number | null;
+  raw_score: number | null;
+  total_questions: number | null;
+}
+
+type HistoryItem = WritingItem | SpeakingItem | ReadingItem;
+type FilterType = "all" | "writing" | "speaking" | "reading";
 
 export default function HistoryClient({
   writingItems,
   speakingItems,
+  readingItems,
   authenticated,
 }: {
   writingItems: WritingItem[];
   speakingItems: SpeakingItem[];
+  readingItems: ReadingItem[];
   authenticated: boolean;
 }) {
   const [filter, setFilter] = useState<FilterType>("all");
@@ -51,6 +65,7 @@ export default function HistoryClient({
   const allItems: HistoryItem[] = [
     ...writingItems,
     ...speakingItems,
+    ...readingItems,
   ].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
@@ -66,10 +81,11 @@ export default function HistoryClient({
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  const filters: { key: FilterType; labelKey: "history_all" | "history_writing" | "history_speaking" }[] = [
-    { key: "all", labelKey: "history_all" },
-    { key: "writing", labelKey: "history_writing" },
-    { key: "speaking", labelKey: "history_speaking" },
+  const filters: { key: FilterType; label: string }[] = [
+    { key: "all", label: t("history_all") },
+    { key: "writing", label: t("history_writing") },
+    { key: "speaking", label: t("history_speaking") },
+    { key: "reading", label: t("history_reading") },
   ];
 
   return (
@@ -88,7 +104,7 @@ export default function HistoryClient({
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            {t(f.labelKey)}
+            {f.label}
           </button>
         ))}
       </div>
@@ -162,39 +178,89 @@ export default function HistoryClient({
               );
             }
 
-            // Speaking item
+            if (item.type === "speaking") {
+              return (
+                <Link
+                  key={`s-${item.id}`}
+                  href={`/speaking/${item.id}`}
+                  className="block rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-purple-200 hover:bg-purple-50/30"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
+                        {t("history_speaking")}
+                      </span>
+                      {item.part && (
+                        <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                          {t("speaking_part")} {item.part}{t("speaking_part_suffix")}
+                        </span>
+                      )}
+                      <span className="text-sm font-medium text-gray-900 line-clamp-1">
+                        {item.prompt}
+                      </span>
+                    </div>
+                    {item.band !== null && (
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-600 text-sm font-bold text-white">
+                        {item.band}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-2 text-xs text-gray-500">
+                    {new Date(item.created_at).toLocaleDateString()} at{" "}
+                    {new Date(item.created_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                </Link>
+              );
+            }
+
+            // Reading item
             return (
               <Link
-                key={`s-${item.id}`}
-                href={`/speaking/${item.id}`}
-                className="block rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-purple-200 hover:bg-purple-50/30"
+                key={`r-${item.id}`}
+                href={`/reading/${item.id}`}
+                className="block rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-cyan-200 hover:bg-cyan-50/30"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="rounded bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
-                      {t("history_speaking")}
+                    <span className="rounded bg-cyan-100 px-2 py-1 text-xs font-medium text-cyan-700">
+                      {t("history_reading")}
                     </span>
-                    {item.part && (
-                      <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                        {t("speaking_part")} {item.part}{t("speaking_part_suffix")}
-                      </span>
-                    )}
-                    <span className="text-sm font-medium text-gray-900 line-clamp-1">
-                      {item.prompt}
+                    <span className="text-sm font-medium text-gray-900">
+                      {item.passage_title}
                     </span>
                   </div>
-                  {item.band !== null && (
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-600 text-sm font-bold text-white">
-                      {item.band}
+                  <div className="flex items-center gap-2">
+                    {item.raw_score !== null && item.total_questions !== null && (
+                      <span className="text-xs text-gray-400">
+                        {item.raw_score}/{item.total_questions}
+                      </span>
+                    )}
+                    {item.band !== null && (
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-600 text-sm font-bold text-white">
+                        {item.band}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
+                  <span>
+                    {new Date(item.created_at).toLocaleDateString()} at{" "}
+                    {new Date(item.created_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                  {item.time_used_seconds !== null && (
+                    <span className="flex items-center gap-1">
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+                      </svg>
+                      {formatTime(item.time_used_seconds)}
                     </span>
                   )}
-                </div>
-                <div className="mt-2 text-xs text-gray-500">
-                  {new Date(item.created_at).toLocaleDateString()} at{" "}
-                  {new Date(item.created_at).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
                 </div>
               </Link>
             );

@@ -298,6 +298,7 @@ It should feel premium, not cluttered.
 - top right language toggle
 - clean writing submission experience
 - editable OCR preview before scoring
+- all textareas must have `spellCheck={false}` to suppress browser spell check underlines
 
 ### Backend considerations
 Need support for:

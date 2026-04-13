@@ -14,6 +14,7 @@ const navLinks: { href: string; labelKey: TranslationKey }[] = [
   { href: "/guide", labelKey: "nav_guide" },
   { href: "/writing", labelKey: "nav_writing" },
   { href: "/speaking", labelKey: "nav_speaking" },
+  { href: "/reading", labelKey: "nav_reading" },
   { href: "/history", labelKey: "nav_history" },
 ];
 

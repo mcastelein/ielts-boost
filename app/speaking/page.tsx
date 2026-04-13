@@ -279,6 +279,7 @@ export default function SpeakingPage() {
                 onChange={(e) => setResponse(e.target.value)}
                 className="mt-1 w-full rounded-lg border border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 rows={6}
+                spellCheck={false}
               />
               <div className="mt-2 flex items-center gap-2">
                 <button
@@ -302,6 +303,7 @@ export default function SpeakingPage() {
               placeholder={t("speaking_placeholder")}
               className="mt-4 w-full rounded-lg border border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               rows={8}
+              spellCheck={false}
             />
           )}
 

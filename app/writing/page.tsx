@@ -640,6 +640,7 @@ export default function WritingPage() {
               placeholder={`${t("writing_placeholder")} (${t("writing_min_words")} ${selectedTask!.minWords} ${t("writing_words")})...`}
               className="mt-4 w-full rounded-lg border border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               rows={10}
+              spellCheck={false}
             />
           )}
 
@@ -708,6 +709,7 @@ export default function WritingPage() {
                 onChange={(e) => setExtractedText(e.target.value)}
                 className="mt-2 w-full rounded-lg border border-gray-300 bg-white p-4 text-sm leading-relaxed text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 rows={12}
+                spellCheck={false}
               />
             </div>
           )}

@@ -7,6 +7,7 @@ import ScoreCard from "./ScoreCard";
 import ExpandableSection from "./ExpandableSection";
 import WritingDetail from "./WritingDetail";
 import SpeakingDetail from "./SpeakingDetail";
+import ReadingDetail from "./ReadingDetail";
 import Encouragement from "./Encouragement";
 import type { SectionDashboardData } from "@/lib/dashboard-data";
 
@@ -15,9 +16,10 @@ type Section = "writing" | "speaking" | "reading" | "listening" | null;
 interface DashboardClientProps {
   writing: SectionDashboardData;
   speaking: SectionDashboardData;
+  reading: SectionDashboardData;
 }
 
-export default function DashboardClient({ writing, speaking }: DashboardClientProps) {
+export default function DashboardClient({ writing, speaking, reading }: DashboardClientProps) {
   const [expanded, setExpanded] = useState<Section>(null);
   const { t } = useLanguage();
 
@@ -82,14 +84,16 @@ export default function DashboardClient({ writing, speaking }: DashboardClientPr
         <div>
           <ScoreCard
             sectionName="Reading"
-            latestScore={null}
-            avgScore={null}
-            submissionCount={0}
-            trend={null}
-            isExpanded={false}
-            onToggle={() => {}}
-            comingSoon
+            latestScore={reading.latestScore}
+            avgScore={reading.avgScore}
+            submissionCount={reading.submissions.length}
+            trend={reading.trend}
+            isExpanded={expanded === "reading"}
+            onToggle={() => toggle("reading")}
           />
+          <ExpandableSection isExpanded={expanded === "reading"}>
+            <ReadingDetail data={reading} />
+          </ExpandableSection>
         </div>
 
         <div>
