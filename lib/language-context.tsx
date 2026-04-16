@@ -18,8 +18,8 @@ const UI_LANG_KEY = "ieltsboost_ui_lang";
 const FEEDBACK_LANG_KEY = "ieltsboost_feedback_lang";
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("en");
-  const [feedbackLocale, setFeedbackLocaleState] = useState<Locale>("en");
+  const [locale, setLocaleState] = useState<Locale>("zh");
+  const [feedbackLocale, setFeedbackLocaleState] = useState<Locale>("zh");
   const [loaded, setLoaded] = useState(false);
 
   // Load from localStorage on mount
