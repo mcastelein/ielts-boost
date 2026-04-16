@@ -48,6 +48,8 @@ interface WritingSession {
   essay: string;
   endTime: number; // absolute timestamp in ms
   useOwnTopic: boolean;
+  timerEnabled?: boolean;
+  startTime?: number;
 }
 
 function saveSession(session: WritingSession) {
@@ -102,12 +104,16 @@ function WritingPage() {
   const [showPromptList, setShowPromptList] = useState(false);
   const [pendingSession, setPendingSession] = useState<WritingSession | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
+  const [timerEnabled, setTimerEnabled] = useState(false);
+
+  const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
 
   // Timer state
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [timerRunning, setTimerRunning] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const endTimeRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
 
   const selectedTask = TASK_TYPES.find((task) => task.value === taskType);
 
@@ -119,11 +125,23 @@ function WritingPage() {
     }
     setSessionLoaded(true);
 
-    // Check writing usage limits
+    // Check writing usage limits and fetch completed prompts
     const checkUsage = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Fetch completed prompt topics to avoid repeats
+      const { data: submissions } = await supabase
+        .from("writing_submissions")
+        .select("prompt_topic")
+        .eq("user_id", user.id);
+
+      if (submissions) {
+        setCompletedTopics(new Set(
+          submissions.map((s) => s.prompt_topic).filter(Boolean)
+        ));
+      }
 
       const { data: settings } = await supabase
         .from("user_settings")
@@ -153,16 +171,18 @@ function WritingPage() {
 
   // Persist essay text to session as user types
   useEffect(() => {
-    if (step === "writing" && endTimeRef.current) {
+    if (step === "writing") {
       saveSession({
         taskType,
         prompt: selectedPrompt,
         essay,
-        endTime: endTimeRef.current,
+        endTime: endTimeRef.current ?? 0,
         useOwnTopic,
+        timerEnabled,
+        startTime: startTimeRef.current ?? undefined,
       });
     }
-  }, [essay, step, taskType, selectedPrompt, useOwnTopic]);
+  }, [essay, step, taskType, selectedPrompt, useOwnTopic, timerEnabled]);
 
   // Auto-scroll to feedback when result appears
   useEffect(() => {
@@ -197,17 +217,34 @@ function WritingPage() {
 
   const handleStartPractice = () => {
     if (!selectedTask) return;
-    const endTime = Date.now() + selectedTask.timeMinutes * 60 * 1000;
-    endTimeRef.current = endTime;
+    const now = Date.now();
+    startTimeRef.current = now;
     setStep("writing");
-    setTimerRunning(true);
-    saveSession({
-      taskType,
-      prompt: selectedPrompt,
-      essay: "",
-      endTime,
-      useOwnTopic,
-    });
+    if (timerEnabled) {
+      const endTime = now + selectedTask.timeMinutes * 60 * 1000;
+      endTimeRef.current = endTime;
+      setTimerRunning(true);
+      saveSession({
+        taskType,
+        prompt: selectedPrompt,
+        essay: "",
+        endTime,
+        useOwnTopic,
+        timerEnabled: true,
+        startTime: now,
+      });
+    } else {
+      endTimeRef.current = null;
+      saveSession({
+        taskType,
+        prompt: selectedPrompt,
+        essay: "",
+        endTime: 0,
+        useOwnTopic,
+        timerEnabled: false,
+        startTime: now,
+      });
+    }
   };
 
   const handleContinueSession = () => {
@@ -216,9 +253,14 @@ function WritingPage() {
     setSelectedPrompt(pendingSession.prompt);
     setUseOwnTopic(pendingSession.useOwnTopic);
     setEssay(pendingSession.essay);
-    endTimeRef.current = pendingSession.endTime;
+    startTimeRef.current = pendingSession.startTime ?? null;
+    const sessionTimerEnabled = pendingSession.timerEnabled ?? true; // backward compat: old sessions had timer always on
+    setTimerEnabled(sessionTimerEnabled);
+    if (sessionTimerEnabled && pendingSession.endTime) {
+      endTimeRef.current = pendingSession.endTime;
+      setTimerRunning(true);
+    }
     setStep("writing");
-    setTimerRunning(true);
     setPendingSession(null);
   };
 
@@ -232,10 +274,12 @@ function WritingPage() {
     setTimerRunning(false);
     setTimeLeft(null);
     endTimeRef.current = null;
+    startTimeRef.current = null;
     if (timerRef.current) clearInterval(timerRef.current);
     setEssay("");
     setResult(null);
     setError(null);
+    setTimerEnabled(false);
     clearSession();
     clearFile();
   };
@@ -332,8 +376,8 @@ function WritingPage() {
     // Stop the timer and calculate time used
     setTimerRunning(false);
     if (timerRef.current) clearInterval(timerRef.current);
-    const timeUsedSeconds = endTimeRef.current
-      ? Math.max(0, Math.round((selectedTask!.timeMinutes * 60) - Math.max(0, (endTimeRef.current - Date.now()) / 1000)))
+    const timeUsedSeconds = startTimeRef.current
+      ? Math.round((Date.now() - startTimeRef.current) / 1000)
       : null;
 
     try {
@@ -371,6 +415,14 @@ function WritingPage() {
       setIsSubmitting(false);
     }
   };
+
+  // Auto-submit when timer expires
+  useEffect(() => {
+    if (timerEnabled && timeLeft === 0 && !isSubmitting && step === "writing") {
+      handleSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft]);
 
   const clearFile = () => {
     setFile(null);
@@ -460,6 +512,28 @@ function WritingPage() {
             ))}
           </div>
 
+          {/* Timer toggle */}
+          {taskType && (
+            <div className="mt-4 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setTimerEnabled((v) => !v)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${
+                  timerEnabled ? "bg-blue-600" : "bg-gray-200"
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                    timerEnabled ? "translate-x-5" : "translate-x-0"
+                  }`}
+                />
+              </button>
+              <span className="text-sm text-gray-700">
+                {t("writing_enable_timer")} ({selectedTask!.timeMinutes} {t("common_min")})
+              </span>
+            </div>
+          )}
+
           {/* Prompt selection — only show after task type is chosen */}
           {taskType && (
           <div className="mt-6 space-y-3">
@@ -469,7 +543,7 @@ function WritingPage() {
               <button
                 onClick={() => {
                   setSelectedPrompt(
-                    getRandomWritingPrompt(taskType as "task1" | "task2")
+                    getRandomWritingPrompt(taskType as "task1" | "task2", completedTopics)
                   );
                   setUseOwnTopic(false);
                   setShowPromptList(false);
@@ -523,6 +597,9 @@ function WritingPage() {
                     }`}
                   >
                     <span className="font-medium">{p.topic}</span>
+                    {completedTopics.has(p.topic) && (
+                      <span className="ml-2 text-xs text-green-600">&#10003;</span>
+                    )}
                     <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">
                       {p.prompt}
                     </p>
@@ -565,7 +642,7 @@ function WritingPage() {
             >
               {usageInfo && !usageInfo.allowed
                 ? `Daily limit reached (${usageInfo.used}/${usageInfo.limit})`
-                : `${t("writing_start")} (${selectedTask!.timeMinutes} ${t("common_min")})`}
+                : t("writing_start")}
             </button>
           )}
         </>
@@ -574,7 +651,7 @@ function WritingPage() {
       {/* ── STEP 2: Writing ── */}
       {step === "writing" && (
         <>
-          {/* Timer bar */}
+          {/* Top bar */}
           <div className="sticky top-0 z-10 mt-4 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
             <button
               onClick={handleBackToSetup}
@@ -583,7 +660,7 @@ function WritingPage() {
               &larr; {t("writing_back")}
             </button>
 
-            {timeLeft !== null && (
+            {timerEnabled && timeLeft !== null && (
               <span
                 className={`text-lg font-mono font-bold ${
                   timeLeft <= 300
@@ -752,7 +829,7 @@ function WritingPage() {
           </div>
 
           {/* Time's up notice */}
-          {timeLeft === 0 && (
+          {timerEnabled && timeLeft === 0 && (
             <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {t("writing_times_up_note")}
             </div>
