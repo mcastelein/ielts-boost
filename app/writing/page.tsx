@@ -135,7 +135,8 @@ function WritingPage() {
       const { data: submissions } = await supabase
         .from("writing_submissions")
         .select("prompt_topic")
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .eq("status", "completed");
 
       if (submissions) {
         setCompletedTopics(new Set(

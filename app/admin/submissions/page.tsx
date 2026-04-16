@@ -36,11 +36,39 @@ interface SpeakingSub {
   }[];
 }
 
+interface ReadingSub {
+  id: string;
+  user_id: string;
+  user_email: string | null;
+  user_name: string | null;
+  passage_title: string;
+  passage_slug: string;
+  answers_json: Record<string, string>;
+  time_used_seconds: number | null;
+  created_at: string;
+  reading_feedback: {
+    band_score: number | null;
+    raw_score: number;
+    total_questions: number;
+    question_results: Record<string, unknown>;
+  }[];
+}
+
+type SubType = "writing" | "speaking" | "reading" | "listening";
+
+const TABS: { value: SubType; label: string }[] = [
+  { value: "writing", label: "Writing" },
+  { value: "speaking", label: "Speaking" },
+  { value: "reading", label: "Reading" },
+  { value: "listening", label: "Listening" },
+];
+
 export default function SubmissionsPage() {
-  const [type, setType] = useState<"writing" | "speaking">("writing");
+  const [type, setType] = useState<SubType>("writing");
   const [taskTypeFilter, setTaskTypeFilter] = useState("");
   const [writingSubs, setWritingSubs] = useState<WritingSub[]>([]);
   const [speakingSubs, setSpeakingSubs] = useState<SpeakingSub[]>([]);
+  const [readingSubs, setReadingSubs] = useState<ReadingSub[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -48,21 +76,28 @@ export default function SubmissionsPage() {
   const perPage = 20;
 
   useEffect(() => {
+    if (type === "listening") {
+      setLoading(false);
+      setTotal(0);
+      return;
+    }
     fetchData();
   }, [type, page, taskTypeFilter]);
 
   const fetchData = async () => {
     setLoading(true);
     const params = new URLSearchParams({ type, page: page.toString() });
-    if (taskTypeFilter) params.set("task_type", taskTypeFilter);
+    if (taskTypeFilter && type === "writing") params.set("task_type", taskTypeFilter);
 
     const res = await fetch(`/api/admin/submissions?${params}`);
     if (res.ok) {
       const data = await res.json();
       if (type === "writing") {
         setWritingSubs(data.submissions);
-      } else {
+      } else if (type === "speaking") {
         setSpeakingSubs(data.submissions);
+      } else if (type === "reading") {
+        setReadingSubs(data.submissions);
       }
       setTotal(data.total);
     }
@@ -78,22 +113,17 @@ export default function SubmissionsPage() {
       <div className="flex items-center gap-4">
         <h2 className="text-lg font-semibold text-gray-900">Submissions</h2>
         <div className="flex gap-1 rounded-lg bg-gray-100 p-0.5">
-          <button
-            onClick={() => { setType("writing"); setPage(1); }}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              type === "writing" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"
-            }`}
-          >
-            Writing
-          </button>
-          <button
-            onClick={() => { setType("speaking"); setPage(1); }}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              type === "speaking" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"
-            }`}
-          >
-            Speaking
-          </button>
+          {TABS.map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => { setType(tab.value); setPage(1); }}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                type === tab.value ? "bg-white text-gray-900 shadow-sm" : "text-gray-500"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
         {type === "writing" && (
           <select
@@ -106,12 +136,21 @@ export default function SubmissionsPage() {
             <option value="task2">Task 2</option>
           </select>
         )}
-        <span className="text-sm text-gray-500">{total} total</span>
+        {type !== "listening" && (
+          <span className="text-sm text-gray-500">{total} total</span>
+        )}
       </div>
 
-      {loading ? (
+      {/* Listening placeholder */}
+      {type === "listening" && (
+        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center">
+          <p className="text-sm text-gray-500">Listening module coming soon.</p>
+        </div>
+      )}
+
+      {type !== "listening" && loading ? (
         <p className="text-gray-500">Loading...</p>
-      ) : (
+      ) : type !== "listening" && (
         <>
           {/* Writing submissions */}
           {type === "writing" && (
@@ -221,6 +260,71 @@ export default function SubmissionsPage() {
                               <h4 className="mb-1 text-xs font-medium uppercase text-gray-500">AI Feedback</h4>
                               <pre className="max-h-80 overflow-auto rounded bg-gray-50 p-3 text-xs text-gray-700">
                                 {JSON.stringify(fb.feedback_json, null, 2)}
+                              </pre>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* Reading submissions */}
+          {type === "reading" && (
+            <div className="space-y-3">
+              {readingSubs.length === 0 ? (
+                <p className="text-gray-400">No submissions found.</p>
+              ) : (
+                readingSubs.map((sub) => {
+                  const fb = sub.reading_feedback?.[0];
+                  const isExpanded = expandedId === sub.id;
+                  return (
+                    <div key={sub.id} className="rounded-lg border border-gray-200 bg-white">
+                      <div
+                        className="flex cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-50"
+                        onClick={() => setExpandedId(isExpanded ? null : sub.id)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                            {sub.passage_title}
+                          </span>
+                          {fb && (
+                            <span className="text-sm font-bold text-gray-900">
+                              Band {fb.band_score}
+                            </span>
+                          )}
+                          {fb && (
+                            <span className="text-xs text-gray-500">
+                              {fb.raw_score}/{fb.total_questions} correct
+                            </span>
+                          )}
+                          <span className="text-sm text-gray-600">{resolveUser(sub)}</span>
+                        </div>
+                        <span className="text-xs text-gray-400">
+                          {new Date(sub.created_at).toLocaleString()}
+                        </span>
+                      </div>
+                      {isExpanded && (
+                        <div className="border-t border-gray-100 px-4 py-4">
+                          {sub.time_used_seconds != null && (
+                            <p className="mb-3 text-sm text-gray-500">
+                              Time: {Math.floor(sub.time_used_seconds / 60)}m {sub.time_used_seconds % 60}s
+                            </p>
+                          )}
+                          <div className="mb-4 rounded bg-gray-50 p-3">
+                            <h4 className="mb-1 text-xs font-medium uppercase text-gray-500">Answers</h4>
+                            <pre className="max-h-40 overflow-auto text-xs text-gray-700">
+                              {JSON.stringify(sub.answers_json, null, 2)}
+                            </pre>
+                          </div>
+                          {fb?.question_results && (
+                            <div>
+                              <h4 className="mb-1 text-xs font-medium uppercase text-gray-500">Question Results</h4>
+                              <pre className="max-h-80 overflow-auto rounded bg-gray-50 p-3 text-xs text-gray-700">
+                                {JSON.stringify(fb.question_results, null, 2)}
                               </pre>
                             </div>
                           )}

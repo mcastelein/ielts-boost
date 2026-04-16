@@ -48,7 +48,13 @@ const SPEAKING_SYSTEM_PROMPT_ZH = `你是一名雅思口语考官。请评估考
   "follow_up_question": "<考官可能会根据考生回答提出的自然追问>"
 }
 
-请用清晰、自然、适合学生理解的中文表达。不要声称这是官方雅思评分。`;
+重要：这是英语考试。以下内容必须用英语写：
+- "improved_response"（改进后的回答）
+- "better_phrases"（更好的表达）
+- "follow_up_question"（追问问题）
+其余所有反馈、评估和解释请用清晰、自然、适合学生理解的中文表达。
+
+不要声称这是官方雅思评分。`;
 
 export async function POST(request: Request) {
   const { prompt, response, part, feedbackLanguage = "en", draft_id } = await request.json();
@@ -84,6 +90,44 @@ export async function POST(request: Request) {
       }
     }
 
+    // Save draft immediately before AI call so the submission is never lost
+    let submissionId: string | null = null;
+    if (user) {
+      if (draft_id) {
+        // Draft already exists from client — just use it
+        submissionId = draft_id;
+      } else {
+        // Create a new draft row
+        const submissionRow: Record<string, unknown> = {
+          user_id: user.id,
+          prompt,
+          response_text: response,
+          status: "draft",
+        };
+        if (part != null) submissionRow.part = part;
+
+        let { data: submission, error: subError } = await supabase
+          .from("speaking_submissions")
+          .insert(submissionRow)
+          .select("id")
+          .single();
+
+        if (subError && part != null) {
+          ({ data: submission, error: subError } = await supabase
+            .from("speaking_submissions")
+            .insert({ user_id: user.id, prompt, response_text: response, status: "draft" })
+            .select("id")
+            .single());
+        }
+
+        if (subError) {
+          console.error("Failed to save draft speaking submission:", subError.message);
+        } else if (submission) {
+          submissionId = submission.id;
+        }
+      }
+    }
+
     const startTime = Date.now();
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
@@ -105,90 +149,35 @@ export async function POST(request: Request) {
     const durationMs = Date.now() - startTime;
     const feedback = JSON.parse(textBlock.text);
 
-    // Save to DB if authenticated
-    let submissionId: string | null = null;
-    if (user) {
-      // If we have a draft, update it; otherwise insert a new row
-      let finalSubmissionId: string | null = null;
+    // Save feedback and mark submission as completed
+    if (user && submissionId) {
+      // Update the draft row: set final response text and mark completed
+      await supabase
+        .from("speaking_submissions")
+        .update({ response_text: response, status: "completed" })
+        .eq("id", submissionId)
+        .eq("user_id", user.id);
 
-      if (draft_id) {
-        // Update existing draft to completed
-        const { data: updated, error: updateError } = await supabase
-          .from("speaking_submissions")
-          .update({ response_text: response, status: "completed" })
-          .eq("id", draft_id)
-          .eq("user_id", user.id)
-          .select("id")
-          .single();
+      const feedbackRow: Record<string, unknown> = {
+        submission_id: submissionId,
+        feedback_json: feedback,
+      };
+      if (feedback.estimated_band != null) feedbackRow.estimated_band = feedback.estimated_band;
+      if (feedback.fluency_score != null) feedbackRow.fluency_score = feedback.fluency_score;
+      if (feedback.lexical_score != null) feedbackRow.lexical_score = feedback.lexical_score;
+      if (feedback.grammar_score != null) feedbackRow.grammar_score = feedback.grammar_score;
+      if (feedback.pronunciation_score != null) feedbackRow.pronunciation_score = feedback.pronunciation_score;
 
-        if (updateError) {
-          console.error("Failed to update draft:", updateError.message);
-        } else {
-          finalSubmissionId = updated.id;
-        }
-      }
+      const { error: fbError } = await supabase.from("speaking_feedback").insert(feedbackRow);
 
-      // If no draft or draft update failed, insert a new row
-      if (!finalSubmissionId) {
-        const submissionRow: Record<string, unknown> = {
-          user_id: user.id,
-          prompt,
-          response_text: response,
-          status: "completed",
-        };
-        if (part != null) submissionRow.part = part;
-
-        let { data: submission, error: subError } = await supabase
-          .from("speaking_submissions")
-          .insert(submissionRow)
-          .select("id")
-          .single();
-
-        // If insert failed (likely due to missing column), retry without optional columns
-        if (subError && part != null) {
-          console.warn("Speaking submission insert failed, retrying without part column:", subError.message);
-          ({ data: submission, error: subError } = await supabase
-            .from("speaking_submissions")
-            .insert({ user_id: user.id, prompt, response_text: response, status: "completed" })
-            .select("id")
-            .single());
-        }
-
-        if (subError) {
-          console.error("Speaking submission insert failed:", subError.message);
-        }
-
-        if (submission) {
-          finalSubmissionId = submission.id;
-        }
-      }
-
-      if (finalSubmissionId) {
-        submissionId = finalSubmissionId;
-
-        const feedbackRow: Record<string, unknown> = {
-          submission_id: finalSubmissionId,
+      if (fbError) {
+        console.warn("Speaking feedback insert failed, retrying with minimal columns:", fbError.message);
+        const { error: fbRetryError } = await supabase.from("speaking_feedback").insert({
+          submission_id: submissionId,
           feedback_json: feedback,
-        };
-        // Only include extra columns if they have values — they may not exist in DB yet
-        if (feedback.estimated_band != null) feedbackRow.estimated_band = feedback.estimated_band;
-        if (feedback.fluency_score != null) feedbackRow.fluency_score = feedback.fluency_score;
-        if (feedback.lexical_score != null) feedbackRow.lexical_score = feedback.lexical_score;
-        if (feedback.grammar_score != null) feedbackRow.grammar_score = feedback.grammar_score;
-        if (feedback.pronunciation_score != null) feedbackRow.pronunciation_score = feedback.pronunciation_score;
-
-        const { error: fbError } = await supabase.from("speaking_feedback").insert(feedbackRow);
-
-        // If feedback insert failed (likely missing columns), retry with just the original columns
-        if (fbError) {
-          console.warn("Speaking feedback insert failed, retrying with minimal columns:", fbError.message);
-          const { error: fbRetryError } = await supabase.from("speaking_feedback").insert({
-            submission_id: finalSubmissionId,
-            feedback_json: feedback,
-          });
-          if (fbRetryError) {
-            console.error("Speaking feedback insert failed on retry:", fbRetryError.message);
-          }
+        });
+        if (fbRetryError) {
+          console.error("Speaking feedback insert failed on retry:", fbRetryError.message);
         }
       }
 

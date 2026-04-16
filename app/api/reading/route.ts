@@ -61,6 +61,30 @@ export async function POST(request: Request) {
       }
     }
 
+    // ── Step 0: Save draft immediately so the submission is never lost ──────
+    let submissionId: string | null = null;
+    if (user) {
+      const { data: submission, error: subError } = await supabase
+        .from("reading_submissions")
+        .insert({
+          user_id: user.id,
+          passage_slug: passage.id,
+          passage_title: passage.title,
+          exam_type: passage.examType,
+          answers_json: answers,
+          time_used_seconds: timeUsedSeconds ?? null,
+          status: "draft",
+        })
+        .select("id")
+        .single();
+
+      if (subError) {
+        console.error("Failed to save draft reading submission:", subError);
+      } else {
+        submissionId = submission.id;
+      }
+    }
+
     // ── Step 1: Deterministic scoring ────────────────────────────────────────
     const allQuestions = passage.questionGroups.flatMap((g) => g.questions);
     const results: ScoredResults = {};
@@ -230,43 +254,29 @@ Rules:
       },
     });
 
-    // ── Step 5: Save to DB if authenticated ───────────────────────────────────
-    let submissionId: string | null = null;
-    if (user) {
-      const { data: submission, error: subError } = await supabase
-        .from("reading_submissions")
+    // ── Step 5: Save feedback and mark submission as completed ──────────────
+    if (user && submissionId) {
+      const { error: fbError } = await supabase
+        .from("reading_feedback")
         .insert({
-          user_id: user.id,
-          passage_slug: passage.id,
-          passage_title: passage.title,
-          exam_type: passage.examType,
-          answers_json: answers,
-          time_used_seconds: timeUsedSeconds ?? null,
-        })
-        .select("id")
-        .single();
+          submission_id: submissionId,
+          raw_score: rawScore,
+          total_questions: totalQuestions,
+          band_score: bandScore,
+          question_results: results,
+        });
 
-      if (subError) {
-        console.error("Failed to save reading submission:", subError);
-      } else {
-        submissionId = submission.id;
-
-        const { error: fbError } = await supabase
-          .from("reading_feedback")
-          .insert({
-            submission_id: submission.id,
-            raw_score: rawScore,
-            total_questions: totalQuestions,
-            band_score: bandScore,
-            question_results: results,
-          });
-
-        if (fbError) {
-          console.error("Failed to save reading feedback:", fbError);
-        }
-
-        await incrementReadingUsage(supabase, user.id);
+      if (fbError) {
+        console.error("Failed to save reading feedback:", fbError);
       }
+
+      // Mark as completed
+      await supabase
+        .from("reading_submissions")
+        .update({ status: "completed" })
+        .eq("id", submissionId);
+
+      await incrementReadingUsage(supabase, user.id);
     }
 
     return NextResponse.json({

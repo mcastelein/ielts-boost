@@ -44,6 +44,7 @@ export async function fetchWritingDashboardData(
       "id, task_type, created_at, writing_feedback(overall_band, task_score, coherence_score, lexical_score, grammar_score, feedback_json)"
     )
     .eq("user_id", userId)
+    .neq("status", "draft")
     .order("created_at", { ascending: true });
 
   const rows = (raw ?? []) as Array<{
@@ -201,6 +202,7 @@ export async function fetchReadingDashboardData(
       "id, passage_title, passage_slug, created_at, reading_feedback(raw_score, total_questions, band_score)"
     )
     .eq("user_id", userId)
+    .neq("status", "draft")
     .order("created_at", { ascending: true });
 
   const rows = (raw ?? []) as Array<{

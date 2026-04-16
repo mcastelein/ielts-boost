@@ -36,6 +36,31 @@ export async function POST(request: Request) {
       }
     }
 
+    // Save draft immediately before AI call so the submission is never lost
+    let submissionId: string | null = null;
+    if (user) {
+      const { data: submission, error: subError } = await supabase
+        .from("writing_submissions")
+        .insert({
+          user_id: user.id,
+          input_type: inputType || "text",
+          final_text: essay,
+          task_type: taskType,
+          prompt_topic: promptTopic || null,
+          prompt_text: promptText || null,
+          time_used_seconds: timeUsedSeconds || null,
+          status: "draft",
+        })
+        .select("id")
+        .single();
+
+      if (subError) {
+        console.error("Failed to save draft submission:", subError);
+      } else {
+        submissionId = submission.id;
+      }
+    }
+
     // Score the essay
     const startTime = Date.now();
     const feedback = await scoreEssay(essay, taskType, feedbackLanguage, promptText || undefined);
@@ -53,47 +78,32 @@ export async function POST(request: Request) {
       metadata: { taskType, feedbackLanguage, inputType: inputType || "text" },
     });
 
-    // Save submission and feedback if user is authenticated
-    let submissionId: string | null = null;
-    if (user) {
-      const { data: submission, error: subError } = await supabase
-        .from("writing_submissions")
+    // Save feedback and mark submission as completed
+    if (user && submissionId) {
+      const { error: fbError } = await supabase
+        .from("writing_feedback")
         .insert({
-          user_id: user.id,
-          input_type: inputType || "text",
-          final_text: essay,
-          task_type: taskType,
-          prompt_topic: promptTopic || null,
-          prompt_text: promptText || null,
-          time_used_seconds: timeUsedSeconds || null,
-        })
-        .select("id")
-        .single();
+          submission_id: submissionId,
+          overall_band: feedback.overall_band,
+          task_score: feedback.task_score,
+          coherence_score: feedback.coherence_score,
+          lexical_score: feedback.lexical_score,
+          grammar_score: feedback.grammar_score,
+          feedback_json: feedback.feedback,
+        });
 
-      if (subError) {
-        console.error("Failed to save submission:", subError);
-      } else {
-        submissionId = submission.id;
-
-        const { error: fbError } = await supabase
-          .from("writing_feedback")
-          .insert({
-            submission_id: submission.id,
-            overall_band: feedback.overall_band,
-            task_score: feedback.task_score,
-            coherence_score: feedback.coherence_score,
-            lexical_score: feedback.lexical_score,
-            grammar_score: feedback.grammar_score,
-            feedback_json: feedback.feedback,
-          });
-
-        if (fbError) {
-          console.error("Failed to save feedback:", fbError);
-        }
-
-        // Increment usage counter
-        await incrementWritingUsage(supabase, user.id);
+      if (fbError) {
+        console.error("Failed to save feedback:", fbError);
       }
+
+      // Mark as completed
+      await supabase
+        .from("writing_submissions")
+        .update({ status: "completed" })
+        .eq("id", submissionId);
+
+      // Increment usage counter
+      await incrementWritingUsage(supabase, user.id);
     }
 
     return NextResponse.json({ ...feedback, submission_id: submissionId });

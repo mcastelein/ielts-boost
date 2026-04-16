@@ -16,6 +16,7 @@ export default async function HistoryPage() {
       .from("writing_submissions")
       .select("id, task_type, input_type, prompt_topic, prompt_text, time_used_seconds, created_at, writing_feedback(overall_band)")
       .eq("user_id", user.id)
+      .neq("status", "draft")
       .order("created_at", { ascending: false })
       .limit(50),
     supabase
@@ -29,6 +30,7 @@ export default async function HistoryPage() {
       .from("reading_submissions")
       .select("id, passage_title, passage_slug, time_used_seconds, created_at, reading_feedback(band_score, raw_score, total_questions)")
       .eq("user_id", user.id)
+      .neq("status", "draft")
       .order("created_at", { ascending: false })
       .limit(50),
   ]);
