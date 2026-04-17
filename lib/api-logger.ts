@@ -16,7 +16,8 @@ export type ApiCallType =
   | "speaking_score"
   | "transcribe"
   | "tts"
-  | "reading_score";
+  | "reading_score"
+  | "listening_score";
 
 interface LogApiCallParams {
   supabase: SupabaseClient;

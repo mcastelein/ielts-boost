@@ -19,9 +19,12 @@ const ACADEMIC_BAND_TABLE: [number, number][] = [
   [4, 2.5],
 ];
 
-export function rawToBand(rawScore: number): number {
+export function rawToBand(rawScore: number, totalQuestions = 40): number {
+  const scaled = totalQuestions === 40
+    ? rawScore
+    : Math.round((rawScore / totalQuestions) * 40);
   for (const [threshold, band] of ACADEMIC_BAND_TABLE) {
-    if (rawScore >= threshold) return band;
+    if (scaled >= threshold) return band;
   }
   return 2.0;
 }

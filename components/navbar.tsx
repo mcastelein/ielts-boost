@@ -12,10 +12,13 @@ import LanguageDropdown from "@/components/language-dropdown";
 const navLinks: { href: string; labelKey: TranslationKey }[] = [
   { href: "/dashboard", labelKey: "nav_dashboard" },
   { href: "/guide", labelKey: "nav_guide" },
-  { href: "/writing", labelKey: "nav_writing" },
-  { href: "/speaking", labelKey: "nav_speaking" },
+];
+
+const practiceLinks: { href: string; labelKey: TranslationKey }[] = [
   { href: "/reading", labelKey: "nav_reading" },
-  { href: "/history", labelKey: "nav_history" },
+  { href: "/writing", labelKey: "nav_writing" },
+  { href: "/listening", labelKey: "nav_listening" },
+  { href: "/speaking", labelKey: "nav_speaking" },
 ];
 
 export default function Navbar() {
@@ -24,9 +27,11 @@ export default function Navbar() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [planType, setPlanType] = useState<string>("free");
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [practiceDropdownOpen, setPracticeDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { locale, setLocale, t } = useLanguage();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const practiceDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -44,20 +49,24 @@ export default function Navbar() {
     });
   }, []);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (practiceDropdownRef.current && !practiceDropdownRef.current.contains(e.target as Node)) {
+        setPracticeDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Close mobile menu on route change
+  // Close menus on route change
   useEffect(() => {
     setMobileMenuOpen(false);
+    setPracticeDropdownOpen(false);
   }, [pathname]);
 
   if (!user) return null;
@@ -84,7 +93,7 @@ export default function Navbar() {
             IELTS<span className="text-blue-600">Boost</span>
           </Link>
           {/* Desktop nav links */}
-          <div className="hidden gap-1 md:flex">
+          <div className="hidden items-center gap-1 md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -98,6 +107,62 @@ export default function Navbar() {
                 {t(link.labelKey)}
               </Link>
             ))}
+
+            {/* Practice dropdown */}
+            <div className="relative" ref={practiceDropdownRef}>
+              <button
+                onClick={() => setPracticeDropdownOpen((prev) => !prev)}
+                className={`flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  practiceLinks.some((l) => pathname.startsWith(l.href))
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                {t("nav_practice")}
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`transition-transform ${practiceDropdownOpen ? "rotate-180" : ""}`}
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+
+              {practiceDropdownOpen && (
+                <div className="absolute left-0 top-full z-50 mt-1 w-40 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                  {practiceLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className={`flex items-center px-4 py-2 text-sm font-medium transition-colors ${
+                        pathname.startsWith(link.href)
+                          ? "bg-blue-50 text-blue-700"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {t(link.labelKey)}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <Link
+              href="/history"
+              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                pathname.startsWith("/history")
+                  ? "bg-blue-50 text-blue-700"
+                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+              }`}
+            >
+              {t("nav_history")}
+            </Link>
           </div>
         </div>
 
@@ -234,6 +299,25 @@ export default function Navbar() {
                 {t(link.labelKey)}
               </Link>
             ))}
+            {/* Practice section */}
+            <div className="pt-1">
+              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                {t("nav_practice")}
+              </p>
+              {practiceLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`block rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
+                    pathname.startsWith(link.href)
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                >
+                  {t(link.labelKey)}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       )}

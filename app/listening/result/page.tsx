@@ -4,28 +4,29 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
 import { createClient } from "@/lib/supabase/client";
-import type { ReadingPassage } from "@/lib/reading-passages";
+import type { ListeningTrack } from "@/lib/listening-tracks";
 import type { ScoredResults } from "@/lib/reading-scoring";
 
 interface InlineResult {
-  passage: ReadingPassage;
+  track: ListeningTrack;
   raw_score: number;
   total_questions: number;
   band_score: number;
   question_results: ScoredResults;
 }
 
-export default function ReadingResultPage() {
+export default function ListeningResultPage() {
   const { t } = useLanguage();
   const [result, setResult] = useState<InlineResult | null>(null);
+  const [transcriptOpen, setTranscriptOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     try {
-      const raw = sessionStorage.getItem("reading_inline_result");
+      const raw = sessionStorage.getItem("listening_inline_result");
       if (raw) {
         setResult(JSON.parse(raw));
-        sessionStorage.removeItem("reading_inline_result");
+        sessionStorage.removeItem("listening_inline_result");
       }
     } catch {
       // ignore
@@ -43,8 +44,8 @@ export default function ReadingResultPage() {
     return (
       <div className="mx-auto max-w-4xl px-4 py-8">
         <p className="text-gray-500">No results found.</p>
-        <Link href="/reading" className="mt-4 inline-block text-blue-600 hover:underline">
-          ← Back to Reading
+        <Link href="/listening" className="mt-4 inline-block text-purple-600 hover:underline">
+          ← Back to Listening
         </Link>
       </div>
     );
@@ -65,22 +66,22 @@ export default function ReadingResultPage() {
         </div>
       )}
 
-      <h1 className="text-2xl font-bold text-gray-900">{t("reading_feedback_title")}</h1>
-      <p className="mt-1 text-sm text-gray-500">{result.passage.title}</p>
+      <h1 className="text-2xl font-bold text-gray-900">{t("listening_feedback_title")}</h1>
+      <p className="mt-1 text-sm text-gray-500">{result.track.title}</p>
 
       {/* Score cards */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-6">
           <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
-            {t("reading_band_score")}
+            {t("listening_band_score")}
           </span>
-          <div className="mt-3 flex h-20 w-20 items-center justify-center rounded-full bg-blue-600 text-3xl font-bold text-white">
+          <div className="mt-3 flex h-20 w-20 items-center justify-center rounded-full bg-purple-600 text-3xl font-bold text-white">
             {result.band_score}
           </div>
         </div>
         <div className="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-6">
           <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
-            {t("reading_raw_score")}
+            {t("listening_raw_score")}
           </span>
           <p className="mt-3 text-4xl font-bold text-gray-900">
             {result.raw_score}
@@ -89,7 +90,7 @@ export default function ReadingResultPage() {
           <div className="mt-3 w-full">
             <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
               <div
-                className="h-2 rounded-full bg-blue-500"
+                className="h-2 rounded-full bg-purple-500"
                 style={{ width: `${accuracy}%` }}
               />
             </div>
@@ -100,10 +101,10 @@ export default function ReadingResultPage() {
 
       {/* Question-by-question results */}
       <div className="mt-8 space-y-6">
-        {result.passage.questionGroups.map((group, gi) => (
+        {result.track.questionGroups.map((group, gi) => (
           <div key={gi}>
-            <div className="rounded-t-lg border border-blue-100 bg-blue-50 px-4 py-3">
-              <p className="text-xs font-medium text-blue-800">{group.instruction}</p>
+            <div className="rounded-t-lg border border-purple-100 bg-purple-50 px-4 py-3">
+              <p className="text-xs font-medium text-purple-800">{group.instruction}</p>
             </div>
             <div className="divide-y divide-gray-100 rounded-b-lg border border-t-0 border-gray-200 bg-white">
               {group.questions.map((q) => {
@@ -128,20 +129,16 @@ export default function ReadingResultPage() {
                           <span className="mr-1.5 font-semibold text-gray-500">
                             {questionCounter}.
                           </span>
-                          {q.type === "matching_headings"
-                            ? `Paragraph ${(q as { paragraphLabel: string }).paragraphLabel}`
-                            : "text" in q
-                            ? q.text
-                            : ""}
+                          {"text" in q ? q.text : ""}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-4 text-xs">
                           <span className={`font-medium ${r.correct ? "text-green-700" : "text-red-600"}`}>
-                            {t("reading_your_answer")}:{" "}
+                            {t("listening_your_answer")}:{" "}
                             <span className="font-mono">{r.user_answer || "—"}</span>
                           </span>
                           {!r.correct && (
                             <span className="font-medium text-gray-700">
-                              {t("reading_correct_answer")}:{" "}
+                              {t("listening_correct_answer")}:{" "}
                               <span className="font-mono text-green-700">{r.correct_answer}</span>
                             </span>
                           )}
@@ -159,12 +156,33 @@ export default function ReadingResultPage() {
         ))}
       </div>
 
+      {/* Transcript reveal */}
+      <div className="mt-8 rounded-xl border border-gray-200 bg-white">
+        <button
+          type="button"
+          onClick={() => setTranscriptOpen((v) => !v)}
+          className="flex w-full items-center justify-between px-5 py-4 text-left"
+        >
+          <span className="font-semibold text-gray-900">{t("listening_transcript_title")}</span>
+          <span className="text-sm text-purple-600">
+            {transcriptOpen ? t("listening_transcript_hide") : t("listening_transcript_show")}
+          </span>
+        </button>
+        {transcriptOpen && (
+          <div className="border-t border-gray-100 px-5 py-4">
+            <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+              {result.track.transcript}
+            </p>
+          </div>
+        )}
+      </div>
+
       <div className="mt-8 flex gap-3">
         <Link
-          href="/reading"
-          className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+          href="/listening"
+          className="rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-purple-700"
         >
-          {t("reading_practice_again")}
+          {t("listening_practice_again")}
         </Link>
         {isLoggedIn === false && (
           <Link

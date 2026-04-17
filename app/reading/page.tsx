@@ -16,7 +16,7 @@ type Step = "setup" | "practice";
 
 export default function ReadingPage() {
   const router = useRouter();
-  const { t, feedbackLocale } = useLanguage();
+  const { t, locale } = useLanguage();
 
   // ── Setup state ──────────────────────────────────────────────────────────
   const [step, setStep] = useState<Step>("setup");
@@ -113,7 +113,7 @@ export default function ReadingPage() {
           passageId: selectedPassage.id,
           answers,
           timeUsedSeconds: timeUsed,
-          feedbackLanguage: feedbackLocale,
+          feedbackLanguage: locale,
         }),
       });
 

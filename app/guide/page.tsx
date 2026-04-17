@@ -52,24 +52,6 @@ export default function GuidePage() {
         {activeSection === "speaking" && <SpeakingSection />}
       </div>
 
-      {/* CTA */}
-      <div className="mt-8 rounded-xl bg-blue-50 p-6 text-center sm:mt-12 sm:p-8">
-        <h2 className="text-lg font-bold text-gray-900 sm:text-xl">{t("guide_practice_cta")}</h2>
-        <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href="/writing"
-            className="w-full rounded-lg bg-blue-600 px-6 py-3 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 sm:w-auto"
-          >
-            {t("guide_start_writing")}
-          </Link>
-          <Link
-            href="/speaking"
-            className="w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto"
-          >
-            {t("guide_start_speaking")}
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }
@@ -276,6 +258,18 @@ function WritingSection() {
           )}
         </ul>
       </SectionCard>
+
+      <div className="rounded-xl bg-blue-50 p-6">
+        <h3 className="text-base font-semibold text-gray-900">{t("guide_practice_cta")}</h3>
+        <div className="mt-3">
+          <Link
+            href="/writing"
+            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+          >
+            {t("guide_start_writing")}
+          </Link>
+        </div>
+      </div>
     </>
   );
 }
@@ -346,6 +340,18 @@ function SpeakingSection() {
           )}
         </ul>
       </SectionCard>
+
+      <div className="rounded-xl bg-blue-50 p-6">
+        <h3 className="text-base font-semibold text-gray-900">{t("guide_practice_cta")}</h3>
+        <div className="mt-3">
+          <Link
+            href="/speaking"
+            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+          >
+            {t("guide_start_speaking")}
+          </Link>
+        </div>
+      </div>
     </>
   );
 }
