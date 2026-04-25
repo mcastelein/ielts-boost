@@ -650,6 +650,39 @@ export const translations = {
   landing_pricing_bundle_3mo_save: { en: "Save 17%", zh: "节省 17%" },
   landing_pricing_bundle_6mo_save: { en: "Save 25%", zh: "节省 25%" },
   landing_pricing_pro_cta: { en: "Choose a plan", zh: "选择方案" },
+
+  // Landing — FAQ
+  landing_faq_title: { en: "Frequently asked questions", zh: "常见问题" },
+  landing_faq_q1: { en: "Is the AI scoring accurate?", zh: "AI 评分准确吗？" },
+  landing_faq_a1: {
+    en: "We use the official IELTS band descriptors as the scoring rubric and calibrate against published example essays. Like any AI grader, scores are an estimate — but they're consistent enough to track real improvement over time.",
+    zh: "我们使用官方雅思评分描述作为评分标准，并根据公开的样本作文进行校准。和任何 AI 评分一样，分数是估计值——但足够一致，能够真实反映你随时间的进步。",
+  },
+  landing_faq_q2: { en: "Can I use this from China?", zh: "我在中国能用吗？" },
+  landing_faq_a2: {
+    en: "Yes. IELTSBoost works without a VPN. The site is hosted in a way that's reliably accessible from mainland China.",
+    zh: "可以。IELTSBoost 无需 VPN 即可使用，部署方式确保中国大陆可以稳定访问。",
+  },
+  landing_faq_q3: { en: "Do you cover all four sections?", zh: "四个部分都覆盖吗？" },
+  landing_faq_a3: {
+    en: "Yes — Writing, Speaking, Reading, and Listening are all available today.",
+    zh: "是的——写作、口语、阅读和听力都已上线。",
+  },
+  landing_faq_q4: { en: "Can I cancel Pro anytime?", zh: "Pro 版可以随时取消吗？" },
+  landing_faq_a4: {
+    en: "Yes. Pro is structured as a one-time purchase that adds days to your account, not an auto-renewing subscription. Nothing renews unless you choose to.",
+    zh: "可以。Pro 版采用一次性购买的方式延长账户使用期，不是自动续费订阅。除非你主动选择，否则不会续费。",
+  },
+  landing_faq_q5: { en: "How does the bilingual feedback work?", zh: "中英文反馈是怎么实现的？" },
+  landing_faq_a5: {
+    en: "You can independently set the UI language and the feedback language. Many learners prefer Chinese explanations even while studying English — both are first-class.",
+    zh: "你可以分别设置界面语言和反馈语言。许多学习者在学习英文的同时偏好中文讲解——两者都是同等重要的体验。",
+  },
+  landing_faq_q6: { en: "Is my data private?", zh: "我的数据是隐私的吗？" },
+  landing_faq_a6: {
+    en: "Your essays and submissions are visible only to you. We don't share or sell your content. See our privacy policy for details.",
+    zh: "你的作文和提交内容只有你自己可以查看。我们不会分享或出售你的内容。详情见隐私政策。",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

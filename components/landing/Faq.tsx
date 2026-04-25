@@ -1,12 +1,51 @@
-// components/landing/Faq.tsx
+"use client";
+
+import { useState } from "react";
+import { useLanguage } from "@/lib/language-context";
+import type { TranslationKey } from "@/lib/translations";
+
+const items: { qKey: TranslationKey; aKey: TranslationKey }[] = [
+  { qKey: "landing_faq_q1", aKey: "landing_faq_a1" },
+  { qKey: "landing_faq_q2", aKey: "landing_faq_a2" },
+  { qKey: "landing_faq_q3", aKey: "landing_faq_a3" },
+  { qKey: "landing_faq_q4", aKey: "landing_faq_a4" },
+  { qKey: "landing_faq_q5", aKey: "landing_faq_a5" },
+  { qKey: "landing_faq_q6", aKey: "landing_faq_a6" },
+];
+
 export default function Faq() {
+  const { t } = useLanguage();
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   return (
-    <section
-      id="faq"
-      className="border-2 border-dashed border-gray-300 bg-rose-50 px-4 py-16"
-    >
-      <div className="mx-auto max-w-5xl text-center text-sm text-gray-500">
-        [Faq placeholder]
+    <section id="faq" className="bg-gray-50 px-4 py-16 sm:py-20">
+      <div className="mx-auto max-w-3xl">
+        <h2 className="text-center text-2xl font-semibold text-gray-900 sm:text-3xl">
+          {t("landing_faq_title")}
+        </h2>
+        <div className="mt-10 space-y-3">
+          {items.map((item, i) => {
+            const isOpen = openIndex === i;
+            return (
+              <div key={item.qKey} className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setOpenIndex(isOpen ? null : i)}
+                  aria-expanded={isOpen}
+                  className="flex w-full items-center justify-between px-5 py-4 text-left"
+                >
+                  <span className="text-base font-medium text-gray-900">{t(item.qKey)}</span>
+                  <span className={`text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}>▼</span>
+                </button>
+                {isOpen && (
+                  <div className="border-t border-gray-100 px-5 py-4 text-sm text-gray-600">
+                    {t(item.aKey)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
