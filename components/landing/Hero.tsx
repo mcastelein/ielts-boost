@@ -36,7 +36,7 @@ export default function Hero() {
           </div>
         </div>
         <div
-          aria-label={t("landing_hero_image_alt")}
+          aria-hidden="true"
           className="flex aspect-[4/3] items-center justify-center rounded-xl border border-gray-200 bg-white text-sm text-gray-400 shadow-sm"
         >
           [Hero feedback screenshot — drop in public/images/landing/hero-feedback-zh.png]
