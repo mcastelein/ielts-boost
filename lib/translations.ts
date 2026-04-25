@@ -683,6 +683,19 @@ export const translations = {
     en: "Your essays and submissions are visible only to you. We don't share or sell your content. See our privacy policy for details.",
     zh: "你的作文和提交内容只有你自己可以查看。我们不会分享或出售你的内容。详情见隐私政策。",
   },
+
+  // Landing — Mission strip
+  landing_mission_body: {
+    en: "We built IELTSBoost to help every learner build the confidence to take the IELTS exam — whether you upgrade or not.",
+    zh: "我们做 IELTSBoost，是为了帮助每一位学习者建立参加雅思考试的信心——无论你是否升级 Pro。",
+  },
+
+  // Landing — Final CTA
+  landing_final_cta_headline: {
+    en: "Ready to see your current band?",
+    zh: "准备好看看你目前的雅思分数了吗？",
+  },
+  landing_final_cta_button: { en: "Start practicing free", zh: "免费开始练习" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
