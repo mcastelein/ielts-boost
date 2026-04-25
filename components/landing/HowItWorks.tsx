@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { PrimaryCtaButton } from "@/components/landing/cta-buttons";
 import type { TranslationKey } from "@/lib/translations";
 
 const steps: { titleKey: TranslationKey; bodyKey: TranslationKey }[] = [
@@ -30,13 +30,9 @@ export default function HowItWorks() {
           ))}
         </ol>
         <div className="mt-10 flex justify-center">
-          <Link
-            href="/signup"
-            data-cta="how-it-works"
-            className="rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
-          >
+          <PrimaryCtaButton href="/signup" ctaId="how-it-works">
             {t("landing_how_cta")}
-          </Link>
+          </PrimaryCtaButton>
         </div>
       </div>
     </section>

@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { PrimaryCtaButton, SecondaryCtaButton } from "@/components/landing/cta-buttons";
 
 export default function Hero() {
   const { t } = useLanguage();
@@ -19,20 +19,12 @@ export default function Hero() {
             {t("landing_hero_subhead")}
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-4 lg:items-start lg:justify-start">
-            <Link
-              href="/signup"
-              data-cta="hero-primary"
-              className="w-full rounded-lg bg-blue-600 px-6 py-3 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 sm:w-auto"
-            >
+            <PrimaryCtaButton href="/signup" ctaId="hero-primary" width="responsive">
               {t("landing_hero_cta_primary")}
-            </Link>
-            <a
-              href="#bilingual"
-              data-cta="hero-secondary"
-              className="w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 sm:w-auto"
-            >
+            </PrimaryCtaButton>
+            <SecondaryCtaButton href="#bilingual" ctaId="hero-secondary" width="responsive">
               {t("landing_hero_cta_secondary")}
-            </a>
+            </SecondaryCtaButton>
           </div>
         </div>
         <div

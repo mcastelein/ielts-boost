@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { PrimaryCtaButton, SecondaryCtaButton } from "@/components/landing/cta-buttons";
 import type { TranslationKey } from "@/lib/translations";
 
 const freeFeatures: TranslationKey[] = [
@@ -43,13 +43,11 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/signup"
-              data-cta="pricing-free"
-              className="mt-8 block w-full rounded-lg bg-blue-600 px-6 py-3 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
-            >
-              {t("landing_pricing_free_cta")}
-            </Link>
+            <div className="mt-8">
+              <PrimaryCtaButton href="/signup" ctaId="pricing-free" width="block">
+                {t("landing_pricing_free_cta")}
+              </PrimaryCtaButton>
+            </div>
           </div>
 
           {/* Pro card */}
@@ -79,13 +77,11 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <Link
-              href="/upgrade"
-              data-cta="pricing-pro"
-              className="mt-8 block w-full rounded-lg border border-gray-300 bg-white px-6 py-3 text-center text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
-            >
-              {t("landing_pricing_pro_cta")}
-            </Link>
+            <div className="mt-8">
+              <SecondaryCtaButton href="/upgrade" ctaId="pricing-pro" width="block">
+                {t("landing_pricing_pro_cta")}
+              </SecondaryCtaButton>
+            </div>
           </div>
         </div>
       </div>
