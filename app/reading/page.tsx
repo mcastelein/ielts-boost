@@ -151,6 +151,14 @@ export default function ReadingPage() {
     }
   };
 
+  // Auto-submit when timer expires
+  useEffect(() => {
+    if (timerExpired && !submitting) {
+      handleSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timerExpired]);
+
   // ── SETUP STEP ────────────────────────────────────────────────────────────
   if (step === "setup") {
     return (

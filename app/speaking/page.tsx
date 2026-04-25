@@ -27,6 +27,12 @@ interface SpeakingFeedback {
 const PARTS = [1, 2, 3] as const;
 type InputMode = "voice" | "text";
 
+const SPEAKING_TIMER_SECONDS: Record<number, number> = {
+  1: 60,   // Part 1: 1 min per question
+  2: 120,  // Part 2: 2 min long turn
+  3: 120,  // Part 3: 2 min per question
+};
+
 export default function SpeakingPageWrapper() {
   return (
     <Suspense>
@@ -52,9 +58,16 @@ function SpeakingPage() {
   const [usageInfo, setUsageInfo] = useState<{ allowed: boolean; used: number; limit: number } | null>(null);
   const [completedPrompts, setCompletedPrompts] = useState<Set<string>>(new Set());
   const [draftId, setDraftId] = useState<string | null>(null);
+  const [timerEnabled, setTimerEnabled] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [timerExpired, setTimerExpired] = useState(false);
+  const startTimeRef = useRef<number | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
   const { t, feedbackLocale } = useLanguage();
+
+  const timerSeconds = SPEAKING_TIMER_SECONDS[selectedPart] ?? 120;
 
   const prompts = SPEAKING_PROMPTS.filter((p) => p.part === selectedPart);
 
@@ -102,6 +115,38 @@ function SpeakingPage() {
     init();
   }, []);
 
+  // Timer effect — starts when prompt is shown and timer is enabled
+  useEffect(() => {
+    if (!currentPrompt || !timerEnabled || feedback) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      return;
+    }
+
+    startTimeRef.current = Date.now();
+    setTimeLeft(timerSeconds);
+    setTimerExpired(false);
+
+    intervalRef.current = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTimeRef.current!) / 1000);
+      const remaining = Math.max(0, timerSeconds - elapsed);
+      setTimeLeft(remaining);
+      if (remaining === 0) {
+        setTimerExpired(true);
+        clearInterval(intervalRef.current!);
+      }
+    }, 1000);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [currentPrompt, timerEnabled, timerSeconds, feedback]);
+
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
   const playTTS = useCallback(async (text: string) => {
     try {
       setIsSpeaking(true);
@@ -136,6 +181,7 @@ function SpeakingPage() {
     setFeedback(null);
     setTranscriptReady(false);
     setDraftId(null);
+    setTimerExpired(false);
   };
 
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -187,6 +233,14 @@ function SpeakingPage() {
     }
   };
 
+  // Auto-submit when timer expires
+  useEffect(() => {
+    if (timerExpired && !isSubmitting && currentPrompt && response.trim()) {
+      handleSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timerExpired]);
+
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-8">
       <h1 className="text-xl font-bold sm:text-2xl">{t("speaking_title")}</h1>
@@ -206,6 +260,7 @@ function SpeakingPage() {
               setFeedback(null);
               setTranscriptReady(false);
               setDraftId(null);
+              setTimerExpired(false);
             }}
             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
               selectedPart === p
@@ -216,6 +271,26 @@ function SpeakingPage() {
             {t("speaking_part")} {p}{t("speaking_part_suffix")}
           </button>
         ))}
+      </div>
+
+      {/* Timer toggle */}
+      <div className="mt-4 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setTimerEnabled((v) => !v)}
+          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus:outline-none ${
+            timerEnabled ? "bg-blue-600" : "bg-gray-200"
+          }`}
+        >
+          <span
+            className={`inline-block h-5 w-5 rounded-full bg-white shadow transition-transform ${
+              timerEnabled ? "translate-x-5" : "translate-x-0"
+            }`}
+          />
+        </button>
+        <span className="text-sm text-gray-700">
+          {t("speaking_enable_timer")} ({Math.floor(timerSeconds / 60)} {t("common_min")})
+        </span>
       </div>
 
       {/* Usage limit reached banner */}
@@ -241,24 +316,41 @@ function SpeakingPage() {
         </button>
       )}
 
-      {/* Prompt display */}
+      {/* Timer display + Prompt display */}
       {currentPrompt && (
-        <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-blue-600">
-              {t("speaking_part")} {currentPrompt.part}{t("speaking_part_suffix")} — {currentPrompt.topic}
-            </span>
-            <button
-              onClick={pickRandom}
-              className="text-xs text-blue-600 hover:underline"
-            >
-              {t("speaking_new_prompt")}
-            </button>
+        <>
+          {timerEnabled && !feedback && (
+            <div className="mt-6 flex items-center justify-center">
+              <span
+                className={`rounded-md px-3 py-1.5 text-lg font-mono font-semibold ${
+                  timerExpired
+                    ? "bg-red-100 text-red-700"
+                    : timeLeft < 30
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-gray-100 text-gray-700"
+                }`}
+              >
+                {timerExpired ? t("speaking_times_up") : formatTime(timeLeft)}
+              </span>
+            </div>
+          )}
+          <div className={`${timerEnabled && !feedback ? "mt-3" : "mt-6"} rounded-xl border border-blue-200 bg-blue-50 p-5`}>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-blue-600">
+                {t("speaking_part")} {currentPrompt.part}{t("speaking_part_suffix")} — {currentPrompt.topic}
+              </span>
+              <button
+                onClick={pickRandom}
+                className="text-xs text-blue-600 hover:underline"
+              >
+                {t("speaking_new_prompt")}
+              </button>
+            </div>
+            <p className="mt-2 text-sm leading-relaxed text-blue-900">
+              {currentPrompt.question}
+            </p>
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-blue-900">
-            {currentPrompt.question}
-          </p>
-        </div>
+        </>
       )}
 
       {/* Input mode toggle + response input */}
