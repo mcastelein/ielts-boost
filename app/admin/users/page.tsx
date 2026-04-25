@@ -14,14 +14,31 @@ interface UserRecord {
   plan_type: string;
   role: string;
   created_at: string;
+  last_sign_in_at: string | null;
+  provider: string | null;
   stats: {
     writing: number;
     speaking: number;
+    reading: number;
+    listening: number;
     totalCost: number;
+    daysActive7d: number;
   };
 }
 
-type SortKey = "name" | "role" | "plan" | "writing" | "speaking" | "cost" | "joined";
+type SortKey =
+  | "name"
+  | "role"
+  | "plan"
+  | "writing"
+  | "speaking"
+  | "reading"
+  | "listening"
+  | "active7d"
+  | "lastSeen"
+  | "provider"
+  | "cost"
+  | "joined";
 type SortDir = "asc" | "desc";
 
 export default function UsersPage() {
@@ -31,7 +48,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [planFilter, setPlanFilter] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("joined");
+  const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -107,6 +124,24 @@ export default function UsersPage() {
         case "speaking":
           cmp = a.stats.speaking - b.stats.speaking;
           break;
+        case "reading":
+          cmp = a.stats.reading - b.stats.reading;
+          break;
+        case "listening":
+          cmp = a.stats.listening - b.stats.listening;
+          break;
+        case "active7d":
+          cmp = a.stats.daysActive7d - b.stats.daysActive7d;
+          break;
+        case "lastSeen": {
+          const av = a.last_sign_in_at ? new Date(a.last_sign_in_at).getTime() : 0;
+          const bv = b.last_sign_in_at ? new Date(b.last_sign_in_at).getTime() : 0;
+          cmp = av - bv;
+          break;
+        }
+        case "provider":
+          cmp = (a.provider ?? "").localeCompare(b.provider ?? "");
+          break;
         case "cost":
           cmp = a.stats.totalCost - b.stats.totalCost;
           break;
@@ -163,7 +198,22 @@ export default function UsersPage() {
     const selected = filtered.filter((u) => selectedIds.has(u.user_id));
     downloadCsv(
       "selected-users.csv",
-      ["Email", "Name", "Role", "Plan", "Writing", "Speaking", "API Cost", "Joined", "User ID"],
+      [
+        "Email",
+        "Name",
+        "Role",
+        "Plan",
+        "Writing",
+        "Speaking",
+        "Reading",
+        "Listening",
+        "Active 7d",
+        "Last seen",
+        "Provider",
+        "API Cost",
+        "Joined",
+        "User ID",
+      ],
       selected.map((u) => [
         u.email ?? "",
         u.display_name ?? "",
@@ -171,6 +221,11 @@ export default function UsersPage() {
         u.plan_type ?? "free",
         String(u.stats.writing),
         String(u.stats.speaking),
+        String(u.stats.reading),
+        String(u.stats.listening),
+        String(u.stats.daysActive7d),
+        u.last_sign_in_at ?? "",
+        u.provider ?? "",
         u.stats.totalCost.toFixed(4),
         new Date(u.created_at).toISOString().split("T")[0],
         u.user_id,
@@ -193,11 +248,32 @@ export default function UsersPage() {
       className="cursor-pointer px-4 py-3 select-none hover:text-gray-700"
       onClick={() => toggleSort(sortKeyVal)}
     >
-      {label} {sortKey === sortKeyVal ? (sortDir === "asc" ? "\u2191" : "\u2193") : ""}
+      {label} {sortKey === sortKeyVal ? (sortDir === "asc" ? "↑" : "↓") : ""}
     </th>
   );
 
   const formatCost = (cost: number) => `$${cost.toFixed(4)}`;
+
+  const formatRelative = (iso: string | null): string => {
+    if (!iso) return "—";
+    const ms = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(ms / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    if (days < 30) return `${days}d ago`;
+    const months = Math.floor(days / 30);
+    return `${months}mo ago`;
+  };
+
+  const providerLabel = (p: string | null): string => {
+    if (!p) return "—";
+    if (p === "google") return "Google";
+    if (p === "email") return "Email";
+    return p.charAt(0).toUpperCase() + p.slice(1);
+  };
 
   if (loading) {
     return <p className="text-gray-500">Loading users...</p>;
@@ -238,7 +314,24 @@ export default function UsersPage() {
           onClick={() => {
             downloadCsv(
               "users-export.csv",
-              ["Email", "Name", "Role", "Plan", "Writing", "Speaking", "API Cost", "UI Lang", "FB Lang", "Joined", "User ID"],
+              [
+                "Email",
+                "Name",
+                "Role",
+                "Plan",
+                "Writing",
+                "Speaking",
+                "Reading",
+                "Listening",
+                "Active 7d",
+                "Last seen",
+                "Provider",
+                "API Cost",
+                "UI Lang",
+                "FB Lang",
+                "Joined",
+                "User ID",
+              ],
               filtered.map((u) => [
                 u.email ?? "",
                 u.display_name ?? "",
@@ -246,6 +339,11 @@ export default function UsersPage() {
                 u.plan_type ?? "free",
                 String(u.stats.writing),
                 String(u.stats.speaking),
+                String(u.stats.reading),
+                String(u.stats.listening),
+                String(u.stats.daysActive7d),
+                u.last_sign_in_at ?? "",
+                u.provider ?? "",
                 u.stats.totalCost.toFixed(4),
                 u.ui_language,
                 u.feedback_language,
@@ -312,6 +410,11 @@ export default function UsersPage() {
                 <SortHeader label="Plan" sortKeyVal="plan" />
                 <SortHeader label="Writing" sortKeyVal="writing" />
                 <SortHeader label="Speaking" sortKeyVal="speaking" />
+                <SortHeader label="Reading" sortKeyVal="reading" />
+                <SortHeader label="Listening" sortKeyVal="listening" />
+                <SortHeader label="Active 7d" sortKeyVal="active7d" />
+                <SortHeader label="Last seen" sortKeyVal="lastSeen" />
+                <SortHeader label="Provider" sortKeyVal="provider" />
                 <SortHeader label="API Cost" sortKeyVal="cost" />
                 <th className="px-4 py-3">Languages</th>
                 <SortHeader label="Joined" sortKeyVal="joined" />
@@ -371,6 +474,17 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-600">{user.stats.writing}</td>
                   <td className="px-4 py-3 text-gray-600">{user.stats.speaking}</td>
+                  <td className="px-4 py-3 text-gray-600">{user.stats.reading}</td>
+                  <td className="px-4 py-3 text-gray-600">{user.stats.listening}</td>
+                  <td className="px-4 py-3 text-gray-600">{user.stats.daysActive7d}/7</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500">
+                    {formatRelative(user.last_sign_in_at)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
+                      {providerLabel(user.provider)}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-gray-600">{formatCost(user.stats.totalCost)}</td>
                   <td className="px-4 py-3 text-xs text-gray-500">
                     UI: {user.ui_language} / FB: {user.feedback_language}
