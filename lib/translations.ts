@@ -488,6 +488,36 @@ export const translations = {
     en: "IELTSBoost AI feedback report showing band score and four criterion scores",
     zh: "IELTSBoost AI 反馈报告，显示总分和四项评分标准",
   },
+
+  // Landing — Personas
+  landing_personas_title: {
+    en: "Is IELTSBoost for me?",
+    zh: "IELTSBoost 适合我吗？",
+  },
+  landing_personas_first_time_title: {
+    en: "Studying for IELTS for the first time",
+    zh: "第一次备考雅思",
+  },
+  landing_personas_first_time_body: {
+    en: "Get a fast read on where you stand and what to focus on first.",
+    zh: "快速了解自己的水平，知道该先专注哪里。",
+  },
+  landing_personas_push_score_title: {
+    en: "Already taken it, want to push from 6.5 → 7+",
+    zh: "已经考过，想从 6.5 提升到 7+",
+  },
+  landing_personas_push_score_body: {
+    en: "Identify the recurring mistakes that are quietly capping your band score.",
+    zh: "找出那些悄悄拉低你分数的反复出现的错误。",
+  },
+  landing_personas_daily_title: {
+    en: "Practicing daily but no one to grade your writing",
+    zh: "每天练习，却没人帮你批改",
+  },
+  landing_personas_daily_body: {
+    en: "Submit any essay and get feedback in seconds — at any hour.",
+    zh: "随时提交作文，秒级获得反馈——任何时间都可以。",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
