@@ -87,6 +87,7 @@ interface ApiLog {
   estimated_cost_usd: number | null;
   duration_ms: number | null;
   created_at: string;
+  metadata?: Record<string, unknown> | null;
 }
 
 const CALL_TYPE_LABELS: Record<string, string> = {
@@ -293,7 +294,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                   </thead>
                   <tbody>
                     {recentErrors.map((log) => {
-                      const meta = (log as unknown as { metadata?: { error?: string } }).metadata;
+                      const meta = log.metadata as { error?: string } | null | undefined;
                       return (
                         <tr key={log.id} className="border-b border-gray-50">
                           <td className="whitespace-nowrap px-4 py-2 text-gray-600">

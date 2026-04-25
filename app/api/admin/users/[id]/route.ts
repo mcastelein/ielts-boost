@@ -198,6 +198,7 @@ export async function GET(
       ...settings,
       email: profile?.email ?? null,
       display_name: profile?.name ?? null,
+      last_sign_in_at: profile?.last_sign_in_at ?? null,
     },
     writingSubmissions: writingSubs ?? [],
     speakingSubmissions: speakingSubs ?? [],
