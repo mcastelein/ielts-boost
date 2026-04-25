@@ -58,11 +58,12 @@ export default function ComparisonTable() {
         <h2 className="text-center text-2xl font-semibold text-gray-900 sm:text-3xl">
           {t("landing_compare_title")}
         </h2>
-        <div className="mt-10 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="mt-10 relative">
+          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-gray-200 bg-gray-50">
               <tr>
-                <th scope="col" className="px-4 py-3 font-medium text-gray-500"></th>
+                <td aria-hidden="true" className="px-4 py-3"></td>
                 {columns.map((c, i) => (
                   <th
                     key={c}
@@ -89,6 +90,12 @@ export default function ComparisonTable() {
               ))}
             </tbody>
           </table>
+          </div>
+          {/* Right-edge fade hint for mobile horizontal scroll */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 rounded-r-xl bg-gradient-to-l from-white to-transparent sm:hidden"
+          />
         </div>
       </div>
     </section>
