@@ -584,6 +584,33 @@ export const translations = {
     zh: "我为我妻子做了 IELTSBoost。她当时正在准备雅思考试，而中国雅思辅导的价格让我们难以置信——每小时几百块人民币，而 AI 现在几秒钟就能给出同样质量的反馈。她用 IELTSBoost 把分数从 6.5 提到了 7.5。我希望任何人都能获得同样的帮助——没有那高昂的价格。",
   },
   landing_story_signature: { en: "— Michael", zh: "— Michael" },
+
+  // Landing — Comparison
+  landing_compare_title: { en: "How does IELTSBoost compare?", zh: "IELTSBoost 与其他选择对比" },
+  landing_compare_col_us: { en: "IELTSBoost", zh: "IELTSBoost" },
+  landing_compare_col_tutor: { en: "Private tutor", zh: "私教" },
+  landing_compare_col_books: { en: "Practice books", zh: "练习书" },
+  landing_compare_col_chatgpt: { en: "ChatGPT", zh: "ChatGPT" },
+  landing_compare_col_zh_platforms: { en: "Chinese platforms", zh: "中国平台" },
+  landing_compare_row_cost: { en: "Cost", zh: "费用" },
+  landing_compare_row_speed: { en: "Speed of feedback", zh: "反馈速度" },
+  landing_compare_row_criteria: { en: "Scored against IELTS criteria", zh: "按雅思评分标准评估" },
+  landing_compare_row_chinese: { en: "Natural Chinese explanations", zh: "自然的中文讲解" },
+  landing_compare_row_tracks: { en: "Tracks recurring mistakes", zh: "追踪反复出现的错误" },
+  landing_compare_row_24_7: { en: "Available 24/7", zh: "全天 24 小时可用" },
+  landing_compare_yes: { en: "Yes", zh: "是" },
+  landing_compare_no: { en: "No", zh: "否" },
+  landing_compare_partial: { en: "Partial", zh: "部分" },
+  landing_compare_cost_us: { en: "Free or ¥200/mo", zh: "免费或 ¥200/月" },
+  landing_compare_cost_tutor: { en: "¥200–600/hr", zh: "¥200–600/小时" },
+  landing_compare_cost_books: { en: "¥30–100", zh: "¥30–100" },
+  landing_compare_cost_chatgpt: { en: "Free or $20/mo", zh: "免费或 $20/月" },
+  landing_compare_cost_zh_platforms: { en: "Mostly subscription", zh: "多为订阅制" },
+  landing_compare_speed_us: { en: "Seconds", zh: "数秒" },
+  landing_compare_speed_tutor: { en: "Days", zh: "数天" },
+  landing_compare_speed_books: { en: "N/A — no feedback", zh: "无——书本不提供反馈" },
+  landing_compare_speed_chatgpt: { en: "Seconds", zh: "数秒" },
+  landing_compare_speed_zh_platforms: { en: "Varies — sample answers, not your essay", zh: "因平台而异，多为参考答案而非批改你的文章" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
