@@ -5,7 +5,7 @@ import { useLanguage } from "@/lib/language-context";
 export default function PersonalStory() {
   const { t } = useLanguage();
   return (
-    <section id="personal-story" className="bg-gray-50 px-4 py-16 sm:py-20">
+    <section id="personal-story" className="bg-white px-4 py-16 sm:py-20">
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
           {t("landing_story_eyebrow")}
