@@ -466,6 +466,28 @@ export const translations = {
   feedback_sending: { en: "Sending...", zh: "发送中..." },
   feedback_success: { en: "Thanks for your feedback! We'll review it soon.", zh: "感谢你的反馈！我们会尽快查看。" },
   feedback_error: { en: "Failed to send feedback. Please try again.", zh: "发送失败，请重试。" },
+
+  // Landing — Hero
+  landing_hero_headline: {
+    en: "Build the confidence to take the IELTS exam — with instant AI feedback in English or 中文.",
+    zh: "以英语或中文获得即时 AI 反馈，建立参加雅思考试的信心。",
+  },
+  landing_hero_subhead: {
+    en: "Practice all four IELTS sections — Writing, Speaking, Reading, Listening — and get scored against the official band criteria in seconds.",
+    zh: "练习雅思的全部四个部分——写作、口语、阅读、听力，并在几秒钟内获得依据官方评分标准的评估。",
+  },
+  landing_hero_cta_primary: {
+    en: "Start free — 2 essays/day, no credit card",
+    zh: "免费开始——每天 2 篇作文，无需信用卡",
+  },
+  landing_hero_cta_secondary: {
+    en: "See a sample feedback report",
+    zh: "查看反馈示例",
+  },
+  landing_hero_image_alt: {
+    en: "IELTSBoost AI feedback report showing band score and four criterion scores",
+    zh: "IELTSBoost AI 反馈报告，显示总分和四项评分标准",
+  },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
