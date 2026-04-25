@@ -24,6 +24,7 @@ interface UserDetail {
     ui_language: string;
     feedback_language: string;
     created_at: string;
+    last_sign_in_at?: string | null;
   };
   writingSubmissions: WritingSub[];
   speakingSubmissions: SpeakingSub[];
@@ -41,6 +42,13 @@ interface UserDetail {
   usageToday: { writing_count: number; speaking_count: number } | null;
   mistakePatterns: [string, number][];
   scoreTrend: { date: string; overall: number; task: number; coherence: number; lexical: number; grammar: number }[];
+  scoresBySection: {
+    writing: { latest: number | null; previous: number | null; count: number };
+    speaking: { latest: number | null; previous: number | null; count: number };
+    reading: { latest: number | null; previous: number | null; count: number };
+    listening: { latest: number | null; previous: number | null; count: number };
+  };
+  recentErrors: ApiLog[];
 }
 
 interface WritingSub {
@@ -89,6 +97,40 @@ const CALL_TYPE_LABELS: Record<string, string> = {
   tts: "Text-to-Speech",
 };
 
+function SubCard({
+  label,
+  count,
+  scores,
+}: {
+  label: string;
+  count: number;
+  scores: { latest: number | null; previous: number | null; count: number };
+}) {
+  const { latest, previous } = scores;
+  let arrow: { symbol: string; color: string } | null = null;
+  if (latest != null && previous != null) {
+    if (latest > previous) arrow = { symbol: "▲", color: "text-green-600" };
+    else if (latest < previous) arrow = { symbol: "▼", color: "text-red-600" };
+    else arrow = { symbol: "–", color: "text-gray-400" };
+  }
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-4">
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-xl font-bold text-gray-900">{count}</p>
+      <p className="mt-1 text-xs text-gray-600">
+        {latest != null ? (
+          <>
+            Band {latest.toFixed(1)}{" "}
+            {arrow && <span className={arrow.color}>{arrow.symbol}</span>}
+          </>
+        ) : (
+          <span className="text-gray-400">no scores yet</span>
+        )}
+      </p>
+    </div>
+  );
+}
+
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [data, setData] = useState<UserDetail | null>(null);
@@ -105,7 +147,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   if (loading) return <p className="text-gray-500">Loading user details...</p>;
   if (!data) return <p className="text-red-500">User not found.</p>;
 
-  const { user, writingSubmissions, speakingSubmissions, apiUsage, sessions, usageToday, mistakePatterns, scoreTrend } = data;
+  const { user, writingSubmissions, speakingSubmissions, apiUsage, sessions, usageToday, mistakePatterns, scoreTrend, scoresBySection, recentErrors } = data;
   const fmt = (n: number) => `$${n.toFixed(4)}`;
 
   const dailyCostData = Object.entries(apiUsage.byDay)
@@ -167,26 +209,30 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
       {activeTab === "overview" && (
         <div className="space-y-6">
           {/* Quick stats */}
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <SubCard label="Writing Subs" count={writingSubmissions.length} scores={scoresBySection.writing} />
+            <SubCard label="Speaking Subs" count={speakingSubmissions.length} scores={scoresBySection.speaking} />
+            <SubCard label="Reading Subs" count={scoresBySection.reading.count} scores={scoresBySection.reading} />
+            <SubCard label="Listening Subs" count={scoresBySection.listening.count} scores={scoresBySection.listening} />
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div className="rounded-lg border border-gray-200 bg-white p-4">
               <p className="text-sm text-gray-500">Total API Cost</p>
               <p className="text-xl font-bold text-gray-900">{fmt(apiUsage.totalCost)}</p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="text-sm text-gray-500">Writing Subs</p>
-              <p className="text-xl font-bold text-gray-900">{writingSubmissions.length}</p>
+              <p className="text-sm text-gray-500">Joined</p>
+              <p className="text-sm font-bold text-gray-900">{new Date(user.created_at).toLocaleDateString()}</p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="text-sm text-gray-500">Speaking Subs</p>
-              <p className="text-xl font-bold text-gray-900">{speakingSubmissions.length}</p>
+              <p className="text-sm text-gray-500">Last seen</p>
+              <p className="text-sm font-bold text-gray-900">
+                {user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : "—"}
+              </p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4">
               <p className="text-sm text-gray-500">Today&apos;s Writing</p>
               <p className="text-xl font-bold text-gray-900">{usageToday?.writing_count ?? 0}</p>
-            </div>
-            <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="text-sm text-gray-500">Joined</p>
-              <p className="text-sm font-bold text-gray-900">{new Date(user.created_at).toLocaleDateString()}</p>
             </div>
           </div>
 
@@ -228,6 +274,44 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 </table>
               </div>
             </div>
+          )}
+
+          {/* Recent Errors */}
+          {recentErrors.length > 0 && (
+            <details className="rounded-lg border border-red-200 bg-white">
+              <summary className="cursor-pointer border-b border-red-200 px-4 py-3 font-medium text-red-700">
+                Recent Errors ({recentErrors.length})
+              </summary>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-100 text-left text-gray-500">
+                      <th className="px-4 py-2">Time</th>
+                      <th className="px-4 py-2">Type</th>
+                      <th className="px-4 py-2">Error</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentErrors.map((log) => {
+                      const meta = (log as unknown as { metadata?: { error?: string } }).metadata;
+                      return (
+                        <tr key={log.id} className="border-b border-gray-50">
+                          <td className="whitespace-nowrap px-4 py-2 text-gray-600">
+                            {new Date(log.created_at).toLocaleString()}
+                          </td>
+                          <td className="px-4 py-2 text-gray-900">
+                            {CALL_TYPE_LABELS[log.call_type] ?? log.call_type}
+                          </td>
+                          <td className="px-4 py-2 text-xs text-red-700 line-clamp-2">
+                            {meta?.error ?? "(no message)"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </details>
           )}
 
           {/* Score Trend */}
