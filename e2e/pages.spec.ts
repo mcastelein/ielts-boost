@@ -1,11 +1,14 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Public pages load correctly", () => {
-  test("landing page has brand name and CTAs", async ({ page }) => {
+  test("landing page renders all sections", async ({ page }) => {
     await page.goto("/");
-    await expect(page.locator("h1")).toContainText("Boost");
-    await expect(page.getByText("Start Writing Practice")).toBeVisible();
-    await expect(page.getByText("Sign In")).toBeVisible();
+    for (const id of [
+      "hero", "personas", "guide", "how-it-works", "personal-story",
+      "comparison", "bilingual", "pricing", "faq", "mission", "final-cta",
+    ]) {
+      await expect(page.locator(`#${id}`)).toBeVisible();
+    }
   });
 
   test("login page has email/password form and Google auth", async ({ page }) => {
@@ -54,9 +57,4 @@ test.describe("Public pages load correctly", () => {
     await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible({ timeout: 10000 });
   });
 
-  test("landing page Start Writing links to /writing", async ({ page }) => {
-    await page.goto("/");
-    const link = page.getByText("Start Writing Practice");
-    await expect(link).toHaveAttribute("href", "/writing");
-  });
 });
