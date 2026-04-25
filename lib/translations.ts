@@ -557,6 +557,25 @@ export const translations = {
   landing_guide_criteria_cc: { en: "Coherence and Cohesion", zh: "连贯与衔接" },
   landing_guide_criteria_lr: { en: "Lexical Resource", zh: "词汇资源" },
   landing_guide_criteria_gra: { en: "Grammatical Range and Accuracy", zh: "语法多样性与准确性" },
+
+  // Landing — How it works
+  landing_how_title: { en: "How it works", zh: "如何使用" },
+  landing_how_step1_title: { en: "Pick your section", zh: "选择练习部分" },
+  landing_how_step1_body: {
+    en: "Writing, Speaking, Reading, or Listening. Practice as much as you want.",
+    zh: "写作、口语、阅读或听力——想练多少就练多少。",
+  },
+  landing_how_step2_title: { en: "Get instant AI feedback", zh: "获得即时 AI 反馈" },
+  landing_how_step2_body: {
+    en: "Band score, evaluation against the four IELTS criteria, specific corrections, and explanations in English or 中文.",
+    zh: "总分、四项评分标准的评估、具体修改建议，以及英文或中文的详细解释。",
+  },
+  landing_how_step3_title: { en: "Track your progress", zh: "追踪你的进步" },
+  landing_how_step3_body: {
+    en: "Your dashboard surfaces recurring mistakes and shows your improvement trend over time.",
+    zh: "仪表盘会显示反复出现的错误，以及你随时间推移的进步趋势。",
+  },
+  landing_how_cta: { en: "Try it free", zh: "免费试用" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
