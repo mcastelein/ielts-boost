@@ -624,6 +624,32 @@ export const translations = {
   },
   landing_bilingual_label_en: { en: "English", zh: "英文" },
   landing_bilingual_label_zh: { en: "中文", zh: "中文" },
+
+  // Landing — Pricing
+  landing_pricing_title: { en: "Pricing", zh: "价格" },
+  landing_pricing_subtitle: {
+    en: "Free is genuinely useful. Pro is for power users — no pressure either way.",
+    zh: "免费版本就足够好用。Pro 是给高频用户准备的——没有压力。",
+  },
+  landing_pricing_free_title: { en: "Free", zh: "免费版" },
+  landing_pricing_free_price: { en: "¥0", zh: "¥0" },
+  landing_pricing_free_tagline: { en: "No credit card needed", zh: "无需信用卡" },
+  landing_pricing_free_feature_1: { en: "Practice every section", zh: "练习全部部分" },
+  landing_pricing_free_feature_2: { en: "Full AI feedback on each submission", zh: "每次提交均有完整 AI 反馈" },
+  landing_pricing_free_feature_3: { en: "Track your progress on the dashboard", zh: "在仪表盘上追踪进步" },
+  landing_pricing_free_feature_4: { en: "2 writing submissions per day", zh: "每天 2 篇写作提交" },
+  landing_pricing_free_cta: { en: "Get started free", zh: "免费开始" },
+  landing_pricing_pro_title: { en: "Pro", zh: "Pro 版" },
+  landing_pricing_pro_tagline: { en: "Unlimited practice, every section", zh: "无限练习，全部部分" },
+  landing_pricing_pro_feature_1: { en: "Unlimited writing submissions", zh: "无限写作提交" },
+  landing_pricing_pro_feature_2: { en: "Unlimited speaking practice", zh: "无限口语练习" },
+  landing_pricing_pro_feature_3: { en: "Priority on new features", zh: "新功能优先体验" },
+  landing_pricing_bundle_1mo: { en: "¥200 / month", zh: "¥200 / 月" },
+  landing_pricing_bundle_3mo: { en: "¥500 / 3 months", zh: "¥500 / 3 个月" },
+  landing_pricing_bundle_6mo: { en: "¥900 / 6 months", zh: "¥900 / 6 个月" },
+  landing_pricing_bundle_3mo_save: { en: "Save 17%", zh: "节省 17%" },
+  landing_pricing_bundle_6mo_save: { en: "Save 25%", zh: "节省 25%" },
+  landing_pricing_pro_cta: { en: "Choose a plan", zh: "选择方案" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
