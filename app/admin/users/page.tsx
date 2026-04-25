@@ -268,11 +268,17 @@ export default function UsersPage() {
     return `${months}mo ago`;
   };
 
+  const PROVIDER_LABELS: Record<string, string> = {
+    google: "Google",
+    email: "Email",
+    wechat: "WeChat",
+    apple: "Apple",
+    github: "GitHub",
+    linkedin: "LinkedIn",
+  };
   const providerLabel = (p: string | null): string => {
     if (!p) return "—";
-    if (p === "google") return "Google";
-    if (p === "email") return "Email";
-    return p.charAt(0).toUpperCase() + p.slice(1);
+    return PROVIDER_LABELS[p] ?? p.charAt(0).toUpperCase() + p.slice(1);
   };
 
   if (loading) {
