@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { trackLandingCta } from "@/lib/landing-analytics";
 
 export type LandingCta =
   | "hero-primary"
@@ -35,16 +36,17 @@ function renderButton(
   className: string,
   children: ReactNode,
 ) {
+  const handleClick = () => trackLandingCta(ctaId);
   // In-page anchors (#bilingual) need a plain <a>; Next.js <Link> can interfere with anchor scrolling.
   if (href.startsWith("#")) {
     return (
-      <a href={href} data-cta={ctaId} className={className}>
+      <a href={href} data-cta={ctaId} className={className} onClick={handleClick}>
         {children}
       </a>
     );
   }
   return (
-    <Link href={href} data-cta={ctaId} className={className}>
+    <Link href={href} data-cta={ctaId} className={className} onClick={handleClick}>
       {children}
     </Link>
   );

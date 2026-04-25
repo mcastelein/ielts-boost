@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { trackLandingCta } from "@/lib/landing-analytics";
 
 export default function FinalCta() {
   const { t } = useLanguage();
@@ -14,6 +15,7 @@ export default function FinalCta() {
         <Link
           href="/signup"
           data-cta="final"
+          onClick={() => trackLandingCta("final")}
           className="mt-8 inline-block rounded-lg bg-white px-8 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50"
         >
           {t("landing_final_cta_button")}
