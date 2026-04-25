@@ -93,7 +93,6 @@ export const translations = {
   writing_words: { en: "words", zh: "字" },
   writing_submit: { en: "Submit for Feedback", zh: "提交获取反馈" },
   writing_submitting: { en: "Submitting...", zh: "提交中..." },
-  writing_enable_timer: { en: "Enable Timer", zh: "开启计时器" },
   writing_times_up: { en: "Time's up", zh: "时间到" },
   writing_times_up_note: { en: "Time's up! You can still edit and submit your essay.", zh: "时间到！你仍然可以编辑和提交作文。" },
   writing_daily_limit: { en: "Daily Limit Reached", zh: "已达每日上限" },
