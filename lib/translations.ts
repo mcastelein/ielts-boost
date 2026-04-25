@@ -518,6 +518,45 @@ export const translations = {
     en: "Submit any essay and get feedback in seconds — at any hour.",
     zh: "随时提交作文，秒级获得反馈——任何时间都可以。",
   },
+
+  // Landing — IELTS Guide
+  landing_guide_title: { en: "A quick IELTS primer", zh: "雅思简明指南" },
+  landing_guide_what_title: { en: "What is IELTS?", zh: "什么是雅思？" },
+  landing_guide_what_body: {
+    en: "The International English Language Testing System is the world's most widely accepted English-proficiency exam — required by universities, employers, and immigration programs in the UK, Australia, Canada, New Zealand, and most of Europe.",
+    zh: "雅思（IELTS）是全球最受认可的英语水平考试，被英国、澳大利亚、加拿大、新西兰及欧洲大部分国家的大学、雇主和移民项目所采用。",
+  },
+  landing_guide_sections_title: { en: "The four sections", zh: "四个考试部分" },
+  landing_guide_section_writing: { en: "Writing", zh: "写作" },
+  landing_guide_section_writing_body: {
+    en: "Two tasks: a 150-word report (Task 1) and a 250-word essay (Task 2). Graded on Task Achievement, Coherence, Lexical Resource, and Grammar.",
+    zh: "两个任务：150 词报告（任务一）和 250 词议论文（任务二）。评分维度为完成情况、连贯性、词汇资源和语法。",
+  },
+  landing_guide_section_speaking: { en: "Speaking", zh: "口语" },
+  landing_guide_section_speaking_body: {
+    en: "Three parts: introduction, a long turn on a familiar topic, and a follow-up discussion. Around 11–14 minutes total.",
+    zh: "三个部分：自我介绍、就熟悉话题的长回答、以及深入讨论。总时长约 11-14 分钟。",
+  },
+  landing_guide_section_reading: { en: "Reading", zh: "阅读" },
+  landing_guide_section_reading_body: {
+    en: "Three passages, 40 questions, 60 minutes. Tests skimming, scanning, and detail comprehension.",
+    zh: "三篇文章，40 道题，60 分钟。考查略读、扫读和细节理解能力。",
+  },
+  landing_guide_section_listening: { en: "Listening", zh: "听力" },
+  landing_guide_section_listening_body: {
+    en: "Four recordings, 40 questions, ~30 minutes plus 10 minutes to transfer answers.",
+    zh: "四段录音，40 道题，约 30 分钟，加 10 分钟誊写答案。",
+  },
+  landing_guide_scoring_title: { en: "How scoring works", zh: "评分机制" },
+  landing_guide_scoring_body: {
+    en: "Each section is scored on a band scale from 1 (non-user) to 9 (expert). Your overall band is the average of the four section scores, rounded to the nearest 0.5. Most universities require a 6.5 or 7.0 overall, with no section below 6.0.",
+    zh: "每部分按 1（不会使用）至 9（专家级）的等级评分。总分是四部分分数的平均值，四舍五入到最接近的 0.5。大多数大学要求总分 6.5 或 7.0，且各单项不低于 6.0。",
+  },
+  landing_guide_criteria_title: { en: "The four writing criteria", zh: "写作四项评分标准" },
+  landing_guide_criteria_ta: { en: "Task Achievement", zh: "任务完成情况" },
+  landing_guide_criteria_cc: { en: "Coherence and Cohesion", zh: "连贯与衔接" },
+  landing_guide_criteria_lr: { en: "Lexical Resource", zh: "词汇资源" },
+  landing_guide_criteria_gra: { en: "Grammatical Range and Accuracy", zh: "语法多样性与准确性" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
