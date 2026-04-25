@@ -20,6 +20,8 @@ export async function GET(
     { data: settings },
     { data: writingSubs },
     { data: speakingSubs },
+    { data: readingSubs },
+    { data: listeningSubs },
     { data: apiLogs },
     { data: usageTracking },
     profiles,
@@ -38,6 +40,18 @@ export async function GET(
     supabase
       .from("speaking_submissions")
       .select("*, speaking_feedback(*)")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("reading_submissions")
+      .select("*, reading_feedback(*)")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("listening_submissions")
+      .select("*, listening_feedback(*)")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(50),
@@ -90,6 +104,49 @@ export async function GET(
       }
     }
   }
+
+  type SectionRow = {
+    created_at: string;
+    band: number | null;
+  };
+
+  const collectScores = (
+    rows: Record<string, unknown>[] | null,
+    feedbackKey: string,
+    bandField: string
+  ): { latest: number | null; previous: number | null; count: number } => {
+    if (!rows) return { latest: null, previous: null, count: 0 };
+
+    const scored: SectionRow[] = rows
+      .map((r) => {
+        const fb = (r[feedbackKey] as Record<string, unknown>[] | undefined)?.[0];
+        const raw = fb?.[bandField];
+        const band = typeof raw === "number" ? raw : raw != null ? Number(raw) : null;
+        return { created_at: r.created_at as string, band };
+      })
+      .filter((r) => r.band != null && !Number.isNaN(r.band))
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    return {
+      latest: scored[0]?.band ?? null,
+      previous: scored[1]?.band ?? null,
+      count: scored.length,
+    };
+  };
+
+  const scoresBySection = {
+    writing: collectScores(writingSubs as Record<string, unknown>[] | null, "writing_feedback", "overall_band"),
+    speaking: collectScores(speakingSubs as Record<string, unknown>[] | null, "speaking_feedback", "estimated_band"),
+    reading: collectScores(readingSubs as Record<string, unknown>[] | null, "reading_feedback", "band_score"),
+    listening: collectScores(listeningSubs as Record<string, unknown>[] | null, "listening_feedback", "band_score"),
+  };
+
+  const recentErrors = (apiLogs ?? [])
+    .filter((log) => {
+      const meta = log.metadata as Record<string, unknown> | null | undefined;
+      return meta?.success === false;
+    })
+    .slice(0, 20);
 
   // Writing score trend
   const scoreTrend = (writingSubs ?? [])
@@ -160,5 +217,7 @@ export async function GET(
       .sort(([, a], [, b]) => b - a)
       .slice(0, 10),
     scoreTrend,
+    scoresBySection,
+    recentErrors,
   });
 }
