@@ -178,6 +178,18 @@ function ListeningSection() {
           )}
         </ul>
       </SectionCard>
+
+      <div className="rounded-xl bg-blue-50 p-6">
+        <h3 className="text-base font-semibold text-gray-900">{t("guide_practice_cta")}</h3>
+        <div className="mt-3">
+          <Link
+            href="/listening"
+            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+          >
+            {t("guide_start_listening")}
+          </Link>
+        </div>
+      </div>
     </>
   );
 }
@@ -206,6 +218,18 @@ function ReadingSection() {
           )}
         </ul>
       </SectionCard>
+
+      <div className="rounded-xl bg-blue-50 p-6">
+        <h3 className="text-base font-semibold text-gray-900">{t("guide_practice_cta")}</h3>
+        <div className="mt-3">
+          <Link
+            href="/reading"
+            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
+          >
+            {t("guide_start_reading")}
+          </Link>
+        </div>
+      </div>
     </>
   );
 }

@@ -305,6 +305,8 @@ export const translations = {
   guide_practice_cta: { en: "Ready to practice?", zh: "准备好练习了吗？" },
   guide_start_writing: { en: "Start Writing Practice", zh: "开始写作练习" },
   guide_start_speaking: { en: "Start Speaking Practice", zh: "开始口语练习" },
+  guide_start_listening: { en: "Start Listening Practice", zh: "开始听力练习" },
+  guide_start_reading: { en: "Start Reading Practice", zh: "开始阅读练习" },
 
   // Upgrade page
   upgrade_title: { en: "Upgrade to Pro", zh: "升级到Pro" },
