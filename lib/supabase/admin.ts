@@ -15,14 +15,21 @@ export function createAdminClient() {
   });
 }
 
-// Fetch a map of user_id -> { email, name } for a list of user IDs
+export type UserProfile = {
+  email: string;
+  name: string | null;
+  last_sign_in_at: string | null;
+  provider: string | null;
+};
+
+// Fetch a map of user_id -> profile for a list of user IDs
 export async function getUserProfiles(
   userIds: string[]
-): Promise<Record<string, { email: string; name: string | null }>> {
+): Promise<Record<string, UserProfile>> {
   const admin = createAdminClient();
   if (!admin || userIds.length === 0) return {};
 
-  const profiles: Record<string, { email: string; name: string | null }> = {};
+  const profiles: Record<string, UserProfile> = {};
 
   // Supabase admin listUsers has pagination, fetch all
   const { data, error } = await admin.auth.admin.listUsers({
@@ -33,12 +40,18 @@ export async function getUserProfiles(
 
   for (const user of data.users) {
     if (userIds.includes(user.id)) {
+      const provider =
+        (user.app_metadata?.provider as string | undefined) ??
+        (user.app_metadata?.providers?.[0] as string | undefined) ??
+        null;
       profiles[user.id] = {
         email: user.email ?? "N/A",
         name:
           user.user_metadata?.full_name ??
           user.user_metadata?.name ??
           null,
+        last_sign_in_at: user.last_sign_in_at ?? null,
+        provider,
       };
     }
   }
