@@ -611,6 +611,19 @@ export const translations = {
   landing_compare_speed_books: { en: "N/A — no feedback", zh: "无——书本不提供反馈" },
   landing_compare_speed_chatgpt: { en: "Seconds", zh: "数秒" },
   landing_compare_speed_zh_platforms: { en: "Varies — sample answers, not your essay", zh: "因平台而异，多为参考答案而非批改你的文章" },
+
+  // Landing — Bilingual showcase
+  landing_bilingual_title: { en: "Same feedback, in either language", zh: "同样的反馈，两种语言" },
+  landing_bilingual_subtitle: {
+    en: "Switch between English and 中文 with one click. Chinese explanations are written naturally for Chinese learners — not machine-translated.",
+    zh: "一键切换英文与中文。中文讲解为中国学习者自然撰写，并非机器翻译。",
+  },
+  landing_bilingual_image_alt: {
+    en: "Side-by-side IELTSBoost feedback in English and Chinese",
+    zh: "IELTSBoost 反馈的中英文对照截图",
+  },
+  landing_bilingual_label_en: { en: "English", zh: "英文" },
+  landing_bilingual_label_zh: { en: "中文", zh: "中文" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
