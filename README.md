@@ -24,6 +24,21 @@ Users can develop their skills within each of the 4 categories using the followi
 1. Answer questions
 
 
+## Architecture
+
+![IELTSBoost Architecture](docs/architecture-simple.svg)
+
+| Component | Model | Pricing |
+|-----------|-------|---------|
+| Writing Feedback | Claude Sonnet 4 | $3 / $15 per M tokens |
+| Speaking Feedback | Claude Sonnet 4 | $3 / $15 per M tokens |
+| Reading Scoring (fill-ins) | Claude Sonnet 4 | $3 / $15 per M tokens |
+| OCR (handwriting) | Claude Sonnet 4 | $3 / $15 per M tokens |
+| Audio Transcription | OpenAI Whisper-1 | ~$0.006 per minute |
+| Text-to-Speech | OpenAI TTS-1 (Nova) | $15 per M characters |
+
+Reading MCQ, True/False/Not Given, and matching questions are scored deterministically (no AI cost).
+
 ## Getting Started
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).

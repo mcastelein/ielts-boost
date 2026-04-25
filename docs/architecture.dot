@@ -1,0 +1,170 @@
+digraph IELTSBoost {
+    // Global styling
+    rankdir=TB;
+    bgcolor="#fafafa";
+    fontname="Segoe UI";
+    node [fontname="Segoe UI", fontsize=11, style=filled, color="#e0e0e0"];
+    edge [fontname="Segoe UI", fontsize=9, color="#888888"];
+    label="IELTSBoost — AI Architecture & API Flow\n\n";
+    labelloc=t;
+    fontsize=16;
+    fontcolor="#333333";
+
+    // ─── User Entry ───
+    user [
+        label="User\n(Browser / Mobile)",
+        shape=box, style="filled,rounded",
+        fillcolor="#f5f5f5", fontcolor="#333333",
+        penwidth=2, color="#999999"
+    ];
+
+    // ─── Next.js API Layer ───
+    subgraph cluster_api {
+        label="Next.js API Routes";
+        style="rounded,dashed";
+        color="#bbbbbb";
+        fontcolor="#666666";
+        fontsize=12;
+        bgcolor="#ffffff";
+
+        api_score [label="/api/score\nWriting Feedback", shape=box, fillcolor="#fff8f0", fontcolor="#8B4513"];
+        api_speaking [label="/api/speaking\nSpeaking Feedback", shape=box, fillcolor="#fff8f0", fontcolor="#8B4513"];
+        api_reading [label="/api/reading\nReading Scoring", shape=box, fillcolor="#fff8f0", fontcolor="#8B4513"];
+        api_ocr [label="/api/ocr\nHandwriting OCR", shape=box, fillcolor="#fff8f0", fontcolor="#8B4513"];
+        api_transcribe [label="/api/speaking/transcribe\nAudio → Text", shape=box, fillcolor="#f0f8ff", fontcolor="#1a4a6e"];
+        api_tts [label="/api/speaking/tts\nText → Speech", shape=box, fillcolor="#f0f8ff", fontcolor="#1a4a6e"];
+        api_stripe [label="/api/webhooks/stripe\nSubscription Events", shape=box, fillcolor="#f5f0ff", fontcolor="#4a1a6e"];
+    }
+
+    // ─── Usage & Logging ───
+    subgraph cluster_middleware {
+        label="Middleware";
+        style="rounded,dashed";
+        color="#bbbbbb";
+        fontcolor="#666666";
+        fontsize=12;
+        bgcolor="#ffffff";
+
+        usage_check [label="Usage Limiter\n3/day free · unlimited Pro", shape=box, style="filled,rounded", fillcolor="#fefce8", fontcolor="#7c6f00"];
+        api_logger [label="API Logger\nTokens · Cost · Duration", shape=box, style="filled,rounded", fillcolor="#fefce8", fontcolor="#7c6f00"];
+    }
+
+    // ─── AI Models ───
+    subgraph cluster_anthropic {
+        label="Anthropic";
+        style="filled,rounded";
+        color="#d4856a";
+        fillcolor="#c75c2e";
+        fontcolor="#ffffff";
+        fontsize=12;
+
+        claude [
+            label="Claude Sonnet 4\nclaude-sonnet-4-20250514\n\n$3/M in · $15/M out",
+            shape=box, style="filled,rounded",
+            fillcolor="#d4856a", fontcolor="#ffffff",
+            penwidth=0
+        ];
+    }
+
+    subgraph cluster_openai {
+        label="OpenAI";
+        style="filled,rounded";
+        color="#6e9e6e";
+        fillcolor="#3b7a3b";
+        fontcolor="#ffffff";
+        fontsize=12;
+
+        whisper [
+            label="Whisper-1\nSpeech-to-Text\n\n~$0.006/min",
+            shape=box, style="filled,rounded",
+            fillcolor="#6e9e6e", fontcolor="#ffffff",
+            penwidth=0
+        ];
+        tts [
+            label="TTS-1 (Nova)\nText-to-Speech\n\n$15/M chars",
+            shape=box, style="filled,rounded",
+            fillcolor="#6e9e6e", fontcolor="#ffffff",
+            penwidth=0
+        ];
+    }
+
+    // ─── Supabase ───
+    subgraph cluster_supabase {
+        label="Supabase (PostgreSQL + Storage)";
+        style="filled,rounded";
+        color="#4a9e6e";
+        fillcolor="#1a8a4e";
+        fontcolor="#ffffff";
+        fontsize=12;
+
+        db [
+            label="Database\nwriting_submissions · writing_feedback\nspeaking_submissions · speaking_feedback\nreading_submissions · reading_feedback\napi_usage_log · usage_tracking\nuser_settings · feedback",
+            shape=box, style="filled,rounded",
+            fillcolor="#4a9e6e", fontcolor="#ffffff",
+            penwidth=0
+        ];
+    }
+
+    // ─── Stripe ───
+    stripe [
+        label="Stripe\nPro subscriptions\n200 RMB/month",
+        shape=box, style="filled,rounded",
+        fillcolor="#635bff", fontcolor="#ffffff",
+        penwidth=0
+    ];
+
+    // ─── Deterministic ───
+    deterministic [
+        label="Deterministic Scorer\nMCQ · T/F/NG · Matching\n(no AI needed)",
+        shape=box, style="filled,rounded",
+        fillcolor="#e8e8e8", fontcolor="#555555"
+    ];
+
+    // ═══ EDGES ═══
+
+    // User → API routes
+    user -> api_score [label="Submit essay\n(text/image/PDF)", style=bold, color="#8B4513"];
+    user -> api_speaking [label="Submit speaking\nresponse", style=bold, color="#8B4513"];
+    user -> api_reading [label="Submit reading\nanswers", style=bold, color="#8B4513"];
+    user -> api_ocr [label="Upload handwritten\nessay image", style=bold, color="#8B4513"];
+    user -> api_transcribe [label="Record audio", style=bold, color="#1a4a6e"];
+    user -> api_tts [label="Request prompt\naudio", style=bold, color="#1a4a6e"];
+
+    // All AI routes → usage check
+    api_score -> usage_check [style=dashed];
+    api_speaking -> usage_check [style=dashed];
+    api_reading -> usage_check [style=dashed];
+
+    // API routes → Claude
+    api_score -> claude [label="Essay + rubric\n→ JSON feedback\nmax 4000 tokens", color="#c75c2e", style=bold];
+    api_speaking -> claude [label="Response + examiner prompt\n→ band scores\nmax 1500 tokens", color="#c75c2e", style=bold];
+    api_reading -> claude [label="Fill-in answers only\n→ synonym-aware scoring\nmax 800 tokens", color="#c75c2e", style=bold];
+    api_reading -> deterministic [label="MCQ / T-F-NG\n→ exact match", style=dashed];
+    api_ocr -> claude [label="Image (base64) + vision\n→ extracted text\nmax 4000 tokens", color="#c75c2e", style=bold];
+
+    // API routes → OpenAI
+    api_transcribe -> whisper [label="Audio file\n→ English transcript", color="#3b7a3b", style=bold];
+    api_tts -> tts [label="Text\n→ audio/mpeg", color="#3b7a3b", style=bold];
+
+    // All AI calls → logger
+    claude -> api_logger [style=dashed, label="log tokens\n& cost"];
+    whisper -> api_logger [style=dashed, label="log duration\n& cost"];
+    tts -> api_logger [style=dashed, label="log chars\n& cost"];
+
+    // Everything → Supabase
+    api_logger -> db [label="api_usage_log", style=dashed];
+    usage_check -> db [label="usage_tracking\nuser_settings", style=dashed];
+    api_score -> db [label="writing_submissions\nwriting_feedback", color="#1a8a4e"];
+    api_speaking -> db [label="speaking_submissions\nspeaking_feedback", color="#1a8a4e"];
+    api_reading -> db [label="reading_submissions\nreading_feedback", color="#1a8a4e"];
+    api_transcribe -> db [label="speaking_submissions\n(draft)", color="#1a8a4e"];
+
+    // Stripe
+    stripe -> api_stripe [label="Webhook events", color="#635bff", style=bold];
+    api_stripe -> db [label="Update plan\n& subscription", color="#1a8a4e"];
+
+    // Return to user
+    claude -> user [label="Structured feedback\n(EN or 中文)", style=dotted, color="#c75c2e"];
+    whisper -> user [label="Transcript for review", style=dotted, color="#3b7a3b"];
+    tts -> user [label="Audio playback", style=dotted, color="#3b7a3b"];
+}

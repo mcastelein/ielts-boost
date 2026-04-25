@@ -1,0 +1,87 @@
+digraph IELTSBoost {
+    // Layout
+    rankdir=LR;
+    bgcolor="#fafafa";
+    fontname="Segoe UI";
+    node [fontname="Segoe UI", fontsize=11, style="filled,rounded", shape=box, penwidth=0];
+    edge [fontname="Segoe UI", fontsize=9, color="#aaaaaa", arrowsize=0.7];
+    label="IELTSBoost — Architecture Overview\n\n";
+    labelloc=t;
+    fontsize=15;
+    fontcolor="#333333";
+    nodesep=0.6;
+    ranksep=1.2;
+
+    // ─── User ───
+    user [
+        label="User",
+        fillcolor="#f0f0f0", fontcolor="#333333",
+        penwidth=1.5, color="#999999", fontsize=13
+    ];
+
+    // ─── Features (invisible cluster for alignment) ───
+    subgraph cluster_features {
+        style=invis;
+
+        writing [label="Writing\nFeedback", fillcolor="#fff3e6", fontcolor="#8B4513"];
+        speaking [label="Speaking\nFeedback", fillcolor="#fff3e6", fontcolor="#8B4513"];
+        reading [label="Reading\nScoring", fillcolor="#fff3e6", fontcolor="#8B4513"];
+        ocr [label="OCR\n(Handwriting)", fillcolor="#fff3e6", fontcolor="#8B4513"];
+        transcribe [label="Audio\nTranscription", fillcolor="#e6f0ff", fontcolor="#1a4a6e"];
+        tts [label="Text-to-\nSpeech", fillcolor="#e6f0ff", fontcolor="#1a4a6e"];
+    }
+
+    // ─── AI Models ───
+    claude [
+        label="Claude Sonnet 4\n\nWriting · Speaking\nReading · OCR\n\n$3 / $15 per M tokens",
+        fillcolor="#c75c2e", fontcolor="#ffffff",
+        fontsize=11, penwidth=0
+    ];
+
+    openai [
+        label="OpenAI\n\nWhisper-1 (STT)\nTTS-1 Nova\n\n~$0.006/min · $15/M chars",
+        fillcolor="#3b7a3b", fontcolor="#ffffff",
+        fontsize=11, penwidth=0
+    ];
+
+    // ─── Storage ───
+    supabase [
+        label="Supabase\n\nSubmissions · Feedback\nUsage · Auth · Files",
+        fillcolor="#1a8a4e", fontcolor="#ffffff",
+        fontsize=11, penwidth=0
+    ];
+
+    stripe [
+        label="Stripe\n\nPro: 200 RMB/mo\nFree: 3/day limit",
+        fillcolor="#635bff", fontcolor="#ffffff",
+        fontsize=11, penwidth=0
+    ];
+
+    // ─── Edges: User → Features ───
+    user -> writing;
+    user -> speaking;
+    user -> reading;
+    user -> ocr;
+    user -> transcribe;
+    user -> tts;
+
+    // ─── Edges: Features → Claude ───
+    writing -> claude [color="#c75c2e", penwidth=1.5];
+    speaking -> claude [color="#c75c2e", penwidth=1.5];
+    reading -> claude [color="#c75c2e", label="fill-ins\nonly", fontcolor="#c75c2e"];
+    ocr -> claude [color="#c75c2e", penwidth=1.5];
+
+    // ─── Edges: Features → OpenAI ───
+    transcribe -> openai [color="#3b7a3b", penwidth=1.5];
+    tts -> openai [color="#3b7a3b", penwidth=1.5];
+
+    // ─── Edges: Everything → Supabase ───
+    claude -> supabase [style=dashed, label="store results"];
+    openai -> supabase [style=dashed, label="store drafts"];
+    stripe -> supabase [style=dashed, label="plan status"];
+
+    // ─── Alignment hints ───
+    {rank=same; writing; speaking; reading; ocr; transcribe; tts;}
+    {rank=same; claude; openai;}
+    {rank=same; supabase; stripe;}
+}
