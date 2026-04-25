@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLanguage } from "@/lib/language-context";
 import { PrimaryCtaButton, SecondaryCtaButton } from "@/components/landing/cta-buttons";
 
@@ -27,12 +28,14 @@ export default function Hero() {
             </SecondaryCtaButton>
           </div>
         </div>
-        <div
-          aria-hidden="true"
-          className="flex aspect-[4/3] items-center justify-center rounded-xl border border-gray-200 bg-white text-sm text-gray-400 shadow-sm"
-        >
-          [Hero feedback screenshot — drop in public/images/landing/hero-feedback-zh.png]
-        </div>
+        <Image
+          src="/images/landing/hero-feedback.png"
+          alt={t("landing_hero_image_alt")}
+          width={1506}
+          height={832}
+          priority
+          className="rounded-xl border border-gray-200 shadow-sm"
+        />
       </div>
     </section>
   );
