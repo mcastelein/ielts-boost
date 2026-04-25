@@ -576,6 +576,14 @@ export const translations = {
     zh: "仪表盘会显示反复出现的错误，以及你随时间推移的进步趋势。",
   },
   landing_how_cta: { en: "Try it free", zh: "免费试用" },
+
+  // Landing — Personal story
+  landing_story_eyebrow: { en: "Why we built this", zh: "我们为什么做这个" },
+  landing_story_body: {
+    en: "I built IELTSBoost for my wife. She was studying for the IELTS exam, and we couldn't believe how expensive Chinese IELTS tutors had become — hundreds of yuan per hour for the kind of feedback an AI can now give in seconds. She used IELTSBoost to go from a 6.5 to a 7.5. I built this so anyone can have the same kind of help, without the price tag.",
+    zh: "我为我妻子做了 IELTSBoost。她当时正在准备雅思考试，而中国雅思辅导的价格让我们难以置信——每小时几百块人民币，而 AI 现在几秒钟就能给出同样质量的反馈。她用 IELTSBoost 把分数从 6.5 提到了 7.5。我希望任何人都能获得同样的帮助——没有那高昂的价格。",
+  },
+  landing_story_signature: { en: "— Michael", zh: "— Michael" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
