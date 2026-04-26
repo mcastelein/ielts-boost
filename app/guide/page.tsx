@@ -153,13 +153,17 @@ function ListeningSection() {
           <p className="mt-1 text-sm text-blue-700">{t("guide_listening_format")}</p>
         </div>
         <div className="mt-4 space-y-3">
-          {(["guide_listening_s1", "guide_listening_s2", "guide_listening_s3", "guide_listening_s4"] as const).map(
-            (key) => (
-              <div key={key} className="rounded-lg bg-gray-50 p-4">
-                <p className="text-sm leading-relaxed text-gray-700">{t(key)}</p>
-              </div>
-            )
-          )}
+          {([
+            { title: "guide_listening_s1_title", desc: "guide_listening_s1" },
+            { title: "guide_listening_s2_title", desc: "guide_listening_s2" },
+            { title: "guide_listening_s3_title", desc: "guide_listening_s3" },
+            { title: "guide_listening_s4_title", desc: "guide_listening_s4" },
+          ] as const).map(({ title, desc }) => (
+            <div key={title} className="rounded-lg bg-gray-50 p-4">
+              <p className="text-sm font-semibold text-gray-800">{t(title)}</p>
+              <p className="mt-1 text-sm leading-relaxed text-gray-700">{t(desc)}</p>
+            </div>
+          ))}
         </div>
       </SectionCard>
 
@@ -198,12 +202,18 @@ function ReadingSection() {
           <p className="mt-1 text-sm text-blue-700">{t("guide_reading_format")}</p>
         </div>
         <div className="mt-4 space-y-3">
-          <div className="rounded-lg bg-gray-50 p-4">
-            <p className="text-sm leading-relaxed text-gray-700">{t("guide_reading_academic")}</p>
-          </div>
-          <div className="rounded-lg bg-gray-50 p-4">
-            <p className="text-sm leading-relaxed text-gray-700">{t("guide_reading_general")}</p>
-          </div>
+          {([
+            { title: "guide_reading_academic_title", desc: "guide_reading_academic", badge: "A" },
+            { title: "guide_reading_general_title", desc: "guide_reading_general", badge: "G" },
+          ] as const).map(({ title, desc, badge }) => (
+            <div key={title} className="rounded-lg bg-gray-50 p-4">
+              <div className="flex items-center gap-2">
+                <span className="shrink-0 font-bold text-blue-600">{badge}</span>
+                <p className="text-sm font-semibold text-gray-800">{t(title)}</p>
+              </div>
+              <p className="mt-1 text-sm leading-relaxed text-gray-700">{t(desc)}</p>
+            </div>
+          ))}
         </div>
       </SectionCard>
 
@@ -242,15 +252,19 @@ function WritingSection() {
           <p className="mt-1 text-sm text-blue-700">{t("guide_writing_format")}</p>
         </div>
         <div className="mt-4 space-y-3">
-          <div className="rounded-lg bg-gray-50 p-4">
-            <p className="text-sm leading-relaxed text-gray-700">{t("guide_writing_task1_academic")}</p>
-          </div>
-          <div className="rounded-lg bg-gray-50 p-4">
-            <p className="text-sm leading-relaxed text-gray-700">{t("guide_writing_task1_general")}</p>
-          </div>
-          <div className="rounded-lg bg-gray-50 p-4">
-            <p className="text-sm leading-relaxed text-gray-700">{t("guide_writing_task2_both")}</p>
-          </div>
+          {([
+            { title: "guide_writing_task1_academic_title", desc: "guide_writing_task1_academic", badge: "A" },
+            { title: "guide_writing_task1_general_title", desc: "guide_writing_task1_general", badge: "G" },
+            { title: "guide_writing_task2_both_title", desc: "guide_writing_task2_both", badge: null },
+          ] as const).map(({ title, desc, badge }) => (
+            <div key={title} className="rounded-lg bg-gray-50 p-4">
+              <p className="text-sm font-semibold text-gray-800">
+                {badge && <span className="mr-1 font-bold text-blue-600">{badge}</span>}
+                {t(title)}
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-gray-700">{t(desc)}</p>
+            </div>
+          ))}
         </div>
       </SectionCard>
 

@@ -4,10 +4,10 @@ import { useLanguage } from "@/lib/language-context";
 import type { TranslationKey } from "@/lib/translations";
 
 const sections: { titleKey: TranslationKey; bodyKey: TranslationKey }[] = [
+  { titleKey: "landing_guide_section_listening", bodyKey: "landing_guide_section_listening_body" },
+  { titleKey: "landing_guide_section_reading", bodyKey: "landing_guide_section_reading_body" },
   { titleKey: "landing_guide_section_writing", bodyKey: "landing_guide_section_writing_body" },
   { titleKey: "landing_guide_section_speaking", bodyKey: "landing_guide_section_speaking_body" },
-  { titleKey: "landing_guide_section_reading", bodyKey: "landing_guide_section_reading_body" },
-  { titleKey: "landing_guide_section_listening", bodyKey: "landing_guide_section_listening_body" },
 ];
 
 const criteria: TranslationKey[] = [

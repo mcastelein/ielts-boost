@@ -55,6 +55,36 @@ export default function DashboardClient({ writing, speaking, reading, listening 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <ScoreCard
+            sectionName="Listening"
+            latestScore={listening.latestScore}
+            avgScore={listening.avgScore}
+            submissionCount={listening.submissions.length}
+            trend={listening.trend}
+            isExpanded={expanded === "listening"}
+            onToggle={() => toggle("listening")}
+          />
+          <ExpandableSection isExpanded={expanded === "listening"}>
+            <ListeningDetail data={listening} />
+          </ExpandableSection>
+        </div>
+
+        <div>
+          <ScoreCard
+            sectionName="Reading"
+            latestScore={reading.latestScore}
+            avgScore={reading.avgScore}
+            submissionCount={reading.submissions.length}
+            trend={reading.trend}
+            isExpanded={expanded === "reading"}
+            onToggle={() => toggle("reading")}
+          />
+          <ExpandableSection isExpanded={expanded === "reading"}>
+            <ReadingDetail data={reading} />
+          </ExpandableSection>
+        </div>
+
+        <div>
+          <ScoreCard
             sectionName="Writing"
             latestScore={writing.latestScore}
             avgScore={writing.avgScore}
@@ -80,36 +110,6 @@ export default function DashboardClient({ writing, speaking, reading, listening 
           />
           <ExpandableSection isExpanded={expanded === "speaking"}>
             <SpeakingDetail data={speaking} />
-          </ExpandableSection>
-        </div>
-
-        <div>
-          <ScoreCard
-            sectionName="Reading"
-            latestScore={reading.latestScore}
-            avgScore={reading.avgScore}
-            submissionCount={reading.submissions.length}
-            trend={reading.trend}
-            isExpanded={expanded === "reading"}
-            onToggle={() => toggle("reading")}
-          />
-          <ExpandableSection isExpanded={expanded === "reading"}>
-            <ReadingDetail data={reading} />
-          </ExpandableSection>
-        </div>
-
-        <div>
-          <ScoreCard
-            sectionName="Listening"
-            latestScore={listening.latestScore}
-            avgScore={listening.avgScore}
-            submissionCount={listening.submissions.length}
-            trend={listening.trend}
-            isExpanded={expanded === "listening"}
-            onToggle={() => toggle("listening")}
-          />
-          <ExpandableSection isExpanded={expanded === "listening"}>
-            <ListeningDetail data={listening} />
           </ExpandableSection>
         </div>
       </div>

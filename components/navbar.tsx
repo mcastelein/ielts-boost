@@ -15,9 +15,9 @@ const navLinks: { href: string; labelKey: TranslationKey }[] = [
 ];
 
 const practiceLinks: { href: string; labelKey: TranslationKey }[] = [
+  { href: "/listening", labelKey: "nav_listening" },
   { href: "/reading", labelKey: "nav_reading" },
   { href: "/writing", labelKey: "nav_writing" },
-  { href: "/listening", labelKey: "nav_listening" },
   { href: "/speaking", labelKey: "nav_speaking" },
 ];
 
