@@ -12,7 +12,8 @@
       "mcp__claude_ai_Gmail__gmail_list_drafts",
       "Bash(npx vercel *)",
       "Bash(gh api *)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(xargs wc *)"
     ]
   }
 }
