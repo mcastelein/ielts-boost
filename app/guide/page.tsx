@@ -152,17 +152,10 @@ function ListeningSection() {
           <p className="text-sm font-medium text-blue-800">{t("guide_section_format")}</p>
           <p className="mt-1 text-sm text-blue-700">{t("guide_listening_format")}</p>
         </div>
-      </SectionCard>
-
-      <SectionCard>
-        <h3 className="text-lg font-semibold text-gray-900">{t("guide_section_format")}</h3>
         <div className="mt-4 space-y-3">
           {(["guide_listening_s1", "guide_listening_s2", "guide_listening_s3", "guide_listening_s4"] as const).map(
-            (key, i) => (
-              <div key={key} className="flex gap-3 rounded-lg bg-gray-50 p-4">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-                  {i + 1}
-                </span>
+            (key) => (
+              <div key={key} className="rounded-lg bg-gray-50 p-4">
                 <p className="text-sm leading-relaxed text-gray-700">{t(key)}</p>
               </div>
             )
@@ -204,9 +197,13 @@ function ReadingSection() {
           <p className="text-sm font-medium text-blue-800">{t("guide_section_format")}</p>
           <p className="mt-1 text-sm text-blue-700">{t("guide_reading_format")}</p>
         </div>
-        <div className="mt-4 space-y-2">
-          <p className="text-sm leading-relaxed text-gray-700">{t("guide_reading_academic")}</p>
-          <p className="text-sm leading-relaxed text-gray-700">{t("guide_reading_general")}</p>
+        <div className="mt-4 space-y-3">
+          <div className="rounded-lg bg-gray-50 p-4">
+            <p className="text-sm leading-relaxed text-gray-700">{t("guide_reading_academic")}</p>
+          </div>
+          <div className="rounded-lg bg-gray-50 p-4">
+            <p className="text-sm leading-relaxed text-gray-700">{t("guide_reading_general")}</p>
+          </div>
         </div>
       </SectionCard>
 
@@ -308,32 +305,17 @@ function SpeakingSection() {
           <p className="text-sm font-medium text-blue-800">{t("guide_section_format")}</p>
           <p className="mt-1 text-sm text-blue-700">{t("guide_speaking_format")}</p>
         </div>
-      </SectionCard>
-
-      {/* Part 1 */}
-      <SectionCard>
-        <h3 className="text-lg font-semibold text-gray-900">{t("guide_speaking_p1_title")}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-gray-700">{t("guide_speaking_p1_desc")}</p>
-        <div className="mt-3 rounded-lg border-l-4 border-blue-400 bg-blue-50 p-3">
-          <p className="text-sm text-blue-800">{t("guide_speaking_p1_tip")}</p>
-        </div>
-      </SectionCard>
-
-      {/* Part 2 */}
-      <SectionCard>
-        <h3 className="text-lg font-semibold text-gray-900">{t("guide_speaking_p2_title")}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-gray-700">{t("guide_speaking_p2_desc")}</p>
-        <div className="mt-3 rounded-lg border-l-4 border-blue-400 bg-blue-50 p-3">
-          <p className="text-sm text-blue-800">{t("guide_speaking_p2_tip")}</p>
-        </div>
-      </SectionCard>
-
-      {/* Part 3 */}
-      <SectionCard>
-        <h3 className="text-lg font-semibold text-gray-900">{t("guide_speaking_p3_title")}</h3>
-        <p className="mt-2 text-sm leading-relaxed text-gray-700">{t("guide_speaking_p3_desc")}</p>
-        <div className="mt-3 rounded-lg border-l-4 border-blue-400 bg-blue-50 p-3">
-          <p className="text-sm text-blue-800">{t("guide_speaking_p3_tip")}</p>
+        <div className="mt-4 space-y-3">
+          {([
+            { title: "guide_speaking_p1_title", desc: "guide_speaking_p1_desc" },
+            { title: "guide_speaking_p2_title", desc: "guide_speaking_p2_desc" },
+            { title: "guide_speaking_p3_title", desc: "guide_speaking_p3_desc" },
+          ] as const).map(({ title, desc }) => (
+            <div key={title} className="rounded-lg bg-gray-50 p-4">
+              <p className="text-sm font-semibold text-gray-800">{t(title)}</p>
+              <p className="mt-1 text-sm leading-relaxed text-gray-700">{t(desc)}</p>
+            </div>
+          ))}
         </div>
       </SectionCard>
 

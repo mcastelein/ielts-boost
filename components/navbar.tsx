@@ -173,8 +173,8 @@ export default function Navbar() {
 
           {!user && (
             <Link
-              href="/signup"
-              className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+              href="/login"
+              className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
             >
               {t("nav_signup")}
             </Link>

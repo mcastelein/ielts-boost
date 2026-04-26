@@ -42,4 +42,4 @@ next-env.d.ts
 test-results/
 playwright-report/
 
-peter-tasks.md
+PETER_TASK.md

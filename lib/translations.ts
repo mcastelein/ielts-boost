@@ -14,7 +14,7 @@ export const translations = {
   nav_admin: { en: "Admin", zh: "管理" },
   nav_settings: { en: "Settings", zh: "设置" },
   nav_signout: { en: "Sign out", zh: "退出登录" },
-  nav_signup: { en: "Sign up free", zh: "免费注册" },
+  nav_signup: { en: "Sign in", zh: "登录" },
 
   // Guest banner
   guest_banner_text: {
