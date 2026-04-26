@@ -18,8 +18,8 @@ export const translations = {
 
   // Guest banner
   guest_banner_text: {
-    en: "Sign up free to unlock this feature and track your progress.",
-    zh: "免费注册以解锁此功能并追踪您的学习进度。",
+    en: "Sign up to unlock this feature and track your progress.",
+    zh: "注册以解锁此功能并追踪您的学习进度。",
   },
   guest_banner_cta: { en: "Sign up free", zh: "免费注册" },
   guest_banner_no_cc: { en: "No credit card required", zh: "无需信用卡" },
