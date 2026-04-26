@@ -44,11 +44,16 @@ export default function SignupPage() {
     });
 
     if (error) {
-      setError(
-        error.message.includes("already registered")
-          ? t("signup_error_exists")
-          : t("login_error_generic")
-      );
+      if (
+        error.message.toLowerCase().includes("already registered") ||
+        error.message.toLowerCase().includes("already been registered") ||
+        error.message.toLowerCase().includes("email address is already used") ||
+        error.message.toLowerCase().includes("user already exists")
+      ) {
+        setError(t("signup_error_exists"));
+      } else {
+        setError(error.message);
+      }
       setLoading(false);
       return;
     }
