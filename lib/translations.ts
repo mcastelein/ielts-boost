@@ -14,6 +14,15 @@ export const translations = {
   nav_admin: { en: "Admin", zh: "管理" },
   nav_settings: { en: "Settings", zh: "设置" },
   nav_signout: { en: "Sign out", zh: "退出登录" },
+  nav_signup: { en: "Sign up free", zh: "免费注册" },
+
+  // Guest banner
+  guest_banner_text: {
+    en: "Sign up free to unlock this feature and track your progress.",
+    zh: "免费注册以解锁此功能并追踪您的学习进度。",
+  },
+  guest_banner_cta: { en: "Sign up free", zh: "免费注册" },
+  guest_banner_no_cc: { en: "No credit card required", zh: "无需信用卡" },
 
   // Login
   login_tagline: { en: "AI-powered IELTS preparation", zh: "AI驱动的雅思备考平台" },
@@ -695,6 +704,7 @@ export const translations = {
     zh: "准备好看看你目前的雅思分数了吗？",
   },
   landing_final_cta_button: { en: "Start practicing free", zh: "免费开始练习" },
+  landing_final_cta_no_cc: { en: "No credit card required", zh: "无需信用卡" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

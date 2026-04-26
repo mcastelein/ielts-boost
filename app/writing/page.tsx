@@ -10,6 +10,7 @@ import {
 } from "@/lib/writing-prompts";
 import TaskChart from "@/components/TaskChart";
 import { useLanguage } from "@/lib/language-context";
+import GuestBanner from "@/components/GuestBanner";
 
 interface SentenceCorrection {
   original: string;
@@ -92,7 +93,14 @@ function WritingPage() {
   const [extractedText, setExtractedText] = useState<string | null>(null);
   const [result, setResult] = useState<FeedbackResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isGuest, setIsGuest] = useState(false);
   const [usageInfo, setUsageInfo] = useState<{ allowed: boolean; used: number; limit: number } | null>(null);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      setIsGuest(!data.user);
+    });
+  }, []);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resultRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -433,7 +441,9 @@ function WritingPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-8">
+    <>
+      {isGuest && <GuestBanner />}
+      <div className={`mx-auto w-full max-w-3xl px-4 py-6 sm:py-8${isGuest ? " pointer-events-none select-none opacity-50" : ""}`}>
       <h1 className="text-xl font-bold sm:text-2xl">{t("writing_title")}</h1>
       <p className="mt-1 text-sm text-gray-500">
         {step === "setup"
@@ -929,6 +939,7 @@ function WritingPage() {
           )}
         </>
       )}
-    </div>
+      </div>
+    </>
   );
 }

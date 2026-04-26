@@ -6,6 +6,7 @@ import { SPEAKING_PROMPTS, type SpeakingPrompt } from "@/lib/speaking-prompts";
 import AudioRecorder from "@/components/audio-recorder";
 import { useLanguage } from "@/lib/language-context";
 import { createClient } from "@/lib/supabase/client";
+import GuestBanner from "@/components/GuestBanner";
 
 interface SpeakingFeedback {
   estimated_band: number;
@@ -55,7 +56,14 @@ function SpeakingPage() {
   const [transcriptReady, setTranscriptReady] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [saveWarning, setSaveWarning] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
   const [usageInfo, setUsageInfo] = useState<{ allowed: boolean; used: number; limit: number } | null>(null);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      setIsGuest(!data.user);
+    });
+  }, []);
   const [completedPrompts, setCompletedPrompts] = useState<Set<string>>(new Set());
   const [draftId, setDraftId] = useState<string | null>(null);
   const [timerEnabled, setTimerEnabled] = useState(false);
@@ -242,7 +250,9 @@ function SpeakingPage() {
   }, [timerExpired]);
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-8">
+    <>
+      {isGuest && <GuestBanner />}
+      <div className={`mx-auto w-full max-w-3xl px-4 py-6 sm:py-8${isGuest ? " pointer-events-none select-none opacity-50" : ""}`}>
       <h1 className="text-xl font-bold sm:text-2xl">{t("speaking_title")}</h1>
       <p className="mt-1 text-sm text-gray-500">
         {t("speaking_subtitle")}
@@ -637,6 +647,7 @@ function SpeakingPage() {
           </button>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

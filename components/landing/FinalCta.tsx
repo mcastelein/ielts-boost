@@ -12,14 +12,17 @@ export default function FinalCta() {
         <h2 className="text-2xl font-semibold text-white sm:text-3xl">
           {t("landing_final_cta_headline")}
         </h2>
-        <Link
-          href="/signup"
-          data-cta="final"
-          onClick={() => trackLandingCta("final")}
-          className="mt-8 inline-block rounded-lg bg-white px-8 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50"
-        >
-          {t("landing_final_cta_button")}
-        </Link>
+        <div className="mt-8">
+          <Link
+            href="/signup"
+            data-cta="final"
+            onClick={() => trackLandingCta("final")}
+            className="inline-block rounded-lg bg-white px-8 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50"
+          >
+            {t("landing_final_cta_button")}
+          </Link>
+          <p className="mt-2 text-xs text-blue-200">{t("landing_final_cta_no_cc")}</p>
+        </div>
       </div>
     </section>
   );

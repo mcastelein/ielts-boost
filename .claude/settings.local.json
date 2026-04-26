@@ -13,7 +13,8 @@
       "Bash(npx vercel *)",
       "Bash(gh api *)",
       "Bash(curl *)",
-      "Bash(xargs wc *)"
+      "Bash(xargs wc *)",
+      "Bash(grep -E \"\\\\.tsx$\")"
     ]
   }
 }

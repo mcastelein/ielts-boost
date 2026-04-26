@@ -8,12 +8,22 @@ import {
   getTotalListeningQuestions,
   type ListeningTrack,
 } from "@/lib/listening-tracks";
+import GuestBanner from "@/components/GuestBanner";
+import { createClient } from "@/lib/supabase/client";
 
 type Step = "setup" | "loading" | "practice";
 
 export default function ListeningPage() {
   const router = useRouter();
   const { t, locale } = useLanguage();
+
+  const [isGuest, setIsGuest] = useState(false);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      setIsGuest(!data.user);
+    });
+  }, []);
 
   // ── Setup state ──────────────────────────────────────────────────────────
   const [step, setStep] = useState<Step>("setup");
@@ -253,7 +263,9 @@ export default function ListeningPage() {
   // ── SETUP STEP ────────────────────────────────────────────────────────────
   if (step === "setup") {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <>
+        {isGuest && <GuestBanner />}
+        <div className={`mx-auto max-w-4xl px-4 py-8${isGuest ? " pointer-events-none select-none opacity-50" : ""}`}>
         <h1 className="text-2xl font-bold text-gray-900">{t("listening_title")}</h1>
         <p className="mt-1 text-sm text-gray-500">{t("listening_setup_subtitle")}</p>
 
@@ -350,7 +362,8 @@ export default function ListeningPage() {
             {t("listening_start")}
           </button>
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 

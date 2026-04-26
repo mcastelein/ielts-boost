@@ -69,13 +69,11 @@ export default function Navbar() {
     setPracticeDropdownOpen(false);
   }, [pathname]);
 
-  if (!user) return null;
-
-  const avatarUrl = user.user_metadata?.avatar_url ?? user.user_metadata?.picture;
+  const avatarUrl = user?.user_metadata?.avatar_url ?? user?.user_metadata?.picture;
   const displayName =
-    user.user_metadata?.full_name ??
-    user.user_metadata?.name ??
-    user.email?.split("@")[0] ??
+    user?.user_metadata?.full_name ??
+    user?.user_metadata?.name ??
+    user?.email?.split("@")[0] ??
     "User";
   const initials = displayName
     .split(" ")
@@ -89,12 +87,12 @@ export default function Navbar() {
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         {/* Left: Logo + desktop nav */}
         <div className="flex items-center gap-4 md:gap-8">
-          <Link href="/dashboard" className="text-lg font-bold text-gray-900">
+          <Link href={user ? "/dashboard" : "/"} className="text-lg font-bold text-gray-900">
             IELTS<span className="text-blue-600">Boost</span>
           </Link>
           {/* Desktop nav links */}
           <div className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => (
+            {navLinks.filter((link) => user || link.href !== "/dashboard").map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -153,16 +151,18 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link
-              href="/history"
-              className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                pathname.startsWith("/history")
-                  ? "bg-blue-50 text-blue-700"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-              }`}
-            >
-              {t("nav_history")}
-            </Link>
+            {user && (
+              <Link
+                href="/history"
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  pathname.startsWith("/history")
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
+                {t("nav_history")}
+              </Link>
+            )}
           </div>
         </div>
 
@@ -171,95 +171,108 @@ export default function Navbar() {
           {/* Language dropdown */}
           <LanguageDropdown locale={locale} setLocale={setLocale} />
 
-          {/* Upgrade to Pro — hidden on very small screens */}
-          {planType !== "pro" && (
+          {!user && (
             <Link
-              href="/upgrade"
-              className="hidden rounded-md bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90 sm:block"
+              href="/signup"
+              className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
             >
-              {t("nav_upgrade")}
+              {t("nav_signup")}
             </Link>
           )}
 
-          {/* Profile dropdown */}
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen((prev) => !prev)}
-              className="flex items-center gap-2 rounded-full p-0.5 transition-colors hover:bg-gray-100"
-            >
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayName}
-                  className="h-8 w-8 rounded-full object-cover"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-medium text-white">
-                  {initials}
-                </div>
+          {user && (
+            <>
+              {/* Upgrade to Pro — hidden on very small screens */}
+              {planType !== "pro" && (
+                <Link
+                  href="/upgrade"
+                  className="hidden rounded-md bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90 sm:block"
+                >
+                  {t("nav_upgrade")}
+                </Link>
               )}
-            </button>
 
-            {dropdownOpen && (
-              <div className="absolute right-0 top-full z-50 mt-1 w-52 rounded-lg border border-gray-200 bg-white py-1 shadow-lg sm:w-56">
-                {/* User info */}
-                <div className="border-b border-gray-100 px-4 py-3">
-                  <p className="truncate text-sm font-medium text-gray-900">{displayName}</p>
-                  <p className="truncate text-xs text-gray-500">{user.email}</p>
-                </div>
-
-                {/* Links */}
-                <div className="py-1">
-                  {/* Upgrade (shown in dropdown on mobile) */}
-                  {planType !== "pro" && (
-                    <Link
-                      href="/upgrade"
-                      onClick={() => setDropdownOpen(false)}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 sm:hidden"
-                    >
-                      <span>{t("nav_upgrade")}</span>
-                      <span className="ml-auto rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700">
-                        Pro
-                      </span>
-                    </Link>
+              {/* Profile dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen((prev) => !prev)}
+                  className="flex items-center gap-2 rounded-full p-0.5 transition-colors hover:bg-gray-100"
+                >
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt={displayName}
+                      className="h-8 w-8 rounded-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-medium text-white">
+                      {initials}
+                    </div>
                   )}
-                  <Link
-                    href="/settings"
-                    onClick={() => setDropdownOpen(false)}
-                    className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                  >
-                    {t("nav_settings")}
-                  </Link>
+                </button>
 
-                  {isAdmin && (
-                    <Link
-                      href="/admin"
-                      onClick={() => setDropdownOpen(false)}
-                      className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      <span>{t("nav_admin")}</span>
-                      <span className="ml-auto rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700">
-                        Admin
-                      </span>
-                    </Link>
-                  )}
-                </div>
+                {dropdownOpen && (
+                  <div className="absolute right-0 top-full z-50 mt-1 w-52 rounded-lg border border-gray-200 bg-white py-1 shadow-lg sm:w-56">
+                    {/* User info */}
+                    <div className="border-b border-gray-100 px-4 py-3">
+                      <p className="truncate text-sm font-medium text-gray-900">{displayName}</p>
+                      <p className="truncate text-xs text-gray-500">{user.email}</p>
+                    </div>
 
-                {/* Sign out */}
-                <div className="border-t border-gray-100 py-1">
-                  <form action="/auth/signout" method="post">
-                    <button
-                      type="submit"
-                      className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      {t("nav_signout")}
-                    </button>
-                  </form>
-                </div>
+                    {/* Links */}
+                    <div className="py-1">
+                      {/* Upgrade (shown in dropdown on mobile) */}
+                      {planType !== "pro" && (
+                        <Link
+                          href="/upgrade"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 sm:hidden"
+                        >
+                          <span>{t("nav_upgrade")}</span>
+                          <span className="ml-auto rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700">
+                            Pro
+                          </span>
+                        </Link>
+                      )}
+                      <Link
+                        href="/settings"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        {t("nav_settings")}
+                      </Link>
+
+                      {isAdmin && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        >
+                          <span>{t("nav_admin")}</span>
+                          <span className="ml-auto rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700">
+                            Admin
+                          </span>
+                        </Link>
+                      )}
+                    </div>
+
+                    {/* Sign out */}
+                    <div className="border-t border-gray-100 py-1">
+                      <form action="/auth/signout" method="post">
+                        <button
+                          type="submit"
+                          className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        >
+                          {t("nav_signout")}
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
 
           {/* Mobile hamburger button */}
           <button
@@ -286,7 +299,7 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div className="border-t border-gray-200 bg-white px-4 pb-3 pt-2 md:hidden">
           <div className="space-y-1">
-            {navLinks.map((link) => (
+            {navLinks.filter((link) => user || link.href !== "/dashboard").map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

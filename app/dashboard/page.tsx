@@ -3,6 +3,7 @@ import {
   fetchWritingDashboardData,
   fetchSpeakingDashboardData,
   fetchReadingDashboardData,
+  fetchListeningDashboardData,
 } from "@/lib/dashboard-data";
 import DashboardClient from "@/components/dashboard/DashboardClient";
 import DashboardSignIn from "@/components/dashboard/DashboardSignIn";
@@ -21,15 +22,16 @@ export default async function DashboardPage() {
     );
   }
 
-  const [writing, speaking, reading] = await Promise.all([
+  const [writing, speaking, reading, listening] = await Promise.all([
     fetchWritingDashboardData(user.id, supabase),
     fetchSpeakingDashboardData(user.id, supabase),
     fetchReadingDashboardData(user.id, supabase),
+    fetchListeningDashboardData(user.id, supabase),
   ]);
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
-      <DashboardClient writing={writing} speaking={speaking} reading={reading} />
+      <DashboardClient writing={writing} speaking={speaking} reading={reading} listening={listening} />
     </div>
   );
 }

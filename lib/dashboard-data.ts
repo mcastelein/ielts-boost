@@ -269,3 +269,81 @@ export async function fetchReadingDashboardData(
     weaknesses: [],
   };
 }
+
+export async function fetchListeningDashboardData(
+  userId: string,
+  supabase: SupabaseClient
+): Promise<SectionDashboardData> {
+  const { data: raw } = await supabase
+    .from("listening_submissions")
+    .select(
+      "id, track_title, track_slug, created_at, listening_feedback(raw_score, total_questions, band_score)"
+    )
+    .eq("user_id", userId)
+    .neq("status", "draft")
+    .order("created_at", { ascending: true });
+
+  const rows = (raw ?? []) as Array<{
+    id: string;
+    track_title: string;
+    track_slug: string;
+    created_at: string;
+    listening_feedback: {
+      raw_score: number;
+      total_questions: number;
+      band_score: number;
+    }[];
+  }>;
+
+  const withFeedback = rows.filter((r) => r.listening_feedback?.length > 0);
+  const scores = withFeedback.map((r) => r.listening_feedback[0].band_score);
+
+  const submissions = rows.map((r) => ({
+    id: r.id,
+    date: new Date(r.created_at).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    }),
+    label: r.track_title,
+    score: r.listening_feedback?.length > 0 ? r.listening_feedback[0].band_score : null,
+  }));
+
+  const trendData: TrendPoint[] = withFeedback.map((r) => ({
+    date: new Date(r.created_at).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+    }),
+    score: r.listening_feedback[0].band_score,
+  }));
+
+  const latest =
+    withFeedback.length > 0
+      ? withFeedback[withFeedback.length - 1].listening_feedback[0]
+      : null;
+
+  const latestSubScores: SubScore[] = latest
+    ? [
+        { label: "Raw Score", score: latest.raw_score },
+        {
+          label: "Accuracy",
+          score:
+            Math.round((latest.raw_score / latest.total_questions) * 90) / 10,
+        },
+      ]
+    : [];
+
+  return {
+    submissions: submissions.reverse(),
+    latestScore: scores.length > 0 ? scores[scores.length - 1] : null,
+    avgScore:
+      scores.length > 0
+        ? Math.round(
+            (scores.reduce((a, b) => a + b, 0) / scores.length) * 10
+          ) / 10
+        : null,
+    trend: computeTrend(scores),
+    trendData,
+    latestSubScores,
+    weaknesses: [],
+  };
+}
