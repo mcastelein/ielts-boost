@@ -3,6 +3,8 @@
 import { Suspense, useState, useRef, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SPEAKING_PROMPTS, type SpeakingPrompt } from "@/lib/speaking-prompts";
+
+const USE_DB = process.env.NEXT_PUBLIC_CONTENT_SOURCE === "db";
 import AudioRecorder from "@/components/audio-recorder";
 import { useLanguage } from "@/lib/language-context";
 import { createClient } from "@/lib/supabase/client";
@@ -64,6 +66,30 @@ function SpeakingPage() {
       setIsGuest(!data.user);
     });
   }, []);
+  const [dbPrompts, setDbPrompts] = useState<SpeakingPrompt[]>([]);
+
+  // Fetch prompts from DB when feature flag is on
+  useEffect(() => {
+    if (!USE_DB) return;
+    createClient()
+      .from("speaking_prompts")
+      .select("part, topic, question, follow_up")
+      .eq("is_active", true)
+      .order("display_order")
+      .then(({ data }) => {
+        if (data) {
+          setDbPrompts(
+            data.map((row) => ({
+              part: row.part as 1 | 2 | 3,
+              topic: row.topic,
+              question: row.question,
+              followUp: row.follow_up ?? undefined,
+            }))
+          );
+        }
+      });
+  }, []);
+
   const [completedPrompts, setCompletedPrompts] = useState<Set<string>>(new Set());
   const [draftId, setDraftId] = useState<string | null>(null);
   const [timerEnabled, setTimerEnabled] = useState(false);
@@ -77,7 +103,8 @@ function SpeakingPage() {
 
   const timerSeconds = SPEAKING_TIMER_SECONDS[selectedPart] ?? 120;
 
-  const prompts = SPEAKING_PROMPTS.filter((p) => p.part === selectedPart);
+  const allPrompts = USE_DB ? dbPrompts : SPEAKING_PROMPTS;
+  const prompts = allPrompts.filter((p) => p.part === selectedPart);
 
   // Check speaking usage limits and fetch completed prompts on mount
   useEffect(() => {

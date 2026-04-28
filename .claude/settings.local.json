@@ -14,7 +14,12 @@
       "Bash(gh api *)",
       "Bash(curl *)",
       "Bash(xargs wc *)",
-      "Bash(grep -E \"\\\\.tsx$\")"
+      "Bash(grep -E \"\\\\.tsx$\")",
+      "Bash(xargs -I {} basename {})",
+      "Bash(sed 's/.*\\\\.from\\(//')",
+      "Bash(sed 's/\\).*//')",
+      "Bash(sed 's/.*\\\\.from\\(\"//')",
+      "Bash(sed 's/\"\\).*//')"
     ]
   }
 }
