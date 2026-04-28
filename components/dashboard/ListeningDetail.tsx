@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
 import { btnPrimaryBlock } from "@/lib/button-styles";
+import { sectionIcons } from "@/lib/section-icons";
 import ScoreTrendChart from "./ScoreTrendChart";
 import SubScoreBarChart from "./SubScoreBarChart";
 import type { SectionDashboardData } from "@/lib/dashboard-data";
@@ -62,7 +63,7 @@ export default function ListeningDetail({ data }: ListeningDetailProps) {
         href="/listening"
         className={btnPrimaryBlock}
       >
-        {t("dashboard_practice_listening")}
+        {sectionIcons.listening} {t("dashboard_practice_listening")}
       </Link>
     </div>
   );

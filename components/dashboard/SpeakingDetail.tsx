@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
 import { btnPrimaryBlock } from "@/lib/button-styles";
+import { sectionIcons } from "@/lib/section-icons";
 import ScoreTrendChart from "./ScoreTrendChart";
 import SubScoreBarChart from "./SubScoreBarChart";
 import type { SectionDashboardData } from "@/lib/dashboard-data";
@@ -66,7 +67,7 @@ export default function SpeakingDetail({ data }: SpeakingDetailProps) {
         href="/speaking"
         className={btnPrimaryBlock}
       >
-        {t("dashboard_practice_speaking")}
+        {sectionIcons.speaking} {t("dashboard_practice_speaking")}
       </Link>
     </div>
   );

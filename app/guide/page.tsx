@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useLanguage } from "@/lib/language-context";
+import { sectionIcons } from "@/lib/section-icons";
+import { btnPrimary } from "@/lib/button-styles";
 
 type Section = "overview" | "listening" | "reading" | "writing" | "speaking";
 
@@ -12,10 +14,10 @@ export default function GuidePage() {
 
   const sections: { id: Section; label: string; icon: string }[] = [
     { id: "overview", label: t("guide_overview_title"), icon: "📋" },
-    { id: "listening", label: t("guide_listening_title"), icon: "🎧" },
-    { id: "reading", label: t("guide_reading_title"), icon: "📖" },
-    { id: "writing", label: t("guide_writing_title"), icon: "✍️" },
-    { id: "speaking", label: t("guide_speaking_title"), icon: "🎤" },
+    { id: "listening", label: t("guide_listening_title"), icon: sectionIcons.listening },
+    { id: "reading", label: t("guide_reading_title"), icon: sectionIcons.reading },
+    { id: "writing", label: t("guide_writing_title"), icon: sectionIcons.writing },
+    { id: "speaking", label: t("guide_speaking_title"), icon: sectionIcons.speaking },
   ];
 
   return (
@@ -123,10 +125,10 @@ function OverviewSection({ onSelectSection }: { onSelectSection: (section: Secti
       {/* Quick overview of all 4 sections — click to navigate to that tab */}
       <div className="grid gap-4 sm:grid-cols-2">
         {[
-          { id: "listening" as Section, icon: "🎧", title: t("guide_listening_title"), desc: "30 min — 4 sections, 40 questions" },
-          { id: "reading" as Section, icon: "📖", title: t("guide_reading_title"), desc: "60 min — 3 passages, 40 questions" },
-          { id: "writing" as Section, icon: "✍️", title: t("guide_writing_title"), desc: "60 min — 2 tasks" },
-          { id: "speaking" as Section, icon: "🎤", title: t("guide_speaking_title"), desc: "11-14 min — 3 parts" },
+          { id: "listening" as Section, icon: sectionIcons.listening, title: t("guide_listening_title"), desc: "30 min — 4 sections, 40 questions" },
+          { id: "reading" as Section, icon: sectionIcons.reading, title: t("guide_reading_title"), desc: "60 min — 3 passages, 40 questions" },
+          { id: "writing" as Section, icon: sectionIcons.writing, title: t("guide_writing_title"), desc: "60 min — 2 tasks" },
+          { id: "speaking" as Section, icon: sectionIcons.speaking, title: t("guide_speaking_title"), desc: "11-14 min — 3 parts" },
         ].map((item) => (
           <button
             key={item.id}
@@ -148,7 +150,7 @@ function ListeningSection() {
   return (
     <>
       <SectionCard>
-        <SectionHeading icon="🎧" title={t("guide_listening_title")} />
+        <SectionHeading icon={sectionIcons.listening} title={t("guide_listening_title")} />
         <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3">
           <p className="text-sm font-medium text-blue-800">{t("guide_section_format")}</p>
           <p className="mt-1 text-sm text-blue-700">{t("guide_listening_format")}</p>
@@ -180,11 +182,8 @@ function ListeningSection() {
       <div className="rounded-xl bg-blue-50 p-6">
         <h3 className="text-base font-semibold text-gray-900">{t("guide_practice_cta")}</h3>
         <div className="mt-3">
-          <Link
-            href="/listening"
-            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
-          >
-            {t("guide_start_listening")}
+          <Link href="/listening" className={`inline-flex items-center gap-2 ${btnPrimary}`}>
+            {sectionIcons.listening} {t("guide_start_listening")}
           </Link>
         </div>
       </div>
@@ -197,7 +196,7 @@ function ReadingSection() {
   return (
     <>
       <SectionCard>
-        <SectionHeading icon="📖" title={t("guide_reading_title")} />
+        <SectionHeading icon={sectionIcons.reading} title={t("guide_reading_title")} />
         <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3">
           <p className="text-sm font-medium text-blue-800">{t("guide_section_format")}</p>
           <p className="mt-1 text-sm text-blue-700">{t("guide_reading_format")}</p>
@@ -230,11 +229,8 @@ function ReadingSection() {
       <div className="rounded-xl bg-blue-50 p-6">
         <h3 className="text-base font-semibold text-gray-900">{t("guide_practice_cta")}</h3>
         <div className="mt-3">
-          <Link
-            href="/reading"
-            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
-          >
-            {t("guide_start_reading")}
+          <Link href="/reading" className={`inline-flex items-center gap-2 ${btnPrimary}`}>
+            {sectionIcons.reading} {t("guide_start_reading")}
           </Link>
         </div>
       </div>
@@ -247,7 +243,7 @@ function WritingSection() {
   return (
     <>
       <SectionCard>
-        <SectionHeading icon="✍️" title={t("guide_writing_title")} />
+        <SectionHeading icon={sectionIcons.writing} title={t("guide_writing_title")} />
         <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3">
           <p className="text-sm font-medium text-blue-800">{t("guide_section_format")}</p>
           <p className="mt-1 text-sm text-blue-700">{t("guide_writing_format")}</p>
@@ -298,11 +294,8 @@ function WritingSection() {
       <div className="rounded-xl bg-blue-50 p-6">
         <h3 className="text-base font-semibold text-gray-900">{t("guide_practice_cta")}</h3>
         <div className="mt-3">
-          <Link
-            href="/writing"
-            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
-          >
-            {t("guide_start_writing")}
+          <Link href="/writing" className={`inline-flex items-center gap-2 ${btnPrimary}`}>
+            {sectionIcons.writing} {t("guide_start_writing")}
           </Link>
         </div>
       </div>
@@ -315,7 +308,7 @@ function SpeakingSection() {
   return (
     <>
       <SectionCard>
-        <SectionHeading icon="🎤" title={t("guide_speaking_title")} />
+        <SectionHeading icon={sectionIcons.speaking} title={t("guide_speaking_title")} />
         <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3">
           <p className="text-sm font-medium text-blue-800">{t("guide_section_format")}</p>
           <p className="mt-1 text-sm text-blue-700">{t("guide_speaking_format")}</p>
@@ -365,11 +358,8 @@ function SpeakingSection() {
       <div className="rounded-xl bg-blue-50 p-6">
         <h3 className="text-base font-semibold text-gray-900">{t("guide_practice_cta")}</h3>
         <div className="mt-3">
-          <Link
-            href="/speaking"
-            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
-          >
-            {t("guide_start_speaking")}
+          <Link href="/speaking" className={`inline-flex items-center gap-2 ${btnPrimary}`}>
+            {sectionIcons.speaking} {t("guide_start_speaking")}
           </Link>
         </div>
       </div>

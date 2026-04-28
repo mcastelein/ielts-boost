@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
 import { btnPrimaryBlock } from "@/lib/button-styles";
+import { sectionIcons } from "@/lib/section-icons";
 import ScoreTrendChart from "./ScoreTrendChart";
 import SubScoreBarChart from "./SubScoreBarChart";
 import type { SectionDashboardData } from "@/lib/dashboard-data";
@@ -63,7 +64,7 @@ export default function ReadingDetail({ data }: ReadingDetailProps) {
         href="/reading"
         className={btnPrimaryBlock}
       >
-        {t("dashboard_practice_reading")}
+        {sectionIcons.reading} {t("dashboard_practice_reading")}
       </Link>
     </div>
   );
