@@ -5,7 +5,7 @@ test.describe("Public pages load correctly", () => {
     await page.goto("/");
     for (const id of [
       "hero", "personas", "guide", "how-it-works", "personal-story",
-      "comparison", "bilingual", "pricing", "faq", "mission", "final-cta",
+      "comparison", "pricing", "faq", "mission", "final-cta",
     ]) {
       await expect(page.locator(`#${id}`)).toBeVisible();
     }
@@ -18,9 +18,6 @@ test.describe("Public pages load correctly", () => {
     const primary = hero.locator('[data-cta="hero-primary"]');
     await expect(primary).toBeVisible();
     await expect(primary).toHaveAttribute("href", "/signup");
-    const secondary = hero.locator('[data-cta="hero-secondary"]');
-    await expect(secondary).toBeVisible();
-    await expect(secondary).toHaveAttribute("href", "#bilingual");
   });
 
   test("login page has email/password form and Google auth", async ({ page }) => {

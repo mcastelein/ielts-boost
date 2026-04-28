@@ -6,7 +6,6 @@ import { trackLandingCta } from "@/lib/landing-analytics";
 
 export type LandingCta =
   | "hero-primary"
-  | "hero-secondary"
   | "how-it-works"
   | "pricing-free"
   | "pricing-pro"

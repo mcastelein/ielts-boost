@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useLanguage } from "@/lib/language-context";
-import { PrimaryCtaButton, SecondaryCtaButton } from "@/components/landing/cta-buttons";
+import { PrimaryCtaButton } from "@/components/landing/cta-buttons";
 
 export default function Hero() {
   const { t } = useLanguage();
@@ -19,13 +19,10 @@ export default function Hero() {
           <p className="mt-5 text-base text-gray-600 sm:text-lg">
             {t("landing_hero_subhead")}
           </p>
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-4 lg:items-start lg:justify-start">
+          <div className="mt-8 flex flex-col items-center sm:flex-row lg:items-start lg:justify-start">
             <PrimaryCtaButton href="/signup" ctaId="hero-primary" width="responsive">
               {t("landing_hero_cta_primary")}
             </PrimaryCtaButton>
-            <SecondaryCtaButton href="#bilingual" ctaId="hero-secondary" width="responsive">
-              {t("landing_hero_cta_secondary")}
-            </SecondaryCtaButton>
           </div>
         </div>
         <Image

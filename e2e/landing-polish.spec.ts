@@ -13,12 +13,12 @@ test.describe("Landing page polish", () => {
     expect(overflowsHorizontally).toBe(false);
   });
 
-  test("all 11 sections render at desktop viewport", async ({ page }) => {
+  test("all 10 sections render at desktop viewport", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/");
     for (const id of [
       "hero", "personas", "guide", "how-it-works", "personal-story",
-      "comparison", "bilingual", "pricing", "faq", "mission", "final-cta",
+      "comparison", "pricing", "faq", "mission", "final-cta",
     ]) {
       await expect(page.locator(`#${id}`)).toBeVisible();
     }
@@ -76,7 +76,7 @@ test.describe("Landing page polish", () => {
   test("all CTA links go to /signup or /upgrade or are #anchors", async ({ page }) => {
     await page.goto("/");
     const ctas = await page.locator("[data-cta]").all();
-    expect(ctas.length).toBe(6);
+    expect(ctas.length).toBe(5);
     for (const cta of ctas) {
       const href = await cta.getAttribute("href");
       expect(href).toBeTruthy();

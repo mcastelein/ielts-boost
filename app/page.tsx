@@ -4,7 +4,6 @@ import IeltsGuide from "@/components/landing/IeltsGuide";
 import HowItWorks from "@/components/landing/HowItWorks";
 import PersonalStory from "@/components/landing/PersonalStory";
 import ComparisonTable from "@/components/landing/ComparisonTable";
-import BilingualShowcase from "@/components/landing/BilingualShowcase";
 import Pricing from "@/components/landing/Pricing";
 import Faq from "@/components/landing/Faq";
 import MissionStrip from "@/components/landing/MissionStrip";
@@ -19,7 +18,6 @@ export default function Home() {
       <HowItWorks />
       <PersonalStory />
       <ComparisonTable />
-      <BilingualShowcase />
       <Pricing />
       <Faq />
       <MissionStrip />
