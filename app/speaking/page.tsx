@@ -2,9 +2,7 @@
 
 import { Suspense, useState, useRef, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SPEAKING_PROMPTS, type SpeakingPrompt } from "@/lib/speaking-prompts";
-
-const USE_DB = process.env.NEXT_PUBLIC_CONTENT_SOURCE === "db";
+import type { SpeakingPrompt } from "@/lib/speaking-prompts";
 import AudioRecorder from "@/components/audio-recorder";
 import { useLanguage } from "@/lib/language-context";
 import { createClient } from "@/lib/supabase/client";
@@ -68,9 +66,7 @@ function SpeakingPage() {
   }, []);
   const [dbPrompts, setDbPrompts] = useState<SpeakingPrompt[]>([]);
 
-  // Fetch prompts from DB when feature flag is on
   useEffect(() => {
-    if (!USE_DB) return;
     createClient()
       .from("speaking_prompts")
       .select("part, topic, question, follow_up")
@@ -103,8 +99,7 @@ function SpeakingPage() {
 
   const timerSeconds = SPEAKING_TIMER_SECONDS[selectedPart] ?? 120;
 
-  const allPrompts = USE_DB ? dbPrompts : SPEAKING_PROMPTS;
-  const prompts = allPrompts.filter((p) => p.part === selectedPart);
+  const prompts = dbPrompts.filter((p) => p.part === selectedPart);
 
   // Check speaking usage limits and fetch completed prompts on mount
   useEffect(() => {

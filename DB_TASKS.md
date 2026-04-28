@@ -10,9 +10,9 @@ Migration order: Speaking → Writing → Reading → Listening (simplest to mos
 
 - [x] `supabase/add_content_speaking_prompts.sql` — create table, indexes, RLS
 - [x] `scripts/seed-content.ts` — seed script (speaking section)
-- [ ] Run migration in Supabase, then: `npx tsx scripts/seed-content.ts` — verify 18 rows
+- [x] Run migration in Supabase, then: `npx tsx scripts/seed-content.ts` — verify 18 rows
 - [x] Update `app/speaking/page.tsx` selection UI to fetch from DB
-- [ ] Add `NEXT_PUBLIC_CONTENT_SOURCE=db` to `.env.local`, restart dev server, test end-to-end
+- [x] Add `NEXT_PUBLIC_CONTENT_SOURCE=db` to `.env.local`, restart dev server, test end-to-end
 
 ## Phase 2 — Writing
 
