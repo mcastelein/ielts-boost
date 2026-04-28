@@ -8,6 +8,7 @@ import type { User } from "@supabase/supabase-js";
 import { useLanguage } from "@/lib/language-context";
 import type { TranslationKey } from "@/lib/translations";
 import LanguageDropdown from "@/components/language-dropdown";
+import { btnPrimarySmall, btnSecondarySmall } from "@/lib/button-styles";
 
 const navLinks: { href: string; labelKey: TranslationKey }[] = [
   { href: "/dashboard", labelKey: "nav_dashboard" },
@@ -174,7 +175,7 @@ export default function Navbar() {
           {!user && (
             <Link
               href="/login"
-              className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+              className={btnSecondarySmall}
             >
               {t("nav_signup")}
             </Link>
@@ -186,7 +187,7 @@ export default function Navbar() {
               {planType !== "pro" && (
                 <Link
                   href="/upgrade"
-                  className="hidden rounded-md bg-gradient-to-r from-blue-600 to-blue-700 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-90 sm:block"
+                  className={`hidden sm:block ${btnPrimarySmall}`}
                 >
                   {t("nav_upgrade")}
                 </Link>

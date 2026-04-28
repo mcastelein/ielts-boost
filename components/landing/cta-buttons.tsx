@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { trackLandingCta } from "@/lib/landing-analytics";
+import { btnPrimary, btnSecondary } from "@/lib/button-styles";
 
 export type LandingCta =
   | "hero-primary"
@@ -20,9 +21,6 @@ interface CtaProps {
   width?: Width;
   children: ReactNode;
 }
-
-const baseClass =
-  "rounded-lg px-6 py-3 text-sm font-semibold text-center shadow-sm transition-colors";
 
 const widthClass: Record<Width, string> = {
   inline: "",
@@ -53,11 +51,11 @@ function renderButton(
 }
 
 export function PrimaryCtaButton({ href, ctaId, width = "inline", children }: CtaProps) {
-  const className = `${baseClass} bg-blue-600 text-white hover:bg-blue-700 ${widthClass[width]}`.trim();
+  const className = `${btnPrimary} ${widthClass[width]}`.trim();
   return renderButton(href, ctaId, className, children);
 }
 
 export function SecondaryCtaButton({ href, ctaId, width = "inline", children }: CtaProps) {
-  const className = `${baseClass} border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 ${widthClass[width]}`.trim();
+  const className = `${btnSecondary} ${widthClass[width]}`.trim();
   return renderButton(href, ctaId, className, children);
 }

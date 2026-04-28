@@ -458,6 +458,9 @@ export const translations = {
   listening_words: { en: "words", zh: "个词" },
   dashboard_listening_no_data: { en: "No listening sessions yet.", zh: "暂无听力练习记录。" },
   dashboard_start_listening: { en: "Start listening practice", zh: "开始听力练习" },
+  dashboard_practice_writing: { en: "Practice Writing", zh: "写作练习" },
+  dashboard_practice_reading: { en: "Practice Reading", zh: "阅读练习" },
+  dashboard_practice_listening: { en: "Practice Listening", zh: "听力练习" },
 
   // Common
   common_signin: { en: "Please sign in", zh: "请登录" },

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { btnPrimaryBlock } from "@/lib/button-styles";
 import ScoreTrendChart from "./ScoreTrendChart";
 import SubScoreBarChart from "./SubScoreBarChart";
 import type { SectionDashboardData } from "@/lib/dashboard-data";
@@ -41,10 +42,7 @@ export default function WritingDetail({ data }: WritingDetailProps) {
       <div>
         <h3 className="mb-2 text-sm font-semibold text-gray-700">{t("dashboard_recent")}</h3>
         {data.submissions.length === 0 ? (
-          <p className="text-sm text-gray-400">
-            {t("dashboard_no_writing")}{" "}
-            <Link href="/writing" className="text-blue-600 hover:underline">{t("dashboard_start_writing")}</Link>
-          </p>
+          <p className="text-sm text-gray-400">{t("dashboard_no_writing")}</p>
         ) : (
           <ul className="divide-y divide-gray-100 rounded-lg border border-gray-100">
             {data.submissions.slice(0, 10).map((s) => (
@@ -68,6 +66,13 @@ export default function WritingDetail({ data }: WritingDetailProps) {
           </ul>
         )}
       </div>
+
+      <Link
+        href="/writing"
+        className={btnPrimaryBlock}
+      >
+        {t("dashboard_practice_writing")}
+      </Link>
     </div>
   );
 }

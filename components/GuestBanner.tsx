@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { btnPrimarySmall } from "@/lib/button-styles";
 
 export default function GuestBanner() {
   const { t } = useLanguage();
@@ -12,7 +13,7 @@ export default function GuestBanner() {
         <div className="text-center">
           <Link
             href="/signup"
-            className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className={btnPrimarySmall}
           >
             {t("guest_banner_cta")}
           </Link>

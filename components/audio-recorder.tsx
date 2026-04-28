@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { btnPrimarySmall, btnSecondarySmall } from "@/lib/button-styles";
 
 interface AudioRecorderProps {
   onTranscript: (text: string, draftId?: string | null) => void;
@@ -164,13 +165,13 @@ export default function AudioRecorder({ onTranscript, disabled, extraFormData }:
           <div className="flex gap-2">
             <button
               onClick={discardRecording}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className={btnSecondarySmall}
             >
               Discard
             </button>
             <button
               onClick={submitRecording}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              className={btnPrimarySmall}
             >
               Transcribe & Submit
             </button>

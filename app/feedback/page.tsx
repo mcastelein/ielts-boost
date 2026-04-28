@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLanguage } from "@/lib/language-context";
+import { btnPrimaryBlock, btnSecondarySmall } from "@/lib/button-styles";
 
 const CATEGORIES = ["bug", "feature", "improvement", "other"] as const;
 
@@ -60,7 +61,7 @@ export default function FeedbackPage() {
           <p className="mt-4 text-lg font-semibold text-green-800">{t("feedback_success")}</p>
           <button
             onClick={() => setSent(false)}
-            className="mt-6 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className={`mt-6 ${btnSecondarySmall}`}
           >
             Send another
           </button>
@@ -137,7 +138,7 @@ export default function FeedbackPage() {
         <button
           type="submit"
           disabled={!subject.trim() || !message.trim() || sending}
-          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
+          className={`${btnPrimaryBlock} disabled:opacity-40 disabled:cursor-not-allowed`}
         >
           {sending ? t("feedback_sending") : t("feedback_submit")}
         </button>
