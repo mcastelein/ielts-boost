@@ -9,7 +9,8 @@ export type LandingCta =
   | "how-it-works"
   | "pricing-free"
   | "pricing-pro"
-  | "final";
+  | "final"
+  | "guide";
 
 type Width = "inline" | "responsive" | "block";
 

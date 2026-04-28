@@ -45,7 +45,7 @@ export default function GuidePage() {
 
       {/* Content */}
       <div className="space-y-6">
-        {activeSection === "overview" && <OverviewSection />}
+        {activeSection === "overview" && <OverviewSection onSelectSection={setActiveSection} />}
         {activeSection === "listening" && <ListeningSection />}
         {activeSection === "reading" && <ReadingSection />}
         {activeSection === "writing" && <WritingSection />}
@@ -82,7 +82,7 @@ function TipItem({ text }: { text: string }) {
   );
 }
 
-function OverviewSection() {
+function OverviewSection({ onSelectSection }: { onSelectSection: (section: Section) => void }) {
   const { t } = useLanguage();
   return (
     <>
@@ -120,22 +120,23 @@ function OverviewSection() {
         </div>
       </SectionCard>
 
-      {/* Quick overview of all 4 sections */}
+      {/* Quick overview of all 4 sections — click to navigate to that tab */}
       <div className="grid gap-4 sm:grid-cols-2">
         {[
-          { icon: "🎧", title: t("guide_listening_title"), desc: "30 min — 4 sections, 40 questions" },
-          { icon: "📖", title: t("guide_reading_title"), desc: "60 min — 3 passages, 40 questions" },
-          { icon: "✍️", title: t("guide_writing_title"), desc: "60 min — 2 tasks" },
-          { icon: "🎤", title: t("guide_speaking_title"), desc: "11-14 min — 3 parts" },
+          { id: "listening" as Section, icon: "🎧", title: t("guide_listening_title"), desc: "30 min — 4 sections, 40 questions" },
+          { id: "reading" as Section, icon: "📖", title: t("guide_reading_title"), desc: "60 min — 3 passages, 40 questions" },
+          { id: "writing" as Section, icon: "✍️", title: t("guide_writing_title"), desc: "60 min — 2 tasks" },
+          { id: "speaking" as Section, icon: "🎤", title: t("guide_speaking_title"), desc: "11-14 min — 3 parts" },
         ].map((item) => (
-          <div
-            key={item.title}
-            className="rounded-xl border border-gray-200 bg-white p-5"
+          <button
+            key={item.id}
+            onClick={() => { onSelectSection(item.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+            className="rounded-xl border border-gray-200 bg-white p-5 text-left transition-colors hover:border-blue-300 hover:bg-blue-50"
           >
             <div className="text-2xl">{item.icon}</div>
             <h3 className="mt-2 font-semibold text-gray-900">{item.title}</h3>
             <p className="mt-1 text-sm text-gray-500">{item.desc}</p>
-          </div>
+          </button>
         ))}
       </div>
     </>

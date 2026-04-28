@@ -534,6 +534,11 @@ export const translations = {
 
   // Landing — IELTS Guide
   landing_guide_title: { en: "A quick IELTS primer", zh: "雅思简明指南" },
+  landing_guide_cta: { en: "Read the Free Guide", zh: "阅读免费指南" },
+  landing_guide_blurb: {
+    en: "New to IELTS? Our free guide covers everything you need to know — the four skills, how band scores work, and what examiners are really looking for.",
+    zh: "初次接触雅思？我们的免费指南涵盖所有基础知识——四项技能、分数如何计算，以及考官真正在评估什么。",
+  },
   landing_guide_what_title: { en: "What is IELTS?", zh: "什么是雅思？" },
   landing_guide_what_body: {
     en: "The International English Language Testing System is the world's most widely accepted English-proficiency exam — required by universities, employers, and immigration programs in the UK, Australia, Canada, New Zealand, and most of Europe.",
