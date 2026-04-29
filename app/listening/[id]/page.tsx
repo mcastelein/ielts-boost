@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ListeningDetailClient from "./listening-detail-client";
-import { LISTENING_TRACKS } from "@/lib/listening-tracks";
+import { dbRowToTrack } from "@/lib/content-mappers";
 import type { ScoredResults } from "@/lib/reading-scoring";
 
 export default async function ListeningDetailPage({
@@ -28,8 +28,13 @@ export default async function ListeningDetailPage({
 
   if (!feedback) notFound();
 
-  const track = LISTENING_TRACKS.find((t) => t.id === submission.track_slug);
-  if (!track) notFound();
+  const { data: trackRow } = await supabase
+    .from("listening_tracks")
+    .select("slug, title, section, difficulty, topic_tags, context, transcript, question_groups, audio_url")
+    .eq("slug", submission.track_slug)
+    .single();
+  if (!trackRow) notFound();
+  const track = dbRowToTrack(trackRow);
 
   return (
     <ListeningDetailClient

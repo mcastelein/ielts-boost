@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import ReadingDetailClient from "./reading-detail-client";
-import { READING_PASSAGES } from "@/lib/reading-passages";
+import { dbRowToPassage } from "@/lib/content-mappers";
 import type { ScoredResults } from "@/lib/reading-scoring";
 
 export default async function ReadingDetailPage({
@@ -28,8 +28,13 @@ export default async function ReadingDetailPage({
 
   if (!feedback) notFound();
 
-  const passage = READING_PASSAGES.find((p) => p.id === submission.passage_slug);
-  if (!passage) notFound();
+  const { data: passageRow } = await supabase
+    .from("reading_passages")
+    .select("slug, title, exam_type, difficulty, topic_tags, passage_text, question_groups")
+    .eq("slug", submission.passage_slug)
+    .single();
+  if (!passageRow) notFound();
+  const passage = dbRowToPassage(passageRow);
 
   return (
     <ReadingDetailClient
