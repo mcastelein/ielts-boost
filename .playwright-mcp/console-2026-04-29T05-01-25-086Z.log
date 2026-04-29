@@ -1,0 +1,25 @@
+[     673ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_RESET @ https://cdn.matomo.cloud/rcvchangedalaska.matomo.cloud/matomo.js:0
+[     736ms] [INFO] [rsbuild] WebSocket connecting... @ http://localhost:3000/static/js/vendors-node_modules_dnd-kit_sortable_dist_sortable_esm_js-node_modules_hello-pangea_dnd_dist-f68a86.js:147259
+[     757ms] [LOG] i18next: languageChanged en-US @ http://localhost:3000/static/js/vendors-node_modules_dnd-kit_sortable_dist_sortable_esm_js-node_modules_hello-pangea_dnd_dist-f68a86.js:157293
+[     757ms] [LOG] i18next: initialized {debug: true, initImmediate: true, ns: Array(1), defaultNS: Array(1), fallbackLng: Array(1)} @ http://localhost:3000/static/js/vendors-node_modules_dnd-kit_sortable_dist_sortable_esm_js-node_modules_hello-pangea_dnd_dist-f68a86.js:157293
+[     776ms] Error: Cannot find module '~/hooks/useDelayedTrue'
+    at webpackMissingModule (http://localhost:3000/static/js/index.js:7725:50)
+    at ./src/components/Election/Admin/Admin.tsx (http://localhost:3000/static/js/index.js:7725:147)
+    at __webpack_require__ (http://localhost:3000/static/js/index.js:31795:21)
+    at fn (http://localhost:3000/static/js/index.js:31994:10)
+    at ./src/components/Election/Election.tsx (http://localhost:3000/static/js/index.js:11780:65)
+    at __webpack_require__ (http://localhost:3000/static/js/index.js:31795:21)
+    at fn (http://localhost:3000/static/js/index.js:31994:10)
+    at ./src/App.tsx (http://localhost:3000/static/js/index.js:139:82)
+    at __webpack_require__ (http://localhost:3000/static/js/index.js:31795:21)
+    at fn (http://localhost:3000/static/js/index.js:31994:10)
+[    1040ms] [INFO] [rsbuild] WebSocket connected. @ http://localhost:3000/static/js/vendors-node_modules_dnd-kit_sortable_dist_sortable_esm_js-node_modules_hello-pangea_dnd_dist-f68a86.js:147180
+[    1041ms] [ERROR] File: [36m./src/components/Election/Admin/Admin.tsx:1:1[39m
+  × Cannot find module '~/hooks/useDelayedTrue' for matched aliased key '~'
+[2mImport traces (entry → error):
+  ./src/index.tsx
+  ./src/App.tsx
+  ./src/components/Election/Election.tsx
+  ./src/components/Election/Admin/Admin.tsx [1m[31m×[39m[22m[2m[22m @ http://localhost:3000/static/js/vendors-node_modules_dnd-kit_sortable_dist_sortable_esm_js-node_modules_hello-pangea_dnd_dist-f68a86.js:147146
+[    1296ms] TypeError: Cannot read properties of null (reading 'contentWindow')
+    at http://localhost:3000/listening:82:32

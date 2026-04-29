@@ -3,7 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { checkListeningUsage, incrementListeningUsage } from "@/lib/usage";
 import { logApiCall } from "@/lib/api-logger";
-import { LISTENING_TRACKS, getTotalListeningQuestions, rawToListeningBand } from "@/lib/listening-tracks";
+import { getTotalListeningQuestions, rawToListeningBand } from "@/lib/listening-tracks";
+import { dbRowToTrack } from "@/lib/content-mappers";
 import {
   checkAnswerDeterministic,
   normalizeAnswer,
@@ -31,13 +32,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const track = LISTENING_TRACKS.find((t) => t.id === trackId);
-  if (!track) {
-    return NextResponse.json({ error: "Track not found" }, { status: 404 });
-  }
-
   try {
     const supabase = await createClient();
+
+    const { data: trackRow } = await supabase
+      .from("listening_tracks")
+      .select("slug, title, section, difficulty, topic_tags, context, transcript, question_groups, audio_url")
+      .eq("slug", trackId)
+      .eq("is_active", true)
+      .single();
+
+    if (!trackRow) {
+      return NextResponse.json({ error: "Track not found" }, { status: 404 });
+    }
+    const track = dbRowToTrack(trackRow);
+
     const {
       data: { user },
     } = await supabase.auth.getUser();

@@ -19,7 +19,12 @@
       "Bash(sed 's/.*\\\\.from\\(//')",
       "Bash(sed 's/\\).*//')",
       "Bash(sed 's/.*\\\\.from\\(\"//')",
-      "Bash(sed 's/\"\\).*//')"
+      "Bash(sed 's/\"\\).*//')",
+      "Bash(netstat -ano)",
+      "PowerShell(Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess | Sort-Object LocalPort | Where-Object { $_.LocalPort -ge 3000 -and $_.LocalPort -le 3100 })",
+      "PowerShell(Get-NetTCPConnection -State Listen)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_wait_for"
     ]
   }
 }

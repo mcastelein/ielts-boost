@@ -27,20 +27,35 @@ Migration order: Speaking → Writing → Reading → Listening (simplest to mos
 - [x] `supabase/add_content_reading_passages.sql` — create table, indexes, RLS
 - [x] Add reading section to `scripts/seed-content.ts`
 - [x] Create `lib/content-mappers.ts` with `dbRowToPassage()` mapper
-- [ ] Run migration in Supabase, then: `npx tsx scripts/seed-content.ts` — verify 4 reading rows
+- [x] Run migration in Supabase, then: `npx tsx scripts/seed-content.ts` — verify 4 reading rows
 - [x] Update `app/reading/page.tsx` selection UI to fetch from DB
 - [x] Update `app/api/reading/route.ts` to look up passage by slug from DB
-- [ ] Test end-to-end
+- [x] Test end-to-end
 
 ## Phase 4 — Listening
 
-- [ ] `supabase/add_content_listening_tracks.sql` — create table, indexes, RLS
-- [ ] Add listening section to `scripts/seed-content.ts`
-- [ ] Add `dbRowToTrack()` to `lib/content-mappers.ts`
-- [ ] Run seed, verify 2 rows in Supabase
-- [ ] Update `app/listening/page.tsx` selection UI to fetch from DB
-- [ ] Update `app/api/listening/route.ts` to look up track by slug from DB
-- [ ] Flip `CONTENT_SOURCE=db` for listening, test end-to-end
+Audio caching strategy: TTS is generated once per track and stored in Supabase Storage
+(`listening-audio` public bucket). The listening page uses the cached `audio_url` directly
+(CDN-served, instant).
+
+Staleness detection: the table has two timestamps — `transcript_updated_at` (auto-set by a
+Postgres trigger whenever the `transcript` column changes) and `audio_generated_at` (written by
+the generate-audio script after a successful upload). `scripts/generate-audio.ts` re-processes
+any row where `audio_generated_at IS NULL OR audio_generated_at < transcript_updated_at`. This
+means editing a transcript and re-running the script is all that's needed to refresh the audio —
+no manual cleanup required.
+
+- [x] `supabase/add_content_listening_tracks.sql` — table with `audio_url`, `transcript_updated_at`, `audio_generated_at`, trigger, indexes, RLS
+- [x] Create `listening-audio` public bucket in Supabase Storage dashboard
+- [x] Add listening data + `seedListeningTracks()` to `scripts/seed-content.ts`
+- [x] Add `dbRowToTrack()` to `lib/content-mappers.ts`
+- [x] Run migration in Supabase, then: `npx tsx scripts/seed-content.ts` — verify 2 listening rows
+- [x] Create `scripts/generate-audio.ts` — fetches stale/new tracks, generates TTS, uploads to Storage, writes `audio_url` + `audio_generated_at`
+- [x] Create `listening-audio` public bucket, then: `npx tsx scripts/generate-audio.ts` — verify both rows have `audio_url` + `audio_generated_at` set
+- [x] Update `app/listening/page.tsx`: uses `track.audioUrl` directly when set; falls back to TTS
+- [x] Update `app/api/listening/route.ts` to look up track by slug from DB
+- [x] Strip `lib/listening-tracks.ts` to types + band-score utilities only
+- [ ] Test end-to-end
 
 ## Phase 5 — Submission table linkage (follow-up)
 

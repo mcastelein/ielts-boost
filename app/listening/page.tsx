@@ -4,10 +4,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import {
-  LISTENING_TRACKS,
   getTotalListeningQuestions,
   type ListeningTrack,
 } from "@/lib/listening-tracks";
+import { dbRowToTrack } from "@/lib/content-mappers";
 import GuestBanner from "@/components/GuestBanner";
 import { createClient } from "@/lib/supabase/client";
 
@@ -18,11 +18,23 @@ export default function ListeningPage() {
   const { t, locale } = useLanguage();
 
   const [isGuest, setIsGuest] = useState(false);
+  const [dbTracks, setDbTracks] = useState<ListeningTrack[]>([]);
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
       setIsGuest(!data.user);
     });
+  }, []);
+
+  useEffect(() => {
+    createClient()
+      .from("listening_tracks")
+      .select("slug, title, section, difficulty, topic_tags, context, transcript, question_groups, audio_url")
+      .eq("is_active", true)
+      .order("display_order")
+      .then(({ data }) => {
+        if (data) setDbTracks(data.map(dbRowToTrack));
+      });
   }, []);
 
   // ── Setup state ──────────────────────────────────────────────────────────
@@ -79,15 +91,24 @@ export default function ListeningPage() {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-  // ── Load TTS audio ────────────────────────────────────────────────────────
+  // ── Load audio ────────────────────────────────────────────────────────────
   useEffect(() => {
     if (step !== "loading" || !selectedTrack) return;
 
     let cancelled = false;
-    let objectUrl: string | null = null;
 
     const loadAudio = async () => {
       try {
+        // Use pre-generated cached URL when available (instant, no TTS cost)
+        if (selectedTrack.audioUrl) {
+          if (!cancelled) {
+            setAudioUrl(selectedTrack.audioUrl);
+            setStep("practice");
+          }
+          return;
+        }
+
+        // Fallback: generate via TTS (for tracks not yet cached)
         const res = await fetch("/api/speaking/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -113,12 +134,7 @@ export default function ListeningPage() {
 
     loadAudio();
 
-    // Only cancel the in-flight fetch; do NOT revoke the URL here because
-    // this cleanup runs when step changes to "practice" — right before the
-    // audio element is wired up. Revocation happens in handleStart / unmount.
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [step, selectedTrack]);
 
   // ── Wire up audio element ─────────────────────────────────────────────────
@@ -298,7 +314,7 @@ export default function ListeningPage() {
           {t("listening_choose_track")}
         </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {LISTENING_TRACKS.map((track) => {
+          {dbTracks.map((track) => {
             const isSelected = selectedTrack?.id === track.id;
             const qCount = getTotalListeningQuestions(track);
             return (
