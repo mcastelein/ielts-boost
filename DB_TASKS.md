@@ -16,11 +16,11 @@ Migration order: Speaking → Writing → Reading → Listening (simplest to mos
 
 ## Phase 2 — Writing
 
-- [ ] `supabase/add_content_writing_prompts.sql` — create table, indexes, RLS
-- [ ] Add writing section to `scripts/seed-content.ts`
-- [ ] Run seed, verify 25 rows in Supabase
-- [ ] Update `app/writing/page.tsx` selection UI to fetch from DB
-- [ ] Flip `CONTENT_SOURCE=db` for writing, test end-to-end
+- [x] `supabase/add_content_writing_prompts.sql` — create table, indexes, RLS
+- [x] Add writing section to `scripts/seed-content.ts`
+- [x] Run migration in Supabase, then: `npx tsx scripts/seed-content.ts` — verify 29 rows total (18 speaking + 29 writing) — note: 29 writing prompts (15 task1 + 14 task2)
+- [x] Update `app/writing/page.tsx` to fetch from DB (always — no feature flag)
+- [x] Test end-to-end
 
 ## Phase 3 — Reading
 

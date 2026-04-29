@@ -3,11 +3,7 @@
 import { Suspense, useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import {
-  WritingPrompt,
-  WRITING_PROMPTS,
-  getRandomWritingPrompt,
-} from "@/lib/writing-prompts";
+import type { WritingPrompt, ChartData } from "@/lib/writing-prompts";
 import TaskChart from "@/components/TaskChart";
 import { useLanguage } from "@/lib/language-context";
 import GuestBanner from "@/components/GuestBanner";
@@ -113,6 +109,28 @@ function WritingPage() {
   const [pendingSession, setPendingSession] = useState<WritingSession | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
   const [timerEnabled, setTimerEnabled] = useState(false);
+
+  const [dbPrompts, setDbPrompts] = useState<WritingPrompt[]>([]);
+
+  useEffect(() => {
+    createClient()
+      .from("writing_prompts")
+      .select("task_type, topic, prompt, chart_data")
+      .eq("is_active", true)
+      .order("display_order")
+      .then(({ data }) => {
+        if (data) {
+          setDbPrompts(
+            data.map((row) => ({
+              taskType: row.task_type as "task1" | "task2",
+              topic: row.topic,
+              prompt: row.prompt,
+              chart: (row.chart_data as ChartData) ?? undefined,
+            }))
+          );
+        }
+      });
+  }, []);
 
   const [completedTopics, setCompletedTopics] = useState<Set<string>>(new Set());
 
@@ -293,9 +311,7 @@ function WritingPage() {
     clearFile();
   };
 
-  const filteredPrompts = WRITING_PROMPTS.filter(
-    (p) => p.taskType === taskType
-  );
+  const filteredPrompts = dbPrompts.filter((p) => p.taskType === taskType);
 
   const activeText = extractedText ?? essay;
   const wordCount = activeText.trim() ? activeText.trim().split(/\s+/).length : 0;
@@ -553,9 +569,10 @@ function WritingPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => {
-                  setSelectedPrompt(
-                    getRandomWritingPrompt(taskType as "task1" | "task2", completedTopics)
-                  );
+                  const pool = dbPrompts.filter((p) => p.taskType === taskType);
+                  const available = pool.filter((p) => !completedTopics.has(p.topic));
+                  const candidates = available.length > 0 ? available : pool;
+                  setSelectedPrompt(candidates[Math.floor(Math.random() * candidates.length)] ?? null);
                   setUseOwnTopic(false);
                   setShowPromptList(false);
                 }}
