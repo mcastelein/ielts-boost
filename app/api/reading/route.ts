@@ -3,7 +3,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { checkReadingUsage, incrementReadingUsage } from "@/lib/usage";
 import { logApiCall } from "@/lib/api-logger";
-import { READING_PASSAGES, getTotalQuestions } from "@/lib/reading-passages";
+import { getTotalQuestions } from "@/lib/reading-passages";
+import { dbRowToPassage } from "@/lib/content-mappers";
 import {
   checkAnswerDeterministic,
   rawToBand,
@@ -34,13 +35,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const passage = READING_PASSAGES.find((p) => p.id === passageId);
-  if (!passage) {
-    return NextResponse.json({ error: "Passage not found" }, { status: 404 });
-  }
-
   try {
     const supabase = await createClient();
+
+    const { data: passageRow } = await supabase
+      .from("reading_passages")
+      .select("slug, title, exam_type, difficulty, topic_tags, passage_text, question_groups")
+      .eq("slug", passageId)
+      .eq("is_active", true)
+      .single();
+
+    if (!passageRow) {
+      return NextResponse.json({ error: "Passage not found" }, { status: 404 });
+    }
+    const passage = dbRowToPassage(passageRow);
+
     const {
       data: { user },
     } = await supabase.auth.getUser();

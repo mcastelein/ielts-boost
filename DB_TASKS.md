@@ -24,13 +24,13 @@ Migration order: Speaking → Writing → Reading → Listening (simplest to mos
 
 ## Phase 3 — Reading
 
-- [ ] `supabase/add_content_reading_passages.sql` — create table, indexes, RLS
-- [ ] Add reading section to `scripts/seed-content.ts`
-- [ ] Create `lib/content-mappers.ts` with `dbRowToPassage()` mapper
-- [ ] Run seed, verify 4 rows in Supabase
-- [ ] Update `app/reading/page.tsx` selection UI to fetch from DB
-- [ ] Update `app/api/reading/route.ts` to look up passage by slug from DB
-- [ ] Flip `CONTENT_SOURCE=db` for reading, test end-to-end
+- [x] `supabase/add_content_reading_passages.sql` — create table, indexes, RLS
+- [x] Add reading section to `scripts/seed-content.ts`
+- [x] Create `lib/content-mappers.ts` with `dbRowToPassage()` mapper
+- [ ] Run migration in Supabase, then: `npx tsx scripts/seed-content.ts` — verify 4 reading rows
+- [x] Update `app/reading/page.tsx` selection UI to fetch from DB
+- [x] Update `app/api/reading/route.ts` to look up passage by slug from DB
+- [ ] Test end-to-end
 
 ## Phase 4 — Listening
 

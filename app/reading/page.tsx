@@ -4,10 +4,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import {
-  READING_PASSAGES,
   getTotalQuestions,
   type ReadingPassage,
 } from "@/lib/reading-passages";
+import { dbRowToPassage } from "@/lib/content-mappers";
 import { PARAGRAPH_LABELS } from "@/components/reading/PassageViewer";
 import PassageViewer from "@/components/reading/PassageViewer";
 import QuestionGroupComponent from "@/components/reading/QuestionGroup";
@@ -21,11 +21,23 @@ export default function ReadingPage() {
   const { t, locale } = useLanguage();
 
   const [isGuest, setIsGuest] = useState(false);
+  const [dbPassages, setDbPassages] = useState<ReadingPassage[]>([]);
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
       setIsGuest(!data.user);
     });
+  }, []);
+
+  useEffect(() => {
+    createClient()
+      .from("reading_passages")
+      .select("slug, title, exam_type, difficulty, topic_tags, passage_text, question_groups")
+      .eq("is_active", true)
+      .order("display_order")
+      .then(({ data }) => {
+        if (data) setDbPassages(data.map(dbRowToPassage));
+      });
   }, []);
 
   // ── Setup state ──────────────────────────────────────────────────────────
@@ -201,7 +213,7 @@ export default function ReadingPage() {
           {t("reading_choose_passage")}
         </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {READING_PASSAGES.map((passage) => {
+          {dbPassages.map((passage) => {
             const isSelected = selectedPassage?.id === passage.id;
             const qCount = getTotalQuestions(passage);
             return (
