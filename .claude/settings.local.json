@@ -24,7 +24,14 @@
       "PowerShell(Get-NetTCPConnection -State Listen | Select-Object LocalPort, OwningProcess | Sort-Object LocalPort | Where-Object { $_.LocalPort -ge 3000 -and $_.LocalPort -le 3100 })",
       "PowerShell(Get-NetTCPConnection -State Listen)",
       "mcp__playwright__browser_navigate",
-      "mcp__playwright__browser_wait_for"
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_tabs",
+      "mcp__playwright__browser_close",
+      "Bash(taskkill /F /IM chrome.exe /T)",
+      "PowerShell(Get-Process -Name \"chrome\" -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Force)",
+      "PowerShell(Get-Process -Name \"chromium\" -ErrorAction SilentlyContinue)",
+      "mcp__playwright__browser_snapshot"
     ]
   }
 }

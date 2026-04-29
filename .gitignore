@@ -43,3 +43,5 @@ test-results/
 playwright-report/
 
 PETER_TASK.md
+
+.playwright-mcp/
