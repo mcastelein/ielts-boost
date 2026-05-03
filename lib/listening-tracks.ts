@@ -22,9 +22,12 @@ const LISTENING_BAND_TABLE: [number, number][] = [
   [11, 4.0], [8, 3.5],  [6, 3.0],  [4, 2.5],
 ];
 
-export function rawToListeningBand(rawScore: number): number {
+export function rawToListeningBand(rawScore: number, totalQuestions = 40): number {
+  const scaled = totalQuestions === 40
+    ? rawScore
+    : Math.round((rawScore / totalQuestions) * 40);
   for (const [threshold, band] of LISTENING_BAND_TABLE) {
-    if (rawScore >= threshold) return band;
+    if (scaled >= threshold) return band;
   }
   return 2.0;
 }

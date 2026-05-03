@@ -231,7 +231,7 @@ Rules:
     // ── Step 3: Compute scores ────────────────────────────────────────────
     const totalQuestions = getTotalListeningQuestions(track);
     const rawScore = Object.values(results).filter((r) => r.correct).length;
-    const bandScore = rawToListeningBand(rawScore);
+    const bandScore = rawToListeningBand(rawScore, totalQuestions);
 
     // ── Step 4: Log API usage ─────────────────────────────────────────────
     await logApiCall({
