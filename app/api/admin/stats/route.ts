@@ -27,6 +27,12 @@ export async function GET() {
     { data: speakingToday },
     { data: speakingWeek },
     { data: speakingMonth },
+    { data: readingToday },
+    { data: readingWeek },
+    { data: readingMonth },
+    { data: listeningToday },
+    { data: listeningWeek },
+    { data: listeningMonth },
     { data: costToday },
     { data: costWeek },
     { data: costMonth },
@@ -34,6 +40,8 @@ export async function GET() {
     { data: allSettings },
     { data: recentWriting },
     { data: recentSpeaking },
+    { data: recentReading },
+    { data: recentListening },
   ] = await Promise.all([
     // Total users
     supabase.from("user_settings").select("*", { count: "exact", head: true }),
@@ -49,32 +57,43 @@ export async function GET() {
     supabase.from("speaking_submissions").select("id", { count: "exact" }).gte("created_at", todayStart),
     supabase.from("speaking_submissions").select("id", { count: "exact" }).gte("created_at", weekAgo),
     supabase.from("speaking_submissions").select("id", { count: "exact" }).gte("created_at", monthAgo),
+    // Reading submissions
+    supabase.from("reading_submissions").select("id", { count: "exact" }).gte("created_at", todayStart),
+    supabase.from("reading_submissions").select("id", { count: "exact" }).gte("created_at", weekAgo),
+    supabase.from("reading_submissions").select("id", { count: "exact" }).gte("created_at", monthAgo),
+    // Listening submissions
+    supabase.from("listening_submissions").select("id", { count: "exact" }).gte("created_at", todayStart),
+    supabase.from("listening_submissions").select("id", { count: "exact" }).gte("created_at", weekAgo),
+    supabase.from("listening_submissions").select("id", { count: "exact" }).gte("created_at", monthAgo),
     // API costs
     supabase.from("api_usage_log").select("estimated_cost_usd").gte("created_at", todayStart),
     supabase.from("api_usage_log").select("estimated_cost_usd").gte("created_at", weekAgo),
     supabase.from("api_usage_log").select("estimated_cost_usd").gte("created_at", monthAgo),
-    // Active users (submitted writing or speaking in last 7 days)
+    // Active users (writing in last 7 days; reading/listening/speaking added below)
     supabase.from("writing_submissions").select("user_id").gte("created_at", weekAgo),
     // All settings for top users
     supabase.from("user_settings").select("user_id, plan_type"),
-    // Recent writing for average band scores
+    // Recent feedback for average band scores
     supabase.from("writing_feedback").select("overall_band").gte("created_at", monthAgo),
-    // Recent speaking
     supabase.from("speaking_feedback").select("estimated_band").gte("created_at", monthAgo),
+    supabase.from("reading_feedback").select("band_score").gte("created_at", monthAgo),
+    supabase.from("listening_feedback").select("band_score").gte("created_at", monthAgo),
   ]);
 
   const sumCost = (rows: { estimated_cost_usd: number | null }[] | null) =>
     rows?.reduce((sum, r) => sum + (r.estimated_cost_usd ?? 0), 0) ?? 0;
 
-  // Active users = unique user_ids across writing + speaking in last 7 days
+  // Active users = unique user_ids across all 4 sections in last 7 days
   const activeUserIds = new Set<string>();
   for (const w of activeUsersData ?? []) activeUserIds.add(w.user_id);
-  // Also check speaking
-  const { data: activeSpeakers } = await supabase
-    .from("speaking_submissions")
-    .select("user_id")
-    .gte("created_at", weekAgo);
+  const [{ data: activeSpeakers }, { data: activeReaders }, { data: activeListeners }] = await Promise.all([
+    supabase.from("speaking_submissions").select("user_id").gte("created_at", weekAgo),
+    supabase.from("reading_submissions").select("user_id").gte("created_at", weekAgo),
+    supabase.from("listening_submissions").select("user_id").gte("created_at", weekAgo),
+  ]);
   for (const s of activeSpeakers ?? []) activeUserIds.add(s.user_id);
+  for (const r of activeReaders ?? []) activeUserIds.add(r.user_id);
+  for (const l of activeListeners ?? []) activeUserIds.add(l.user_id);
 
   // Top users by API cost this month
   const { data: topCostData } = await supabase
@@ -93,16 +112,24 @@ export async function GET() {
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5);
 
-  // Top users by submissions this month
-  const { data: topWriters } = await supabase
-    .from("writing_submissions")
-    .select("user_id")
-    .gte("created_at", monthAgo);
+  // Top users by submissions this month — count across all 4 sections
+  const [
+    { data: topWriters },
+    { data: topSpeakers },
+    { data: topReaders },
+    { data: topListeners },
+  ] = await Promise.all([
+    supabase.from("writing_submissions").select("user_id").gte("created_at", monthAgo),
+    supabase.from("speaking_submissions").select("user_id").gte("created_at", monthAgo),
+    supabase.from("reading_submissions").select("user_id").gte("created_at", monthAgo),
+    supabase.from("listening_submissions").select("user_id").gte("created_at", monthAgo),
+  ]);
 
   const subsByUser: Record<string, number> = {};
-  for (const row of topWriters ?? []) {
-    subsByUser[row.user_id] = (subsByUser[row.user_id] ?? 0) + 1;
-  }
+  for (const row of topWriters ?? []) subsByUser[row.user_id] = (subsByUser[row.user_id] ?? 0) + 1;
+  for (const row of topSpeakers ?? []) subsByUser[row.user_id] = (subsByUser[row.user_id] ?? 0) + 1;
+  for (const row of topReaders ?? []) subsByUser[row.user_id] = (subsByUser[row.user_id] ?? 0) + 1;
+  for (const row of topListeners ?? []) subsByUser[row.user_id] = (subsByUser[row.user_id] ?? 0) + 1;
   const topUsersByActivity = Object.entries(subsByUser)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5);
@@ -117,14 +144,14 @@ export async function GET() {
   const profiles = await getUserProfiles(allTopUserIds);
 
   // Average band scores
-  const writingBands = recentWriting?.map((r) => r.overall_band).filter(Boolean) ?? [];
-  const speakingBands = recentSpeaking?.map((r) => r.estimated_band).filter(Boolean) ?? [];
-  const avgWritingBand = writingBands.length > 0
-    ? writingBands.reduce((a: number, b: number) => a + b, 0) / writingBands.length
-    : null;
-  const avgSpeakingBand = speakingBands.length > 0
-    ? speakingBands.reduce((a: number, b: number) => a + b, 0) / speakingBands.length
-    : null;
+  const avg = (rows: { [k: string]: number | null }[] | null, key: string): number | null => {
+    const bands = rows?.map((r) => r[key]).filter((n): n is number => typeof n === "number" && !Number.isNaN(n)) ?? [];
+    return bands.length > 0 ? bands.reduce((a, b) => a + b, 0) / bands.length : null;
+  };
+  const avgWritingBand = avg(recentWriting, "overall_band");
+  const avgSpeakingBand = avg(recentSpeaking, "estimated_band");
+  const avgReadingBand = avg(recentReading, "band_score");
+  const avgListeningBand = avg(recentListening, "band_score");
 
   // Plan distribution
   const planCounts = { free: 0, pro: 0 };
@@ -194,6 +221,16 @@ export async function GET() {
         week: speakingWeek?.length ?? 0,
         month: speakingMonth?.length ?? 0,
       },
+      reading: {
+        today: readingToday?.length ?? 0,
+        week: readingWeek?.length ?? 0,
+        month: readingMonth?.length ?? 0,
+      },
+      listening: {
+        today: listeningToday?.length ?? 0,
+        week: listeningWeek?.length ?? 0,
+        month: listeningMonth?.length ?? 0,
+      },
     },
     costs: {
       today: sumCost(costToday),
@@ -217,6 +254,8 @@ export async function GET() {
     averageBands: {
       writing: avgWritingBand,
       speaking: avgSpeakingBand,
+      reading: avgReadingBand,
+      listening: avgListeningBand,
     },
     systemHealth,
   });

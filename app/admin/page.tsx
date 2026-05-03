@@ -14,6 +14,8 @@ interface Stats {
   submissions: {
     writing: { today: number; week: number; month: number };
     speaking: { today: number; week: number; month: number };
+    reading: { today: number; week: number; month: number };
+    listening: { today: number; week: number; month: number };
   };
   costs: {
     today: number;
@@ -27,6 +29,8 @@ interface Stats {
   averageBands: {
     writing: number | null;
     speaking: number | null;
+    reading: number | null;
+    listening: number | null;
   };
   systemHealth: {
     model: string;
@@ -100,14 +104,26 @@ export default function AdminDashboard() {
 
       {/* Submission KPIs */}
       <div>
-        <h3 className="mb-3 text-sm font-medium uppercase tracking-wide text-gray-500">Submissions</h3>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          <StatCard label="Writing Today" value={stats.submissions.writing.today} />
-          <StatCard label="Writing (7d)" value={stats.submissions.writing.week} />
-          <StatCard label="Writing (30d)" value={stats.submissions.writing.month} />
-          <StatCard label="Speaking Today" value={stats.submissions.speaking.today} />
-          <StatCard label="Speaking (7d)" value={stats.submissions.speaking.week} />
-          <StatCard label="Speaking (30d)" value={stats.submissions.speaking.month} />
+        <h3 className="mb-3 text-sm font-medium uppercase tracking-wide text-gray-500">
+          Submissions (today / 7d / 30d)
+        </h3>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <StatCard
+            label="Listening"
+            value={`${stats.submissions.listening.today} / ${stats.submissions.listening.week} / ${stats.submissions.listening.month}`}
+          />
+          <StatCard
+            label="Reading"
+            value={`${stats.submissions.reading.today} / ${stats.submissions.reading.week} / ${stats.submissions.reading.month}`}
+          />
+          <StatCard
+            label="Writing"
+            value={`${stats.submissions.writing.today} / ${stats.submissions.writing.week} / ${stats.submissions.writing.month}`}
+          />
+          <StatCard
+            label="Speaking"
+            value={`${stats.submissions.speaking.today} / ${stats.submissions.speaking.week} / ${stats.submissions.speaking.month}`}
+          />
         </div>
       </div>
 
@@ -128,9 +144,11 @@ export default function AdminDashboard() {
         <h3 className="mb-3 text-sm font-medium uppercase tracking-wide text-gray-500">
           Average Band Scores (30d)
         </h3>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2">
-          <StatCard label="Avg Writing Band" value={fmtBand(stats.averageBands.writing)} />
-          <StatCard label="Avg Speaking Band" value={fmtBand(stats.averageBands.speaking)} />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <StatCard label="Avg Listening" value={fmtBand(stats.averageBands.listening)} />
+          <StatCard label="Avg Reading" value={fmtBand(stats.averageBands.reading)} />
+          <StatCard label="Avg Writing" value={fmtBand(stats.averageBands.writing)} />
+          <StatCard label="Avg Speaking" value={fmtBand(stats.averageBands.speaking)} />
         </div>
       </div>
 

@@ -206,6 +206,8 @@ export async function GET(
     },
     writingSubmissions: writingSubs ?? [],
     speakingSubmissions: speakingSubs ?? [],
+    readingSubmissions: readingSubs ?? [],
+    listeningSubmissions: listeningSubs ?? [],
     apiUsage: {
       totalCost,
       byType: costByType,

@@ -28,6 +28,8 @@ interface UserDetail {
   };
   writingSubmissions: WritingSub[];
   speakingSubmissions: SpeakingSub[];
+  readingSubmissions: ReadingSub[];
+  listeningSubmissions: ListeningSub[];
   apiUsage: {
     totalCost: number;
     byType: Record<string, { count: number; cost: number }>;
@@ -39,7 +41,7 @@ interface UserDetail {
     avgCost: number;
     recent: { start: string; end: string; calls: number; cost: number }[];
   };
-  usageToday: { writing_count: number; speaking_count: number } | null;
+  usageToday: { writing_count: number; speaking_count: number; reading_count: number; listening_count: number } | null;
   mistakePatterns: [string, number][];
   scoreTrend: { date: string; overall: number; task: number; coherence: number; lexical: number; grammar: number }[];
   scoresBySection: {
@@ -76,6 +78,43 @@ interface SpeakingSub {
     estimated_band: number | null;
     feedback_json: Record<string, unknown>;
   }[];
+}
+
+interface ReadingFb {
+  band_score: number;
+  raw_score: number;
+  total_questions: number;
+}
+
+interface ReadingSub {
+  id: string;
+  passage_title: string;
+  passage_slug: string;
+  created_at: string;
+  time_used_seconds: number | null;
+  // PostgREST embeds reading_feedback as a single object (UNIQUE FK)
+  reading_feedback: ReadingFb | ReadingFb[] | null;
+}
+
+interface ListeningFb {
+  band_score: number;
+  raw_score: number;
+  total_questions: number;
+}
+
+interface ListeningSub {
+  id: string;
+  track_title: string;
+  track_slug: string;
+  section: number | null;
+  created_at: string;
+  listening_feedback: ListeningFb | ListeningFb[] | null;
+}
+
+function pickFeedback<T>(fb: T | T[] | null | undefined): T | null {
+  if (!fb) return null;
+  if (Array.isArray(fb)) return fb[0] ?? null;
+  return fb;
 }
 
 interface ApiLog {
@@ -136,7 +175,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   const { id } = use(params);
   const [data, setData] = useState<UserDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "writing" | "speaking" | "api">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "writing" | "speaking" | "reading" | "listening" | "api">("overview");
 
   useEffect(() => {
     fetch(`/api/admin/users/${id}`)
@@ -148,7 +187,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   if (loading) return <p className="text-gray-500">Loading user details...</p>;
   if (!data) return <p className="text-red-500">User not found.</p>;
 
-  const { user, writingSubmissions, speakingSubmissions, apiUsage, sessions, usageToday, mistakePatterns, scoreTrend, scoresBySection, recentErrors } = data;
+  const { user, writingSubmissions, speakingSubmissions, readingSubmissions, listeningSubmissions, apiUsage, sessions, usageToday, mistakePatterns, scoreTrend, scoresBySection, recentErrors } = data;
   const fmt = (n: number) => `$${n.toFixed(4)}`;
 
   const dailyCostData = Object.entries(apiUsage.byDay)
@@ -161,6 +200,8 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
 
   const tabs = [
     { key: "overview" as const, label: "Overview" },
+    { key: "listening" as const, label: `Listening (${listeningSubmissions.length})` },
+    { key: "reading" as const, label: `Reading (${readingSubmissions.length})` },
     { key: "writing" as const, label: `Writing (${writingSubmissions.length})` },
     { key: "speaking" as const, label: `Speaking (${speakingSubmissions.length})` },
     { key: "api" as const, label: "API Usage" },
@@ -232,8 +273,10 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
               </p>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-4">
-              <p className="text-sm text-gray-500">Today&apos;s Writing</p>
-              <p className="text-xl font-bold text-gray-900">{usageToday?.writing_count ?? 0}</p>
+              <p className="text-sm text-gray-500">Today (W/S/R/L)</p>
+              <p className="font-mono text-xl font-bold text-gray-900">
+                {usageToday?.writing_count ?? 0}/{usageToday?.speaking_count ?? 0}/{usageToday?.reading_count ?? 0}/{usageToday?.listening_count ?? 0}
+              </p>
             </div>
           </div>
 
@@ -452,6 +495,78 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                         {JSON.stringify(fb.feedback_json, null, 2)}
                       </pre>
                     </details>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* Reading Tab */}
+      {activeTab === "reading" && (
+        <div className="space-y-4">
+          {readingSubmissions.length === 0 ? (
+            <p className="text-gray-400">No reading submissions yet.</p>
+          ) : (
+            readingSubmissions.map((sub) => {
+              const fb = pickFeedback(sub.reading_feedback);
+              return (
+                <div key={sub.id} className="rounded-lg border border-gray-200 bg-white p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded bg-cyan-50 px-2 py-0.5 text-xs font-medium text-cyan-700">Reading</span>
+                      <span className="text-sm font-medium text-gray-900">{sub.passage_title}</span>
+                    </div>
+                    <span className="text-xs text-gray-400">
+                      {new Date(sub.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                  {fb && (
+                    <div className="flex items-center gap-4 text-sm">
+                      <span className="font-bold text-gray-900">Band {fb.band_score}</span>
+                      <span className="text-gray-500">{fb.raw_score} / {fb.total_questions} correct</span>
+                      {sub.time_used_seconds != null && sub.time_used_seconds <= 7200 && (
+                        <span className="text-gray-500">
+                          Time: {Math.floor(sub.time_used_seconds / 60)}m {sub.time_used_seconds % 60}s
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* Listening Tab */}
+      {activeTab === "listening" && (
+        <div className="space-y-4">
+          {listeningSubmissions.length === 0 ? (
+            <p className="text-gray-400">No listening submissions yet.</p>
+          ) : (
+            listeningSubmissions.map((sub) => {
+              const fb = pickFeedback(sub.listening_feedback);
+              return (
+                <div key={sub.id} className="rounded-lg border border-gray-200 bg-white p-4">
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">Listening</span>
+                      {sub.section && (
+                        <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">Section {sub.section}</span>
+                      )}
+                      <span className="text-sm font-medium text-gray-900">{sub.track_title}</span>
+                    </div>
+                    <span className="text-xs text-gray-400">
+                      {new Date(sub.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                  {fb && (
+                    <div className="flex items-center gap-4 text-sm">
+                      <span className="font-bold text-gray-900">Band {fb.band_score}</span>
+                      <span className="text-gray-500">{fb.raw_score} / {fb.total_questions} correct</span>
+                    </div>
                   )}
                 </div>
               );

@@ -36,6 +36,13 @@ interface SpeakingSub {
   }[];
 }
 
+interface ReadingFb {
+  band_score: number | null;
+  raw_score: number;
+  total_questions: number;
+  question_results: Record<string, unknown>;
+}
+
 interface ReadingSub {
   id: string;
   user_id: string;
@@ -46,12 +53,34 @@ interface ReadingSub {
   answers_json: Record<string, string>;
   time_used_seconds: number | null;
   created_at: string;
-  reading_feedback: {
-    band_score: number | null;
-    raw_score: number;
-    total_questions: number;
-    question_results: Record<string, unknown>;
-  }[];
+  // PostgREST embeds 1-to-1 FK as object, 1-to-many as array
+  reading_feedback: ReadingFb | ReadingFb[] | null;
+}
+
+interface ListeningFb {
+  band_score: number | null;
+  raw_score: number;
+  total_questions: number;
+  question_results: Record<string, unknown>;
+}
+
+interface ListeningSub {
+  id: string;
+  user_id: string;
+  user_email: string | null;
+  user_name: string | null;
+  track_title: string;
+  track_slug: string;
+  section: number | null;
+  answers_json: Record<string, string>;
+  created_at: string;
+  listening_feedback: ListeningFb | ListeningFb[] | null;
+}
+
+function pickFeedback<T>(fb: T | T[] | null | undefined): T | null {
+  if (!fb) return null;
+  if (Array.isArray(fb)) return fb[0] ?? null;
+  return fb;
 }
 
 type SubType = "writing" | "speaking" | "reading" | "listening";
@@ -69,6 +98,7 @@ export default function SubmissionsPage() {
   const [writingSubs, setWritingSubs] = useState<WritingSub[]>([]);
   const [speakingSubs, setSpeakingSubs] = useState<SpeakingSub[]>([]);
   const [readingSubs, setReadingSubs] = useState<ReadingSub[]>([]);
+  const [listeningSubs, setListeningSubs] = useState<ListeningSub[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -76,11 +106,6 @@ export default function SubmissionsPage() {
   const perPage = 20;
 
   useEffect(() => {
-    if (type === "listening") {
-      setLoading(false);
-      setTotal(0);
-      return;
-    }
     fetchData();
   }, [type, page, taskTypeFilter]);
 
@@ -98,6 +123,8 @@ export default function SubmissionsPage() {
         setSpeakingSubs(data.submissions);
       } else if (type === "reading") {
         setReadingSubs(data.submissions);
+      } else if (type === "listening") {
+        setListeningSubs(data.submissions);
       }
       setTotal(data.total);
     }
@@ -141,16 +168,9 @@ export default function SubmissionsPage() {
         )}
       </div>
 
-      {/* Listening placeholder */}
-      {type === "listening" && (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center">
-          <p className="text-sm text-gray-500">Listening module coming soon.</p>
-        </div>
-      )}
-
-      {type !== "listening" && loading ? (
+      {loading ? (
         <p className="text-gray-500">Loading...</p>
-      ) : type !== "listening" && (
+      ) : (
         <>
           {/* Writing submissions */}
           {type === "writing" && (
@@ -279,7 +299,7 @@ export default function SubmissionsPage() {
                 <p className="text-gray-400">No submissions found.</p>
               ) : (
                 readingSubs.map((sub) => {
-                  const fb = sub.reading_feedback?.[0];
+                  const fb = pickFeedback(sub.reading_feedback);
                   const isExpanded = expandedId === sub.id;
                   return (
                     <div key={sub.id} className="rounded-lg border border-gray-200 bg-white">
@@ -288,7 +308,7 @@ export default function SubmissionsPage() {
                         onClick={() => setExpandedId(isExpanded ? null : sub.id)}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="rounded bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                          <span className="rounded bg-cyan-50 px-2 py-0.5 text-xs font-medium text-cyan-700">
                             {sub.passage_title}
                           </span>
                           {fb && (
@@ -309,11 +329,76 @@ export default function SubmissionsPage() {
                       </div>
                       {isExpanded && (
                         <div className="border-t border-gray-100 px-4 py-4">
-                          {sub.time_used_seconds != null && (
+                          {sub.time_used_seconds != null && sub.time_used_seconds <= 7200 && (
                             <p className="mb-3 text-sm text-gray-500">
                               Time: {Math.floor(sub.time_used_seconds / 60)}m {sub.time_used_seconds % 60}s
                             </p>
                           )}
+                          <div className="mb-4 rounded bg-gray-50 p-3">
+                            <h4 className="mb-1 text-xs font-medium uppercase text-gray-500">Answers</h4>
+                            <pre className="max-h-40 overflow-auto text-xs text-gray-700">
+                              {JSON.stringify(sub.answers_json, null, 2)}
+                            </pre>
+                          </div>
+                          {fb?.question_results && (
+                            <div>
+                              <h4 className="mb-1 text-xs font-medium uppercase text-gray-500">Question Results</h4>
+                              <pre className="max-h-80 overflow-auto rounded bg-gray-50 p-3 text-xs text-gray-700">
+                                {JSON.stringify(fb.question_results, null, 2)}
+                              </pre>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* Listening submissions */}
+          {type === "listening" && (
+            <div className="space-y-3">
+              {listeningSubs.length === 0 ? (
+                <p className="text-gray-400">No submissions found.</p>
+              ) : (
+                listeningSubs.map((sub) => {
+                  const fb = pickFeedback(sub.listening_feedback);
+                  const isExpanded = expandedId === sub.id;
+                  return (
+                    <div key={sub.id} className="rounded-lg border border-gray-200 bg-white">
+                      <div
+                        className="flex cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-50"
+                        onClick={() => setExpandedId(isExpanded ? null : sub.id)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="rounded bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                            {sub.track_title}
+                          </span>
+                          {sub.section && (
+                            <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600">
+                              S{sub.section}
+                            </span>
+                          )}
+                          {fb && (
+                            <span className="text-sm font-bold text-gray-900">
+                              Band {fb.band_score}
+                            </span>
+                          )}
+                          {fb && (
+                            <span className="text-xs text-gray-500">
+                              {fb.raw_score}/{fb.total_questions} correct
+                            </span>
+                          )}
+                          <span className="text-sm text-gray-600">{resolveUser(sub)}</span>
+                        </div>
+                        <span className="text-xs text-gray-400">
+                          {new Date(sub.created_at).toLocaleString()}
+                        </span>
+                      </div>
+                      {isExpanded && (
+                        <div className="border-t border-gray-100 px-4 py-4">
                           <div className="mb-4 rounded bg-gray-50 p-3">
                             <h4 className="mb-1 text-xs font-medium uppercase text-gray-500">Answers</h4>
                             <pre className="max-h-40 overflow-auto text-xs text-gray-700">

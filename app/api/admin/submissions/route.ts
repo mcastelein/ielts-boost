@@ -79,6 +79,22 @@ export async function GET(request: Request) {
     return NextResponse.json({ submissions, total: count ?? 0, page, perPage });
   }
 
-  // Listening or unknown type — return empty
+  if (type === "listening") {
+    let query = supabase
+      .from("listening_submissions")
+      .select("*, listening_feedback(*)", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(offset, offset + perPage - 1);
+
+    if (userId) query = query.eq("user_id", userId);
+
+    const { data, count, error } = await query;
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    const submissions = await enrichWithProfiles(data ?? []);
+    return NextResponse.json({ submissions, total: count ?? 0, page, perPage });
+  }
+
+  // Unknown type — return empty
   return NextResponse.json({ submissions: [], total: 0, page, perPage });
 }
