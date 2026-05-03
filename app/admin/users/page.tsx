@@ -30,10 +30,7 @@ type SortKey =
   | "name"
   | "role"
   | "plan"
-  | "writing"
-  | "speaking"
-  | "reading"
-  | "listening"
+  | "submissions"
   | "active7d"
   | "lastSeen"
   | "provider"
@@ -48,7 +45,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [planFilter, setPlanFilter] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("lastSeen");
+  const [sortKey, setSortKey] = useState<SortKey>("joined");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -118,18 +115,12 @@ export default function UsersPage() {
         case "plan":
           cmp = (a.plan_type ?? "free").localeCompare(b.plan_type ?? "free");
           break;
-        case "writing":
-          cmp = a.stats.writing - b.stats.writing;
+        case "submissions": {
+          const aTotal = a.stats.writing + a.stats.speaking + a.stats.reading + a.stats.listening;
+          const bTotal = b.stats.writing + b.stats.speaking + b.stats.reading + b.stats.listening;
+          cmp = aTotal - bTotal;
           break;
-        case "speaking":
-          cmp = a.stats.speaking - b.stats.speaking;
-          break;
-        case "reading":
-          cmp = a.stats.reading - b.stats.reading;
-          break;
-        case "listening":
-          cmp = a.stats.listening - b.stats.listening;
-          break;
+        }
         case "active7d":
           cmp = a.stats.daysActive7d - b.stats.daysActive7d;
           break;
@@ -414,16 +405,13 @@ export default function UsersPage() {
                 <SortHeader label="User" sortKeyVal="name" />
                 <SortHeader label="Role" sortKeyVal="role" />
                 <SortHeader label="Plan" sortKeyVal="plan" />
-                <SortHeader label="Writing" sortKeyVal="writing" />
-                <SortHeader label="Speaking" sortKeyVal="speaking" />
-                <SortHeader label="Reading" sortKeyVal="reading" />
-                <SortHeader label="Listening" sortKeyVal="listening" />
+                <SortHeader label="Joined" sortKeyVal="joined" />
+                <SortHeader label="W/S/R/L" sortKeyVal="submissions" />
                 <SortHeader label="Active 7d" sortKeyVal="active7d" />
                 <SortHeader label="Last seen" sortKeyVal="lastSeen" />
                 <SortHeader label="Provider" sortKeyVal="provider" />
                 <SortHeader label="API Cost" sortKeyVal="cost" />
                 <th className="px-4 py-3">Languages</th>
-                <SortHeader label="Joined" sortKeyVal="joined" />
               </tr>
             </thead>
             <tbody>
@@ -478,10 +466,12 @@ export default function UsersPage() {
                       <option value="pro">Pro</option>
                     </select>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{user.stats.writing}</td>
-                  <td className="px-4 py-3 text-gray-600">{user.stats.speaking}</td>
-                  <td className="px-4 py-3 text-gray-600">{user.stats.reading}</td>
-                  <td className="px-4 py-3 text-gray-600">{user.stats.listening}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-gray-500">
+                    {new Date(user.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 font-mono text-gray-600">
+                    {user.stats.writing}/{user.stats.speaking}/{user.stats.reading}/{user.stats.listening}
+                  </td>
                   <td className="px-4 py-3 text-gray-600">{user.stats.daysActive7d}/7</td>
                   <td className="whitespace-nowrap px-4 py-3 text-xs text-gray-500">
                     {formatRelative(user.last_sign_in_at)}
@@ -494,9 +484,6 @@ export default function UsersPage() {
                   <td className="px-4 py-3 text-gray-600">{formatCost(user.stats.totalCost)}</td>
                   <td className="px-4 py-3 text-xs text-gray-500">
                     UI: {user.ui_language} / FB: {user.feedback_language}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-gray-500">
-                    {new Date(user.created_at).toLocaleDateString()}
                   </td>
                 </tr>
               ))}
