@@ -48,7 +48,10 @@ export async function POST(request: Request) {
           task_type: taskType,
           prompt_topic: promptTopic || null,
           prompt_text: promptText || null,
-          time_used_seconds: timeUsedSeconds || null,
+          time_used_seconds:
+            typeof timeUsedSeconds === "number" && timeUsedSeconds > 0
+              ? Math.min(timeUsedSeconds, 2 * 60 * 60)
+              : null,
           status: "draft",
         })
         .select("id")

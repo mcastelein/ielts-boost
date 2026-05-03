@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { formatElapsed, parseTimestamp } from "@/lib/time-format";
 
 interface WritingItem {
   id: string;
@@ -76,26 +77,21 @@ export default function HistoryClient({
     );
   }
 
-  // Merge and sort by date
+  const parseDate = parseTimestamp;
+  const formatTime = formatElapsed;
+
+  // Merge and sort by date (newest first)
   const allItems: HistoryItem[] = [
     ...writingItems,
     ...speakingItems,
     ...readingItems,
     ...listeningItems,
-  ].sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  );
+  ].sort((a, b) => parseTimestamp(b.created_at).getTime() - parseTimestamp(a.created_at).getTime());
 
   const filteredItems =
     filter === "all"
       ? allItems
       : allItems.filter((item) => item.type === filter);
-
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, "0")}`;
-  };
 
   const filters: { key: FilterType; label: string }[] = [
     { key: "all", label: t("history_all") },
@@ -178,8 +174,8 @@ export default function HistoryClient({
                   )}
                   <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
                     <span>
-                      {new Date(item.created_at).toLocaleDateString()} at{" "}
-                      {new Date(item.created_at).toLocaleTimeString([], {
+                      {parseDate(item.created_at).toLocaleDateString()} at{" "}
+                      {parseDate(item.created_at).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
@@ -228,8 +224,8 @@ export default function HistoryClient({
                     )}
                   </div>
                   <div className="mt-2 text-xs text-gray-500">
-                    {new Date(item.created_at).toLocaleDateString()} at{" "}
-                    {new Date(item.created_at).toLocaleTimeString([], {
+                    {parseDate(item.created_at).toLocaleDateString()} at{" "}
+                    {parseDate(item.created_at).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
@@ -269,8 +265,8 @@ export default function HistoryClient({
                   </div>
                   <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
                     <span>
-                      {new Date(item.created_at).toLocaleDateString()} at{" "}
-                      {new Date(item.created_at).toLocaleTimeString([], {
+                      {parseDate(item.created_at).toLocaleDateString()} at{" "}
+                      {parseDate(item.created_at).toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
                       })}
@@ -323,8 +319,8 @@ export default function HistoryClient({
                   </div>
                 </div>
                 <div className="mt-2 text-xs text-gray-500">
-                  {new Date(item.created_at).toLocaleDateString()} at{" "}
-                  {new Date(item.created_at).toLocaleTimeString([], {
+                  {parseDate(item.created_at).toLocaleDateString()} at{" "}
+                  {parseDate(item.created_at).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}

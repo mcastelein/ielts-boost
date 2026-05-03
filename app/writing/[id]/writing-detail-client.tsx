@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { formatElapsed } from "@/lib/time-format";
 
 interface SentenceCorrection {
   original: string;
@@ -77,9 +78,7 @@ export default function WritingDetailClient({ submission, feedback, isPro }: Pro
         {submission.time_used_seconds != null && (
           <>
             <span>&middot;</span>
-            <span>
-              {Math.floor(submission.time_used_seconds / 60)}:{(submission.time_used_seconds % 60).toString().padStart(2, "0")}
-            </span>
+            <span>{formatElapsed(submission.time_used_seconds)}</span>
           </>
         )}
       </div>

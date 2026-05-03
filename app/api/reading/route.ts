@@ -81,7 +81,10 @@ export async function POST(request: Request) {
           passage_title: passage.title,
           exam_type: passage.examType,
           answers_json: answers,
-          time_used_seconds: timeUsedSeconds ?? null,
+          time_used_seconds:
+            typeof timeUsedSeconds === "number" && timeUsedSeconds > 0
+              ? Math.min(timeUsedSeconds, 2 * 60 * 60)
+              : null,
           status: "draft",
         })
         .select("id")
