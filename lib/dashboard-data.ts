@@ -31,13 +31,19 @@ function pickFeedback<T>(fb: T | T[] | null | undefined): T | null {
 }
 
 function computeTrend(scores: number[]): "up" | "down" | "flat" | null {
-  if (scores.length < 4) return null;
-  const recent = scores.slice(-3);
-  const previous = scores.slice(-6, -3);
-  if (previous.length === 0) return null;
-  const recentAvg = recent.reduce((a, b) => a + b, 0) / recent.length;
-  const prevAvg = previous.reduce((a, b) => a + b, 0) / previous.length;
-  const diff = recentAvg - prevAvg;
+  if (scores.length === 0) return null;
+  // Single session — nothing to compare yet, show as steady so the marker is consistent across cards
+  if (scores.length === 1) return "flat";
+
+  // 6+ sessions: stable 3-vs-3 average comparison
+  // 2-5 sessions: compare latest score to average of all previous
+  const [recent, previous] =
+    scores.length >= 6
+      ? [scores.slice(-3), scores.slice(-6, -3)]
+      : [scores.slice(-1), scores.slice(0, -1)];
+
+  const avg = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+  const diff = avg(recent) - avg(previous);
   if (diff > 0.25) return "up";
   if (diff < -0.25) return "down";
   return "flat";
