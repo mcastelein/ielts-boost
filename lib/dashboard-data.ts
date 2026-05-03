@@ -21,6 +21,15 @@ export interface SectionDashboardData {
   weaknesses: { text: string; count: number }[];
 }
 
+// PostgREST embeds 1-to-1 FK joins as an object and 1-to-many as an array.
+// reading_feedback.submission_id is UNIQUE so it returns an object;
+// other feedback tables don't have UNIQUE so they return arrays.
+function pickFeedback<T>(fb: T | T[] | null | undefined): T | null {
+  if (!fb) return null;
+  if (Array.isArray(fb)) return fb[0] ?? null;
+  return fb;
+}
+
 function computeTrend(scores: number[]): "up" | "down" | "flat" | null {
   if (scores.length < 4) return null;
   const recent = scores.slice(-3);
@@ -47,36 +56,42 @@ export async function fetchWritingDashboardData(
     .neq("status", "draft")
     .order("created_at", { ascending: true });
 
+  type WritingFb = {
+    overall_band: number;
+    task_score: number;
+    coherence_score: number;
+    lexical_score: number;
+    grammar_score: number;
+    feedback_json: { weaknesses?: string[] };
+  };
   const rows = (raw ?? []) as Array<{
     id: string;
     task_type: string;
     created_at: string;
-    writing_feedback: {
-      overall_band: number;
-      task_score: number;
-      coherence_score: number;
-      lexical_score: number;
-      grammar_score: number;
-      feedback_json: { weaknesses?: string[] };
-    }[];
+    writing_feedback: WritingFb | WritingFb[] | null;
   }>;
 
-  const withFeedback = rows.filter((r) => r.writing_feedback?.length > 0);
-  const scores = withFeedback.map((r) => r.writing_feedback[0].overall_band);
+  const withFeedback = rows
+    .map((r) => ({ row: r, fb: pickFeedback(r.writing_feedback) }))
+    .filter((x): x is { row: typeof rows[number]; fb: WritingFb } => x.fb !== null);
+  const scores = withFeedback.map((x) => x.fb.overall_band);
 
-  const submissions = rows.map((r) => ({
-    id: r.id,
-    date: new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-    label: r.task_type === "task1" ? "Task 1" : "Task 2",
-    score: r.writing_feedback?.length > 0 ? r.writing_feedback[0].overall_band : null,
+  const submissions = rows.map((r) => {
+    const fb = pickFeedback(r.writing_feedback);
+    return {
+      id: r.id,
+      date: new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+      label: r.task_type === "task1" ? "Task 1" : "Task 2",
+      score: fb?.overall_band ?? null,
+    };
+  });
+
+  const trendData: TrendPoint[] = withFeedback.map((x) => ({
+    date: new Date(x.row.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+    score: x.fb.overall_band,
   }));
 
-  const trendData: TrendPoint[] = withFeedback.map((r) => ({
-    date: new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-    score: r.writing_feedback[0].overall_band,
-  }));
-
-  const latest = withFeedback.length > 0 ? withFeedback[withFeedback.length - 1].writing_feedback[0] : null;
+  const latest = withFeedback.length > 0 ? withFeedback[withFeedback.length - 1].fb : null;
   const latestSubScores: SubScore[] = latest
     ? [
         { label: "Task", score: latest.task_score },
@@ -88,8 +103,8 @@ export async function fetchWritingDashboardData(
 
   // Collect weaknesses
   const weaknessCounts: Record<string, number> = {};
-  withFeedback.forEach((r) => {
-    const ws = r.writing_feedback[0].feedback_json?.weaknesses ?? [];
+  withFeedback.forEach((x) => {
+    const ws = x.fb.feedback_json?.weaknesses ?? [];
     ws.forEach((w) => {
       const key = w.toLowerCase().slice(0, 60);
       weaknessCounts[key] = (weaknessCounts[key] || 0) + 1;
@@ -124,39 +139,43 @@ export async function fetchSpeakingDashboardData(
     .neq("status", "draft")
     .order("created_at", { ascending: true });
 
+  type SpeakingFb = {
+    estimated_band: number | null;
+    fluency_score: number | null;
+    lexical_score: number | null;
+    grammar_score: number | null;
+    pronunciation_score: number | null;
+    feedback_json: { weaknesses?: string[] };
+  };
   const rows = (raw ?? []) as Array<{
     id: string;
     prompt: string;
     part: number | null;
     created_at: string;
-    speaking_feedback: {
-      estimated_band: number | null;
-      fluency_score: number | null;
-      lexical_score: number | null;
-      grammar_score: number | null;
-      pronunciation_score: number | null;
-      feedback_json: { weaknesses?: string[] };
-    }[];
+    speaking_feedback: SpeakingFb | SpeakingFb[] | null;
   }>;
 
-  const withFeedback = rows.filter(
-    (r) => r.speaking_feedback?.length > 0 && r.speaking_feedback[0].estimated_band != null
-  );
-  const scores = withFeedback.map((r) => r.speaking_feedback[0].estimated_band!);
+  const withFeedback = rows
+    .map((r) => ({ row: r, fb: pickFeedback(r.speaking_feedback) }))
+    .filter((x): x is { row: typeof rows[number]; fb: SpeakingFb } => x.fb !== null && x.fb.estimated_band != null);
+  const scores = withFeedback.map((x) => x.fb.estimated_band!);
 
-  const submissions = rows.map((r) => ({
-    id: r.id,
-    date: new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-    label: r.part ? `Part ${r.part}` : "Speaking",
-    score: r.speaking_feedback?.length > 0 ? r.speaking_feedback[0].estimated_band : null,
+  const submissions = rows.map((r) => {
+    const fb = pickFeedback(r.speaking_feedback);
+    return {
+      id: r.id,
+      date: new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+      label: r.part ? `Part ${r.part}` : "Speaking",
+      score: fb?.estimated_band ?? null,
+    };
+  });
+
+  const trendData: TrendPoint[] = withFeedback.map((x) => ({
+    date: new Date(x.row.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+    score: x.fb.estimated_band!,
   }));
 
-  const trendData: TrendPoint[] = withFeedback.map((r) => ({
-    date: new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-    score: r.speaking_feedback[0].estimated_band!,
-  }));
-
-  const latest = withFeedback.length > 0 ? withFeedback[withFeedback.length - 1].speaking_feedback[0] : null;
+  const latest = withFeedback.length > 0 ? withFeedback[withFeedback.length - 1].fb : null;
   const latestSubScores: SubScore[] =
     latest && latest.fluency_score != null
       ? [
@@ -169,8 +188,8 @@ export async function fetchSpeakingDashboardData(
 
   // Collect weaknesses from feedback_json
   const weaknessCounts: Record<string, number> = {};
-  withFeedback.forEach((r) => {
-    const ws = r.speaking_feedback[0].feedback_json?.weaknesses ?? [];
+  withFeedback.forEach((x) => {
+    const ws = x.fb.feedback_json?.weaknesses ?? [];
     ws.forEach((w) => {
       const key = w.toLowerCase().slice(0, 60);
       weaknessCounts[key] = (weaknessCounts[key] || 0) + 1;
@@ -205,43 +224,46 @@ export async function fetchReadingDashboardData(
     .neq("status", "draft")
     .order("created_at", { ascending: true });
 
+  type ReadingFb = {
+    raw_score: number;
+    total_questions: number;
+    band_score: number;
+  };
   const rows = (raw ?? []) as Array<{
     id: string;
     passage_title: string;
     passage_slug: string;
     created_at: string;
-    reading_feedback: {
-      raw_score: number;
-      total_questions: number;
-      band_score: number;
-    }[];
+    reading_feedback: ReadingFb | ReadingFb[] | null;
   }>;
 
-  const withFeedback = rows.filter((r) => r.reading_feedback?.length > 0);
-  const scores = withFeedback.map((r) => r.reading_feedback[0].band_score);
+  const withFeedback = rows
+    .map((r) => ({ row: r, fb: pickFeedback(r.reading_feedback) }))
+    .filter((x): x is { row: typeof rows[number]; fb: ReadingFb } => x.fb !== null);
+  const scores = withFeedback.map((x) => x.fb.band_score);
 
-  const submissions = rows.map((r) => ({
-    id: r.id,
-    date: new Date(r.created_at).toLocaleDateString(undefined, {
+  const submissions = rows.map((r) => {
+    const fb = pickFeedback(r.reading_feedback);
+    return {
+      id: r.id,
+      date: new Date(r.created_at).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      }),
+      label: r.passage_title,
+      score: fb?.band_score ?? null,
+    };
+  });
+
+  const trendData: TrendPoint[] = withFeedback.map((x) => ({
+    date: new Date(x.row.created_at).toLocaleDateString(undefined, {
       month: "short",
       day: "numeric",
     }),
-    label: r.passage_title,
-    score: r.reading_feedback?.length > 0 ? r.reading_feedback[0].band_score : null,
+    score: x.fb.band_score,
   }));
 
-  const trendData: TrendPoint[] = withFeedback.map((r) => ({
-    date: new Date(r.created_at).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-    }),
-    score: r.reading_feedback[0].band_score,
-  }));
-
-  const latest =
-    withFeedback.length > 0
-      ? withFeedback[withFeedback.length - 1].reading_feedback[0]
-      : null;
+  const latest = withFeedback.length > 0 ? withFeedback[withFeedback.length - 1].fb : null;
 
   const latestSubScores: SubScore[] = latest
     ? [
@@ -283,43 +305,46 @@ export async function fetchListeningDashboardData(
     .neq("status", "draft")
     .order("created_at", { ascending: true });
 
+  type ListeningFb = {
+    raw_score: number;
+    total_questions: number;
+    band_score: number;
+  };
   const rows = (raw ?? []) as Array<{
     id: string;
     track_title: string;
     track_slug: string;
     created_at: string;
-    listening_feedback: {
-      raw_score: number;
-      total_questions: number;
-      band_score: number;
-    }[];
+    listening_feedback: ListeningFb | ListeningFb[] | null;
   }>;
 
-  const withFeedback = rows.filter((r) => r.listening_feedback?.length > 0);
-  const scores = withFeedback.map((r) => r.listening_feedback[0].band_score);
+  const withFeedback = rows
+    .map((r) => ({ row: r, fb: pickFeedback(r.listening_feedback) }))
+    .filter((x): x is { row: typeof rows[number]; fb: ListeningFb } => x.fb !== null);
+  const scores = withFeedback.map((x) => x.fb.band_score);
 
-  const submissions = rows.map((r) => ({
-    id: r.id,
-    date: new Date(r.created_at).toLocaleDateString(undefined, {
+  const submissions = rows.map((r) => {
+    const fb = pickFeedback(r.listening_feedback);
+    return {
+      id: r.id,
+      date: new Date(r.created_at).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      }),
+      label: r.track_title,
+      score: fb?.band_score ?? null,
+    };
+  });
+
+  const trendData: TrendPoint[] = withFeedback.map((x) => ({
+    date: new Date(x.row.created_at).toLocaleDateString(undefined, {
       month: "short",
       day: "numeric",
     }),
-    label: r.track_title,
-    score: r.listening_feedback?.length > 0 ? r.listening_feedback[0].band_score : null,
+    score: x.fb.band_score,
   }));
 
-  const trendData: TrendPoint[] = withFeedback.map((r) => ({
-    date: new Date(r.created_at).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-    }),
-    score: r.listening_feedback[0].band_score,
-  }));
-
-  const latest =
-    withFeedback.length > 0
-      ? withFeedback[withFeedback.length - 1].listening_feedback[0]
-      : null;
+  const latest = withFeedback.length > 0 ? withFeedback[withFeedback.length - 1].fb : null;
 
   const latestSubScores: SubScore[] = latest
     ? [

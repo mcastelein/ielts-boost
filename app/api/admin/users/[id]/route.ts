@@ -119,7 +119,11 @@ export async function GET(
 
     const scored: SectionRow[] = rows
       .map((r) => {
-        const fb = (r[feedbackKey] as Record<string, unknown>[] | undefined)?.[0];
+        // PostgREST returns 1-to-1 FKs as objects, 1-to-many as arrays
+        const rawFb = r[feedbackKey];
+        const fb = Array.isArray(rawFb)
+          ? (rawFb[0] as Record<string, unknown> | undefined)
+          : (rawFb as Record<string, unknown> | null | undefined);
         const raw = fb?.[bandField];
         const band = typeof raw === "number" ? raw : raw != null ? Number(raw) : null;
         return { created_at: r.created_at as string, band };

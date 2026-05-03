@@ -37,18 +37,32 @@ interface ReadingItem {
   total_questions: number | null;
 }
 
-type HistoryItem = WritingItem | SpeakingItem | ReadingItem;
-type FilterType = "all" | "writing" | "speaking" | "reading";
+interface ListeningItem {
+  id: string;
+  type: "listening";
+  track_title: string;
+  track_slug: string;
+  section: number | null;
+  created_at: string;
+  band: number | null;
+  raw_score: number | null;
+  total_questions: number | null;
+}
+
+type HistoryItem = WritingItem | SpeakingItem | ReadingItem | ListeningItem;
+type FilterType = "all" | "writing" | "speaking" | "reading" | "listening";
 
 export default function HistoryClient({
   writingItems,
   speakingItems,
   readingItems,
+  listeningItems,
   authenticated,
 }: {
   writingItems: WritingItem[];
   speakingItems: SpeakingItem[];
   readingItems: ReadingItem[];
+  listeningItems: ListeningItem[];
   authenticated: boolean;
 }) {
   const [filter, setFilter] = useState<FilterType>("all");
@@ -67,6 +81,7 @@ export default function HistoryClient({
     ...writingItems,
     ...speakingItems,
     ...readingItems,
+    ...listeningItems,
   ].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
@@ -84,9 +99,10 @@ export default function HistoryClient({
 
   const filters: { key: FilterType; label: string }[] = [
     { key: "all", label: t("history_all") },
+    { key: "listening", label: t("history_listening") },
+    { key: "reading", label: t("history_reading") },
     { key: "writing", label: t("history_writing") },
     { key: "speaking", label: t("history_speaking") },
-    { key: "reading", label: t("history_reading") },
   ];
 
   return (
@@ -222,20 +238,75 @@ export default function HistoryClient({
               );
             }
 
-            // Reading item
+            if (item.type === "reading") {
+              return (
+                <Link
+                  key={`r-${item.id}`}
+                  href={`/reading/${item.id}`}
+                  className="block rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-cyan-200 hover:bg-cyan-50/30"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded bg-cyan-100 px-2 py-1 text-xs font-medium text-cyan-700">
+                        {t("history_reading")}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {item.passage_title}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {item.raw_score !== null && item.total_questions !== null && (
+                        <span className="text-xs text-gray-400">
+                          {item.raw_score}/{item.total_questions}
+                        </span>
+                      )}
+                      {item.band !== null && (
+                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-600 text-sm font-bold text-white">
+                          {item.band}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
+                    <span>
+                      {new Date(item.created_at).toLocaleDateString()} at{" "}
+                      {new Date(item.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                    {item.time_used_seconds !== null && (
+                      <span className="flex items-center gap-1">
+                        <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+                        </svg>
+                        {formatTime(item.time_used_seconds)}
+                      </span>
+                    )}
+                  </div>
+                </Link>
+              );
+            }
+
+            // Listening item
             return (
               <Link
-                key={`r-${item.id}`}
-                href={`/reading/${item.id}`}
-                className="block rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-cyan-200 hover:bg-cyan-50/30"
+                key={`l-${item.id}`}
+                href={`/listening/${item.id}`}
+                className="block rounded-xl border border-gray-200 bg-white p-4 transition-colors hover:border-emerald-200 hover:bg-emerald-50/30"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="rounded bg-cyan-100 px-2 py-1 text-xs font-medium text-cyan-700">
-                      {t("history_reading")}
+                    <span className="rounded bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-700">
+                      {t("history_listening")}
                     </span>
+                    {item.section && (
+                      <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                        Section {item.section}
+                      </span>
+                    )}
                     <span className="text-sm font-medium text-gray-900">
-                      {item.passage_title}
+                      {item.track_title}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -245,28 +316,18 @@ export default function HistoryClient({
                       </span>
                     )}
                     {item.band !== null && (
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-600 text-sm font-bold text-white">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
                         {item.band}
                       </span>
                     )}
                   </div>
                 </div>
-                <div className="mt-2 flex items-center gap-4 text-xs text-gray-500">
-                  <span>
-                    {new Date(item.created_at).toLocaleDateString()} at{" "}
-                    {new Date(item.created_at).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                  {item.time_used_seconds !== null && (
-                    <span className="flex items-center gap-1">
-                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
-                      </svg>
-                      {formatTime(item.time_used_seconds)}
-                    </span>
-                  )}
+                <div className="mt-2 text-xs text-gray-500">
+                  {new Date(item.created_at).toLocaleDateString()} at{" "}
+                  {new Date(item.created_at).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </div>
               </Link>
             );
