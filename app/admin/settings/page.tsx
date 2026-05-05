@@ -111,17 +111,6 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
-      {/* DB Schema Note */}
-      <div className="max-w-lg rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-500">
-        <p className="font-medium text-gray-700">Required Supabase table:</p>
-        <pre className="mt-2 text-xs">
-{`create table admin_settings (
-  key text primary key,
-  value jsonb,
-  updated_at timestamp with time zone default now()
-);`}
-        </pre>
-      </div>
     </div>
   );
 }
