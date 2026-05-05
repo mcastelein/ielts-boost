@@ -176,23 +176,6 @@ export default function AdminFeedbackPage() {
           </button>
         </div>
       )}
-
-      {/* DB Schema Note */}
-      <div className="max-w-lg rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-500">
-        <p className="font-medium text-gray-700">Required Supabase table:</p>
-        <pre className="mt-2 text-xs">
-{`create table feedback (
-  id uuid default gen_random_uuid() primary key,
-  user_id uuid,
-  user_email text,
-  category text default 'other',
-  subject text not null,
-  message text not null,
-  status text default 'new',
-  created_at timestamp with time zone default now()
-);`}
-        </pre>
-      </div>
     </div>
   );
 }
