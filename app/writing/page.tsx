@@ -7,6 +7,8 @@ import type { WritingPrompt, ChartData } from "@/lib/writing-prompts";
 import TaskChart from "@/components/TaskChart";
 import { useLanguage } from "@/lib/language-context";
 import GuestBanner from "@/components/GuestBanner";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 interface SentenceCorrection {
   original: string;
@@ -79,6 +81,7 @@ function WritingPage() {
   const { t, feedbackLocale } = useLanguage();
   const searchParams = useSearchParams();
   const initialTask = searchParams.get("task");
+  const isOnboarding = searchParams.get("onboarding") === "1";
   const [taskType, setTaskType] = useState(initialTask === "task1" || initialTask === "task2" ? initialTask : "");
   const [inputMode, setInputMode] = useState<InputMode>("text");
   const [essay, setEssay] = useState("");
@@ -147,7 +150,16 @@ function WritingPage() {
   useEffect(() => {
     const session = loadSession();
     if (session) {
-      setPendingSession(session);
+      if (isOnboarding) {
+        setTaskType(session.taskType);
+        setSelectedPrompt(session.prompt);
+        setUseOwnTopic(session.useOwnTopic);
+        setEssay(session.essay);
+        endTimeRef.current = null;
+        setStep("writing");
+      } else {
+        setPendingSession(session);
+      }
     }
     setSessionLoaded(true);
 
@@ -195,6 +207,42 @@ function WritingPage() {
     };
     checkUsage();
   }, []);
+
+  // Onboarding mini-tour: point at essay + submit button
+  useEffect(() => {
+    if (!isOnboarding || step !== "writing") return;
+    const timer = setTimeout(() => {
+      const driverObj = driver({
+        showProgress: false,
+        nextBtnText: t("onboarding_tour_next"),
+        prevBtnText: t("onboarding_tour_back"),
+        doneBtnText: t("onboarding_tour_next"),
+        steps: [
+          {
+            element: "#writing-textarea",
+            popover: {
+              title: t("onboarding_writing_essay_title"),
+              description: t("onboarding_writing_essay_body"),
+              side: "top",
+              align: "start",
+            },
+          },
+          {
+            element: "#writing-submit-btn",
+            popover: {
+              title: t("onboarding_writing_submit_title"),
+              description: t("onboarding_writing_submit_body"),
+              side: "top",
+              align: "end",
+            },
+          },
+        ],
+      });
+      driverObj.drive();
+    }, 600);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOnboarding, step]);
 
   // Persist essay text to session as user types
   useEffect(() => {
@@ -430,7 +478,7 @@ function WritingPage() {
       clearSession();
 
       if (data.submission_id) {
-        router.push(`/writing/${data.submission_id}`);
+        router.push(`/writing/${data.submission_id}${isOnboarding ? "?onboarding=1" : ""}`);
         return;
       }
       setResult(data);
@@ -751,6 +799,7 @@ function WritingPage() {
           {/* Text input */}
           {inputMode === "text" && (
             <textarea
+              id="writing-textarea"
               value={essay}
               onChange={(e) => setEssay(e.target.value)}
               placeholder={`${t("writing_placeholder")} (${t("writing_min_words")} ${selectedTask!.minWords} ${t("writing_words")})...`}
@@ -848,6 +897,7 @@ function WritingPage() {
             </div>
 
             <button
+              id="writing-submit-btn"
               onClick={handleSubmit}
               disabled={!activeText.trim() || isSubmitting}
               className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"

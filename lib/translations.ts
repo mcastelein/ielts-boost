@@ -705,6 +705,112 @@ export const translations = {
   },
   landing_final_cta_button: { en: "Start practicing free", zh: "免费开始练习" },
   landing_final_cta_no_cc: { en: "No credit card required", zh: "无需信用卡" },
+
+  // Onboarding tour
+  onboarding_step_of: { en: "Step {current} of {total}", zh: "第 {current} 步，共 {total} 步" },
+  onboarding_skip: { en: "Skip tour", zh: "跳过引导" },
+  onboarding_next: { en: "Next", zh: "下一步" },
+  onboarding_done: { en: "Start practicing", zh: "开始练习" },
+
+  onboarding_welcome_title: { en: "Welcome to IELTSBoost!", zh: "欢迎使用 IELTSBoost！" },
+  onboarding_welcome_body: {
+    en: "You're moments away from AI-powered IELTS feedback. Let's take a quick tour so you get the most out of the platform.",
+    zh: "即刻获得AI驱动的雅思反馈。让我们快速了解一下平台，帮助你充分利用每一次练习。",
+  },
+
+  onboarding_writing_title: { en: "Writing Practice", zh: "写作练习" },
+  onboarding_writing_body: {
+    en: "Submit a Task 1 or Task 2 essay — typed, pasted, or uploaded as an image or PDF. You'll get an instant band score and detailed feedback across all four IELTS criteria.",
+    zh: "提交 Task 1 或 Task 2 作文——直接输入、粘贴，或上传图片和PDF均可。你将立即获得雅思四项评分标准的详细反馈和预估分数。",
+  },
+
+  onboarding_speaking_title: { en: "Speaking Practice", zh: "口语练习" },
+  onboarding_speaking_body: {
+    en: "Practice IELTS Speaking Parts 1, 2, and 3. Get feedback on fluency, vocabulary, grammar, and coherence — plus stronger example responses to learn from.",
+    zh: "练习雅思口语第1、2、3部分。获取流利度、词汇、语法和连贯性等方面的反馈，并参考更优质的示范回答来提升自己。",
+  },
+
+  onboarding_dashboard_title: { en: "Track Your Progress", zh: "追踪学习进度" },
+  onboarding_dashboard_body: {
+    en: "Your Dashboard shows your band score trends, most common mistakes, and what to focus on next. The more you practice, the smarter your insights get.",
+    zh: "仪表板展示你的分数趋势、常见错误和下一步重点。练习越多，洞察越精准。",
+  },
+
+  onboarding_ready_title: { en: "You're all set!", zh: "准备好了！" },
+  onboarding_ready_body: {
+    en: "Start with a writing submission to get your first band score estimate. Your dashboard will update as you practice.",
+    zh: "从一篇写作作文开始，获取你的第一个预估分数。随着练习积累，仪表板将不断更新你的学习进度。",
+  },
+
+  // Onboarding — level picker
+  onboarding_welcome_subtitle: { en: "Let's personalise your first practice session.", zh: "让我们为你的第一次练习量身定制。" },
+  onboarding_pick_level: { en: "What's your current English level?", zh: "你目前的英语水平是？" },
+  onboarding_level_beginner: { en: "Beginner", zh: "初级" },
+  onboarding_level_beginner_band: { en: "Band 4–5", zh: "雅思 4–5 分" },
+  onboarding_level_intermediate: { en: "Intermediate", zh: "中级" },
+  onboarding_level_intermediate_band: { en: "Band 5.5–6.5", zh: "雅思 5.5–6.5 分" },
+  onboarding_level_advanced: { en: "Advanced", zh: "高级" },
+  onboarding_level_advanced_band: { en: "Band 7+", zh: "雅思 7 分及以上" },
+
+  // Onboarding — guided tour
+  onboarding_tour_intro_title: { en: "Great! Let's take a quick tour.", zh: "太好了！让我们快速了解一下平台。" },
+  onboarding_tour_intro_body: {
+    en: "We'll walk you through the key features in just a few steps — then drop you straight into your first practice session.",
+    zh: "我们将用几个步骤带你了解核心功能，然后直接进入你的第一次练习。",
+  },
+  onboarding_tour_practice_title: { en: "Practice Menu", zh: "练习菜单" },
+  onboarding_tour_practice_body: {
+    en: "Access Writing and Speaking from the Practice menu anytime. Writing is the highest-priority skill for improving your band score.",
+    zh: "随时从【练习】菜单进入写作和口语模块。写作是提升雅思分数最关键的技能。",
+  },
+  onboarding_tour_next: { en: "Next →", zh: "下一步 →" },
+  onboarding_tour_back: { en: "← Back", zh: "← 上一步" },
+  onboarding_tour_done: { en: "Start Writing ✍️", zh: "开始写作 ✍️" },
+
+  // Onboarding — writing page tour
+  onboarding_writing_essay_title: { en: "Your practice essay", zh: "你的练习作文" },
+  onboarding_writing_essay_body: {
+    en: "A sample essay has been loaded for you. Read it through, then click Submit to see what AI feedback looks like.",
+    zh: "我们已为你预加载了一篇示例作文。阅读后点击提交，亲眼看看AI反馈是什么样的。",
+  },
+  onboarding_writing_submit_title: { en: "Submit for instant feedback", zh: "提交获取即时反馈" },
+  onboarding_writing_submit_body: {
+    en: "Click here to submit. In seconds you'll get a band score and detailed feedback across all 4 IELTS writing criteria.",
+    zh: "点击提交，几秒钟内你就能获得雅思四项评分标准的详细反馈和预估分数。",
+  },
+
+  // Onboarding — feedback page tour
+  onboarding_feedback_band_title: { en: "Your Band Score", zh: "你的雅思分数" },
+  onboarding_feedback_band_body: {
+    en: "Your overall estimated band score, plus a breakdown across the 4 IELTS writing criteria: Task Achievement, Coherence & Cohesion, Lexical Resource, and Grammar.",
+    zh: "你的整体预估雅思分数，以及雅思写作四项评分标准的分项分数。",
+  },
+  onboarding_feedback_sw_title: { en: "Strengths & Weaknesses", zh: "优势与不足" },
+  onboarding_feedback_sw_body: {
+    en: "A clear breakdown of what you did well and what needs improvement — so you know exactly where to focus next.",
+    zh: "清晰呈现你的写作优势与不足，让你清楚下一步该重点改进哪里。",
+  },
+  onboarding_feedback_corrections_title: { en: "Sentence Corrections", zh: "句子纠错" },
+  onboarding_feedback_corrections_body: {
+    en: "Specific sentence-level corrections with explanations, showing exactly how to rewrite weaker sentences into stronger ones.",
+    zh: "具体的句子级别纠错及解释，清楚展示如何将薄弱句子改写得更好。",
+  },
+  onboarding_feedback_improvements_title: { en: "Top 3 Things to Fix", zh: "最重要的3个改进点" },
+  onboarding_feedback_improvements_body: {
+    en: "Your most impactful next steps. Focus on these 3 things in your next essay to make the biggest jump in your band score.",
+    zh: "最有价值的下一步行动。在下一篇作文中专注改进这3点，能最有效地提升你的雅思分数。",
+  },
+  onboarding_feedback_done_btn: { en: "See my plan →", zh: "查看我的方案 →" },
+
+  // Onboarding — Free vs Pro modal
+  onboarding_plan_title: { en: "Choose how you want to continue", zh: "选择你的使用方式" },
+  onboarding_plan_subtitle: { en: "You can always upgrade later from your settings.", zh: "你随时可以在设置中升级。" },
+  onboarding_plan_free_label: { en: "Free", zh: "免费版" },
+  onboarding_plan_free_cta: { en: "Continue with Free", zh: "使用免费版继续" },
+  onboarding_plan_pro_label: { en: "Pro", zh: "专业版" },
+  onboarding_plan_pro_price: { en: "¥200 / month", zh: "¥200 / 月" },
+  onboarding_plan_pro_cta: { en: "Upgrade to Pro", zh: "升级到专业版" },
+  onboarding_plan_best_value: { en: "Best value", zh: "最超值" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

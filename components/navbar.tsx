@@ -96,6 +96,7 @@ export default function Navbar() {
             {navLinks.filter((link) => user || link.href !== "/dashboard").map((link) => (
               <Link
                 key={link.href}
+                id={link.href === "/dashboard" ? "nav-dashboard" : undefined}
                 href={link.href}
                 className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   pathname.startsWith(link.href)
@@ -110,6 +111,7 @@ export default function Navbar() {
             {/* Practice dropdown */}
             <div className="relative" ref={practiceDropdownRef}>
               <button
+                id="nav-practice"
                 onClick={() => setPracticeDropdownOpen((prev) => !prev)}
                 className={`flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   practiceLinks.some((l) => pathname.startsWith(l.href))

@@ -9,6 +9,7 @@ import SpeakingDetail from "./SpeakingDetail";
 import ReadingDetail from "./ReadingDetail";
 import ListeningDetail from "./ListeningDetail";
 import Encouragement from "./Encouragement";
+import OnboardingTour from "@/components/OnboardingTour";
 import type { SectionDashboardData } from "@/lib/dashboard-data";
 
 type Section = "writing" | "speaking" | "reading" | "listening";
@@ -18,9 +19,10 @@ interface DashboardClientProps {
   speaking: SectionDashboardData;
   reading: SectionDashboardData;
   listening: SectionDashboardData;
+  showOnboarding?: boolean;
 }
 
-export default function DashboardClient({ writing, speaking, reading, listening }: DashboardClientProps) {
+export default function DashboardClient({ writing, speaking, reading, listening, showOnboarding }: DashboardClientProps) {
   const [expanded, setExpanded] = useState<Set<Section>>(new Set());
   const { t } = useLanguage();
 
@@ -34,6 +36,7 @@ export default function DashboardClient({ writing, speaking, reading, listening 
 
   return (
     <div className="space-y-4">
+      {showOnboarding && <OnboardingTour />}
       <h1 className="text-xl font-bold sm:text-2xl">{t("dashboard_title")}</h1>
 
       <Encouragement writing={writing} speaking={speaking} />
@@ -70,7 +73,7 @@ export default function DashboardClient({ writing, speaking, reading, listening 
           </ExpandableSection>
         </div>
 
-        <div>
+        <div id="score-writing">
           <ScoreCard
             sectionName="Writing"
             latestScore={writing.latestScore}
@@ -85,7 +88,7 @@ export default function DashboardClient({ writing, speaking, reading, listening 
           </ExpandableSection>
         </div>
 
-        <div>
+        <div id="score-speaking">
           <ScoreCard
             sectionName="Speaking"
             latestScore={speaking.latestScore}

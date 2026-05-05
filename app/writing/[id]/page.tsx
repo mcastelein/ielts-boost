@@ -4,10 +4,14 @@ import WritingDetailClient from "./writing-detail-client";
 
 export default async function WritingResultPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ onboarding?: string }>;
 }) {
   const { id } = await params;
+  const sp = await searchParams;
+  const isOnboarding = sp.onboarding === "1";
   const supabase = await createClient();
 
   const { data: submission } = await supabase
@@ -43,6 +47,7 @@ export default async function WritingResultPage({
       submission={submission}
       feedback={feedback}
       isPro={isPro}
+      isOnboarding={isOnboarding}
     />
   );
 }
