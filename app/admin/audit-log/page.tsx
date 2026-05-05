@@ -127,20 +127,6 @@ export default function AuditLogPage() {
         </div>
       )}
 
-      {/* DB Schema Note */}
-      <div className="max-w-lg rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-500">
-        <p className="font-medium text-gray-700">Required Supabase table:</p>
-        <pre className="mt-2 text-xs">
-{`create table admin_audit_log (
-  id uuid default gen_random_uuid() primary key,
-  admin_user_id uuid not null,
-  action text not null,
-  target_user_id uuid,
-  details jsonb,
-  created_at timestamp with time zone default now()
-);`}
-        </pre>
-      </div>
     </div>
   );
 }
