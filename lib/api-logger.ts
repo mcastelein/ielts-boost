@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { notifyError } from "./clickup-notify";
 
 // Approximate costs per model
 const COST_RATES: Record<string, { input: number; output: number }> = {
@@ -75,6 +76,11 @@ export async function logApiCall({
   } catch (error) {
     // Don't let logging failures break the main flow
     console.error("Failed to log API call:", error);
+  }
+
+  // Fire-and-forget ClickUp notification on errors. Has its own dedupe + try/catch.
+  if (!success && errorMessage) {
+    void notifyError({ callType, errorMessage, userId });
   }
 }
 
