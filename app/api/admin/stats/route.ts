@@ -180,7 +180,7 @@ export async function GET() {
   const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const { data: healthLogs } = await supabase
     .from("api_usage_log")
-    .select("call_type, model, duration_ms, metadata, created_at")
+    .select("call_type, model, duration_ms, metadata, created_at, user_id")
     .gte("created_at", dayAgo);
 
   const healthByModel: Record<string, { calls: number; errors: number; totalDuration: number; lastCall: string }> = {};
@@ -201,6 +201,29 @@ export async function GET() {
     avgDurationMs: stats.calls > 0 ? Math.round(stats.totalDuration / stats.calls) : 0,
     lastCall: stats.lastCall,
   }));
+
+  // Recent platform errors (last 24h, signed-in + anonymous)
+  const recentErrorRows = (healthLogs ?? [])
+    .filter((log) => (log.metadata as Record<string, unknown> | null)?.success === false)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const errorCount24h = recentErrorRows.length;
+  const errorSlice = recentErrorRows.slice(0, 30);
+  const errorUserIds = [...new Set(
+    errorSlice.map((r) => r.user_id as string | null).filter((id): id is string => !!id),
+  )];
+  const errorProfiles = await getUserProfiles(errorUserIds);
+  const recentErrors = errorSlice.map((log) => {
+    const meta = (log.metadata as Record<string, unknown> | null) ?? {};
+    const userId = (log.user_id as string | null) ?? null;
+    return {
+      created_at: log.created_at,
+      call_type: log.call_type,
+      user_id: userId,
+      user_email: userId ? errorProfiles[userId]?.email ?? null : null,
+      user_name: userId ? errorProfiles[userId]?.name ?? null : null,
+      error: typeof meta.error === "string" ? meta.error : null,
+    };
+  });
 
   return NextResponse.json({
     users: {
@@ -258,5 +281,7 @@ export async function GET() {
       listening: avgListeningBand,
     },
     systemHealth,
+    recentErrors,
+    errorCount24h,
   });
 }

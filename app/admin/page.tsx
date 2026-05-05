@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import AutoRefresh from "@/components/admin/AutoRefresh";
 
 interface Stats {
@@ -40,6 +41,15 @@ interface Stats {
     avgDurationMs: number;
     lastCall: string;
   }[];
+  recentErrors: {
+    created_at: string;
+    call_type: string;
+    user_id: string | null;
+    user_email: string | null;
+    user_name: string | null;
+    error: string | null;
+  }[];
+  errorCount24h: number;
 }
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
@@ -216,6 +226,60 @@ export default function AdminDashboard() {
           </table>
         </div>
       </div>
+
+      {/* Recent Platform Errors (24h) */}
+      {stats.errorCount24h > 0 && (
+        <div>
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-medium uppercase tracking-wide text-red-700">
+            Recent Errors (24h)
+            <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
+              {stats.errorCount24h}
+            </span>
+          </h3>
+          <div className="rounded-lg border border-red-200 bg-white">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-red-100 text-left text-gray-500">
+                  <th className="px-4 py-2">Time</th>
+                  <th className="px-4 py-2">User</th>
+                  <th className="px-4 py-2">Type</th>
+                  <th className="px-4 py-2">Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.recentErrors.map((e, i) => {
+                  const userLabel = e.user_name ?? e.user_email ?? (e.user_id ? e.user_id.slice(0, 8) + "..." : "anonymous");
+                  return (
+                    <tr key={i} className="border-b border-red-50 last:border-b-0">
+                      <td className="whitespace-nowrap px-4 py-2 text-xs text-gray-600">
+                        {new Date(e.created_at).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-2 text-sm">
+                        {e.user_id ? (
+                          <Link href={`/admin/users/${e.user_id}`} className="text-blue-600 hover:text-blue-800">
+                            {userLabel}
+                          </Link>
+                        ) : (
+                          <span className="text-gray-400">anonymous</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 text-xs text-gray-700">{e.call_type}</td>
+                      <td className="px-4 py-2 text-xs text-red-700 line-clamp-2 max-w-md">
+                        {e.error ?? "(no message)"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {stats.errorCount24h > stats.recentErrors.length && (
+              <p className="border-t border-red-100 px-4 py-2 text-xs text-gray-500">
+                Showing {stats.recentErrors.length} of {stats.errorCount24h} errors. Older errors visible per-user via the Users tab.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* System Health */}
       {stats.systemHealth.length > 0 && (
