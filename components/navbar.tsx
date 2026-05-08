@@ -36,18 +36,30 @@ export default function Navbar() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data }) => {
-      setUser(data.user);
-      if (data.user) {
+
+    const loadUser = async (nextUser: User | null) => {
+      setUser(nextUser);
+      if (nextUser) {
         const { data: settings } = await supabase
           .from("user_settings")
           .select("role, plan_type")
-          .eq("user_id", data.user.id)
+          .eq("user_id", nextUser.id)
           .single();
         setIsAdmin(settings?.role === "admin");
         setPlanType(settings?.plan_type ?? "free");
+      } else {
+        setIsAdmin(false);
+        setPlanType("free");
       }
+    };
+
+    supabase.auth.getUser().then(({ data }) => loadUser(data.user));
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      loadUser(session?.user ?? null);
     });
+
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   // Close dropdowns when clicking outside
