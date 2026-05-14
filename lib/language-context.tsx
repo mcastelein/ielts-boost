@@ -26,8 +26,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const storedUI = localStorage.getItem(UI_LANG_KEY) as Locale | null;
     const storedFeedback = localStorage.getItem(FEEDBACK_LANG_KEY) as Locale | null;
-    if (storedUI === "en" || storedUI === "zh") setLocaleState(storedUI);
-    if (storedFeedback === "en" || storedFeedback === "zh") setFeedbackLocaleState(storedFeedback);
+    const resolvedUI = storedUI === "en" || storedUI === "zh" ? storedUI : "zh";
+    setLocaleState(resolvedUI);
+    // If feedback language was never explicitly set, follow the UI language
+    if (storedFeedback === "en" || storedFeedback === "zh") {
+      setFeedbackLocaleState(storedFeedback);
+    } else {
+      setFeedbackLocaleState(resolvedUI);
+    }
     setLoaded(true);
   }, []);
 
@@ -35,6 +41,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale);
     localStorage.setItem(UI_LANG_KEY, newLocale);
+    // If feedback language was never explicitly set, keep it in sync with UI language
+    if (!localStorage.getItem(FEEDBACK_LANG_KEY)) {
+      setFeedbackLocaleState(newLocale);
+    }
     // Update html lang attribute
     document.documentElement.lang = newLocale === "zh" ? "zh-CN" : "en";
     // Sync to DB for authenticated users
