@@ -1,5 +1,7 @@
+export type MCQAnswer = "A" | "B" | "C" | "D" | "E" | "F";
+
 export type ReadingQuestion =
-  | { id: string; type: "mcq"; text: string; options: string[]; answer: string }
+  | { id: string; type: "mcq"; text: string; options: string[]; answer: MCQAnswer }
   | { id: string; type: "tfng" | "ynng"; text: string; answer: string }
   | { id: string; type: "matching_headings"; paragraphLabel: string; answer: string }
   | { id: string; type: "matching_info"; text: string; answer: string }

@@ -31,7 +31,8 @@
       "PowerShell(Get-Process -Name \"chrome\" -ErrorAction SilentlyContinue)",
       "PowerShell(Stop-Process -Force)",
       "PowerShell(Get-Process -Name \"chromium\" -ErrorAction SilentlyContinue)",
-      "mcp__playwright__browser_snapshot"
+      "mcp__playwright__browser_snapshot",
+      "Bash(npx husky *)"
     ]
   }
 }

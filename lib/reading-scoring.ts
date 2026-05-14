@@ -49,10 +49,7 @@ export function checkAnswerDeterministic(
 
   switch (question.type) {
     case "mcq": {
-      // Accept just the letter (e.g. "A") or the full option text
-      const correctLetter = normalizeAnswer(question.answer);
-      const userLetter = ua.charAt(0); // first char of trimmed answer
-      return userLetter === correctLetter || ua === correctLetter;
+      return ua === normalizeAnswer(question.answer);
     }
 
     case "tfng":
@@ -71,15 +68,11 @@ export function checkAnswerDeterministic(
     }
 
     case "matching_headings": {
-      // Answer is a Roman numeral like "iii" or "vii"
-      const correct = normalizeAnswer(question.answer);
-      return ua === correct || ua === correct.toLowerCase();
+      return ua === normalizeAnswer(question.answer);
     }
 
     case "matching_info": {
-      // Answer is a paragraph letter like "B" or "E"
-      const correct = normalizeAnswer(question.answer);
-      return ua === correct || ua.toUpperCase() === correct.toUpperCase();
+      return ua === normalizeAnswer(question.answer);
     }
 
     case "sentence_completion":
