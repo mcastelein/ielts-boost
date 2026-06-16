@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useLanguage } from "@/lib/language-context";
 import { btnPrimaryBlock, btnSecondarySmall } from "@/lib/button-styles";
+import WeChatConnect from "@/components/WeChatConnect";
 
 const CATEGORIES = ["bug", "feature", "improvement", "other"] as const;
 
@@ -74,6 +75,10 @@ export default function FeedbackPage() {
     <div className="mx-auto w-full max-w-xl px-4 py-8">
       <h1 className="text-2xl font-bold">{t("feedback_form_title")}</h1>
       <p className="mt-1 text-sm text-gray-500">{t("feedback_form_subtitle")}</p>
+
+      <div className="mt-6">
+        <WeChatConnect />
+      </div>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5">
         {/* Category */}
