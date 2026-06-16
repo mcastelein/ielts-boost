@@ -180,7 +180,7 @@ Rules:
       try {
         const aiStart = Date.now();
         const message = await anthropic.messages.create({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-6",
           max_tokens: 800,
           system: systemPrompt,
           messages: [
@@ -252,7 +252,7 @@ Rules:
       supabase,
       userId: user?.id ?? null,
       callType: "reading_score",
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       inputTokens: aiUsage?.input_tokens,
       outputTokens: aiUsage?.output_tokens,
       durationMs: durationMs || Date.now() - startTime,
@@ -310,7 +310,7 @@ Rules:
         supabase,
         userId: user?.id ?? null,
         callType: "reading_score",
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-6",
         success: false,
         errorMessage: error instanceof Error ? error.message : "Unknown error",
         metadata: { passageId },

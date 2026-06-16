@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     const startTime = Date.now();
 
     const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 4000,
       messages: [
         {
@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       supabase,
       userId: user?.id ?? null,
       callType: "ocr",
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       inputTokens: message.usage?.input_tokens,
       outputTokens: message.usage?.output_tokens,
       durationMs,
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
         supabase,
         userId: user?.id ?? null,
         callType: "ocr",
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-6",
         success: false,
         errorMessage: error instanceof Error ? error.message : "Unknown error",
       });
