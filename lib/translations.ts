@@ -886,11 +886,11 @@ export const translations = {
   // Step: offer a feature tour
   onboarding_offer_tour_title: { en: "Want a quick tour?", zh: "想快速了解一下吗？" },
   onboarding_offer_tour_body: {
-    en: "We can show you around the dashboard and key features in 30 seconds — or you can jump straight into your first practice.",
-    zh: "我们可以用 30 秒带你了解仪表板和主要功能——你也可以直接开始第一次练习。",
+    en: "We can show you around the dashboard and key features in 30 seconds — or you can skip and explore on your own.",
+    zh: "我们可以用 30 秒带你了解仪表板和主要功能——你也可以跳过，自己探索。",
   },
   onboarding_offer_tour_yes: { en: "Show me around", zh: "带我了解一下" },
-  onboarding_offer_tour_no: { en: "Skip, start practicing", zh: "跳过，开始练习" },
+  onboarding_offer_tour_no: { en: "No thanks, I'll explore on my own", zh: "不用了，我自己看看" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;
