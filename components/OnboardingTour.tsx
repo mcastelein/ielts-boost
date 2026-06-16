@@ -182,11 +182,13 @@ export default function OnboardingTour() {
     driverObj.drive();
   };
 
-  // "Skip, start practicing" — go straight to the first essay.
+  // "Skip, start practicing" — save the survey and drop the user onto a clean writing
+  // page so they can explore on their own. No forced tour (no ?onboarding=1) and no
+  // pre-loaded demo essay.
   const startPractice = async () => {
     setClosed(true);
-    await persist();
-    router.push("/writing?onboarding=1");
+    await saveOnboarding(buildPayload());
+    router.push("/writing");
   };
 
   // "Show me around" — hide the modal, persist, then run the dashboard tour.
