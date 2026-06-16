@@ -811,6 +811,75 @@ export const translations = {
   onboarding_plan_pro_price: { en: "¥200 / month", zh: "¥200 / 月" },
   onboarding_plan_pro_cta: { en: "Upgrade to Pro", zh: "升级到专业版" },
   onboarding_plan_best_value: { en: "Best value", zh: "最超值" },
+
+  // Onboarding — new survey-first welcome flow
+  onboarding_intro_value: {
+    en: "Get instant, bilingual IELTS feedback and watch your band score climb.",
+    zh: "获取即时双语雅思反馈，见证你的分数稳步提升。",
+  },
+  onboarding_welcome_cta: { en: "Let's get started", zh: "开始设置" },
+  onboarding_continue: { en: "Continue", zh: "继续" },
+  onboarding_back: { en: "Back", zh: "上一步" },
+  onboarding_skip_setup: { en: "Skip for now", zh: "暂时跳过" },
+
+  // Step: target band
+  onboarding_q_target_title: { en: "What's your target band score?", zh: "你的目标雅思分数是多少？" },
+  onboarding_q_target_sub: { en: "We'll track your progress toward it.", zh: "我们会帮你追踪达成进度。" },
+
+  // Step: exam date
+  onboarding_q_examdate_title: { en: "When's your exam?", zh: "你的考试时间是？" },
+  onboarding_q_examdate_sub: {
+    en: "This powers your countdown and study plan.",
+    zh: "这将用于你的考试倒计时和学习计划。",
+  },
+  onboarding_examdate_unknown: { en: "Not sure yet", zh: "还不确定" },
+
+  // Step: focus
+  onboarding_q_focus_title: { en: "What do you want to focus on?", zh: "你想重点练习什么？" },
+  onboarding_q_focus_sub: {
+    en: "Select all that apply — this just tailors your recommendations.",
+    zh: "可多选——这只是为了定制推荐。",
+  },
+  onboarding_focus_listening: { en: "Listening", zh: "听力" },
+  onboarding_focus_reading: { en: "Reading", zh: "阅读" },
+  onboarding_focus_writing: { en: "Writing", zh: "写作" },
+  onboarding_focus_speaking: { en: "Speaking", zh: "口语" },
+
+  // Step: referral / attribution
+  onboarding_q_referral_title: { en: "Where did you hear about us?", zh: "你是从哪里了解到我们的？" },
+  onboarding_q_referral_sub: {
+    en: "This helps us reach more learners like you.",
+    zh: "这能帮助我们让更多像你一样的学习者找到我们。",
+  },
+  onboarding_ref_wechat: { en: "WeChat", zh: "微信" },
+  onboarding_ref_xiaohongshu: { en: "Xiaohongshu (RED)", zh: "小红书" },
+  onboarding_ref_douyin: { en: "Douyin / TikTok", zh: "抖音" },
+  onboarding_ref_bilibili: { en: "Bilibili", zh: "哔哩哔哩" },
+  onboarding_ref_friend: { en: "Friend / word of mouth", zh: "朋友推荐" },
+  onboarding_ref_search: { en: "Search engine", zh: "搜索引擎" },
+  onboarding_ref_other: { en: "Other", zh: "其他" },
+  onboarding_ref_other_placeholder: { en: "Tell us where…", zh: "请告诉我们…" },
+
+  // Step: final recap + CTA
+  onboarding_done_title: { en: "You're all set!", zh: "一切就绪！" },
+  onboarding_done_body: {
+    en: "We've loaded a practice essay matched to your level. Submit it to get your first AI band score and feedback.",
+    zh: "我们已根据你的水平准备了一篇练习作文。提交它即可获得你的第一个 AI 雅思分数和反馈。",
+  },
+  onboarding_recap_level: { en: "Level", zh: "水平" },
+  onboarding_recap_target: { en: "Target", zh: "目标" },
+  onboarding_recap_exam: { en: "Exam", zh: "考试" },
+  onboarding_recap_focus: { en: "Focus", zh: "重点" },
+  onboarding_start_practice: { en: "Start my first practice →", zh: "开始我的第一次练习 →" },
+
+  // Step: offer a feature tour
+  onboarding_offer_tour_title: { en: "Want a quick tour?", zh: "想快速了解一下吗？" },
+  onboarding_offer_tour_body: {
+    en: "We can show you around the dashboard and key features in 30 seconds — or you can jump straight into your first practice.",
+    zh: "我们可以用 30 秒带你了解仪表板和主要功能——你也可以直接开始第一次练习。",
+  },
+  onboarding_offer_tour_yes: { en: "Show me around", zh: "带我了解一下" },
+  onboarding_offer_tour_no: { en: "Skip, start practicing", zh: "跳过，开始练习" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

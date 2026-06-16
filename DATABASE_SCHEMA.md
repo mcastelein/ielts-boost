@@ -16,6 +16,14 @@ create table user_settings (
   role text default 'user',
   stripe_customer_id text,
   stripe_subscription_id text,
+  onboarding_completed boolean not null default false,
+  -- onboarding survey answers (see supabase/add_onboarding_survey.sql)
+  self_level text,            -- beginner | intermediate | advanced
+  target_band numeric,        -- 6.0 .. 7.5 (7.5 = "7.5+")
+  exam_date date,
+  focus text,                 -- comma-separated skills: listening,reading,writing,speaking
+  referral_source text,       -- wechat | xiaohongshu | douyin | bilibili | friend | search | other
+  referral_other text,        -- free text when referral_source = other
   created_at timestamp default now()
 );
 

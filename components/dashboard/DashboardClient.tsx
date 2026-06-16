@@ -24,6 +24,8 @@ interface DashboardClientProps {
 
 export default function DashboardClient({ writing, speaking, reading, listening, showOnboarding }: DashboardClientProps) {
   const [expanded, setExpanded] = useState<Set<Section>>(new Set());
+  const [tourKey, setTourKey] = useState(0);
+  const [forceTour, setForceTour] = useState(false);
   const { t } = useLanguage();
 
   const toggle = (section: Section) => {
@@ -34,10 +36,25 @@ export default function DashboardClient({ writing, speaking, reading, listening,
     });
   };
 
+  const showTour = showOnboarding || forceTour;
+
   return (
     <div className="space-y-4">
-      {showOnboarding && <OnboardingTour />}
-      <h1 className="text-xl font-bold sm:text-2xl">{t("dashboard_title")}</h1>
+      {showTour && <OnboardingTour key={tourKey} />}
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold sm:text-2xl">{t("dashboard_title")}</h1>
+        {/* TEMP: remove after onboarding QA */}
+        <button
+          type="button"
+          onClick={() => {
+            setForceTour(true);
+            setTourKey((k) => k + 1);
+          }}
+          className="rounded-md border border-dashed border-amber-500 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100"
+        >
+          Replay onboarding (temp)
+        </button>
+      </div>
 
       <Encouragement writing={writing} speaking={speaking} />
 
