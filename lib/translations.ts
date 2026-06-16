@@ -473,6 +473,17 @@ export const translations = {
   // Feedback form page
   feedback_form_title: { en: "Feedback", zh: "反馈" },
   feedback_form_subtitle: { en: "Found a bug, have a feature request, or just want to share your thoughts? We'd love to hear from you.", zh: "发现了bug、有功能建议、或想分享你的想法？我们很乐意听取你的意见。" },
+
+  // WeChat connect
+  wechat_connect_title: { en: "Let's talk directly", zh: "直接和我聊聊" },
+  wechat_connect_subtitle: {
+    en: "Add me on WeChat and message me anytime. I'm the founder, and I read and reply to every message myself.",
+    zh: "在微信上加我，随时给我留言。我是创始人，每一条消息我都会亲自查看并回复。",
+  },
+  wechat_connect_scan: { en: "Scan to add me on WeChat", zh: "扫一扫，加我微信" },
+  wechat_connect_id_label: { en: "Or add by WeChat ID", zh: "或通过微信号添加" },
+  wechat_connect_copy: { en: "Copy", zh: "复制" },
+  wechat_connect_copied: { en: "Copied", zh: "已复制" },
   feedback_category: { en: "Category", zh: "类别" },
   feedback_cat_bug: { en: "Bug Report", zh: "Bug报告" },
   feedback_cat_feature: { en: "Feature Request", zh: "功能建议" },
