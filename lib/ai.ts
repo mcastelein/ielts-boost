@@ -2,6 +2,35 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic();
 
+// Parse JSON from a model response that may be wrapped in a markdown code
+// fence (```json ... ```) or surrounded by stray prose, despite the prompt
+// asking for raw JSON. Tries the raw string first, then a stripped fence,
+// then the outermost { ... } slice. Throws with the raw text on total failure.
+export function parseJsonFromModel<T = unknown>(text: string): T {
+  const candidates: string[] = [];
+  const trimmed = text.trim();
+  candidates.push(trimmed);
+
+  // Strip a leading/trailing markdown code fence if present.
+  const fenceMatch = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  if (fenceMatch) candidates.push(fenceMatch[1].trim());
+
+  // Fall back to the substring between the first { and last }.
+  const first = trimmed.indexOf("{");
+  const last = trimmed.lastIndexOf("}");
+  if (first !== -1 && last > first) candidates.push(trimmed.slice(first, last + 1));
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate) as T;
+    } catch {
+      // try the next candidate
+    }
+  }
+
+  throw new Error(`Could not parse JSON from model response: ${text.slice(0, 200)}`);
+}
+
 const SCORING_PROMPT_EN = `You are an experienced IELTS examiner. Evaluate the following essay and return your assessment as valid JSON only — no markdown, no code fences, no extra text.
 
 Return this exact JSON structure:
@@ -94,6 +123,7 @@ export async function scoreEssay(
     throw new Error("No text response from AI");
   }
 
-  const parsed = JSON.parse(textBlock.text);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const parsed = parseJsonFromModel<any>(textBlock.text);
   return { ...parsed, _usage: message.usage };
 }
