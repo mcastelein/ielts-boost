@@ -12,6 +12,7 @@ import { PARAGRAPH_LABELS } from "@/components/reading/PassageViewer";
 import PassageViewer from "@/components/reading/PassageViewer";
 import QuestionGroupComponent from "@/components/reading/QuestionGroup";
 import GuestBanner from "@/components/GuestBanner";
+import SelectableCard from "@/components/SelectableCard";
 import { createClient } from "@/lib/supabase/client";
 
 type Step = "setup" | "practice";
@@ -217,15 +218,11 @@ export default function ReadingPage() {
             const isSelected = selectedPassage?.id === passage.id;
             const qCount = getTotalQuestions(passage);
             return (
-              <button
+              <SelectableCard
                 key={passage.id}
-                type="button"
+                selected={isSelected}
                 onClick={() => setSelectedPassage(passage)}
-                className={`rounded-xl border-2 p-5 text-left transition-all ${
-                  isSelected
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 bg-white hover:border-blue-200 hover:bg-blue-50/30"
-                }`}
+                accent="blue"
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-semibold text-gray-900">{passage.title}</span>
@@ -261,7 +258,7 @@ export default function ReadingPage() {
                     {qCount} {t("reading_questions_count")}
                   </span>
                 </div>
-              </button>
+              </SelectableCard>
             );
           })}
         </div>
