@@ -24,6 +24,8 @@ export async function GET(
     { data: listeningSubs },
     { data: apiLogs },
     { data: usageTracking },
+    { data: analyticsEvents },
+    { data: analyticsVisitors },
     profiles,
   ] = await Promise.all([
     supabase
@@ -67,6 +69,18 @@ export async function GET(
       .eq("user_id", userId)
       .order("date", { ascending: false })
       .limit(1),
+    // Engagement: raw events + visitor rollup. Guarded — if the analytics
+    // migration hasn't been applied yet, these resolve to null (not a throw).
+    supabase
+      .from("analytics_events")
+      .select("event_type, name, path, session_id, created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true })
+      .limit(5000),
+    supabase
+      .from("analytics_visitors")
+      .select("first_seen, last_seen, first_referrer, country")
+      .eq("user_id", userId),
     getUserProfiles([userId]),
   ]);
 
@@ -195,9 +209,71 @@ export async function GET(
     ? sessions.reduce((sum, s) => sum + s.cost, 0) / sessions.length
     : 0;
 
+  // ── Engagement analytics (pageviews / time on site / pages visited) ──────
+  type AnalyticsEvent = {
+    event_type: string;
+    name: string | null;
+    path: string | null;
+    session_id: string | null;
+    created_at: string;
+  };
+  const events = (analyticsEvents ?? []) as AnalyticsEvent[];
+  const pageviews = events.filter((e) => e.event_type === "pageview");
+
+  const pathCounts: Record<string, number> = {};
+  for (const e of pageviews) {
+    const p = e.path ?? "(unknown)";
+    pathCounts[p] = (pathCounts[p] ?? 0) + 1;
+  }
+
+  // Time on site: sum of (last - first event) per session, capped at 60min
+  // per session to discount left-open idle tabs. Single-event sessions = 0.
+  const SESSION_CAP_MS = 60 * 60 * 1000;
+  const sessionTimes: Record<string, number[]> = {};
+  for (const e of events) {
+    if (!e.session_id) continue;
+    (sessionTimes[e.session_id] ??= []).push(new Date(e.created_at).getTime());
+  }
+  let totalTimeMs = 0;
+  for (const times of Object.values(sessionTimes)) {
+    if (times.length < 2) continue;
+    totalTimeMs += Math.min(Math.max(...times) - Math.min(...times), SESSION_CAP_MS);
+  }
+
+  const visitorRows = (analyticsVisitors ?? []) as {
+    first_seen: string;
+    last_seen: string;
+    first_referrer: string | null;
+    country: string | null;
+  }[];
+
+  const engagement = {
+    // null query result => the analytics tables aren't live yet (vs. [] = live but no activity)
+    available: analyticsEvents != null,
+    totalPageviews: pageviews.length,
+    distinctPages: Object.keys(pathCounts).length,
+    sessions: Object.keys(sessionTimes).length,
+    totalTimeMs,
+    firstSeen: visitorRows.length
+      ? visitorRows.map((v) => v.first_seen).sort()[0]
+      : events[0]?.created_at ?? null,
+    lastSeen: visitorRows.length
+      ? visitorRows.map((v) => v.last_seen).sort().at(-1) ?? null
+      : events.at(-1)?.created_at ?? null,
+    referrer: visitorRows.find((v) => v.first_referrer)?.first_referrer ?? null,
+    country: visitorRows.find((v) => v.country)?.country ?? null,
+    pageBreakdown: Object.entries(pathCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 30),
+    milestones: events
+      .filter((e) => e.event_type === "milestone" && e.name)
+      .map((e) => ({ name: e.name as string, at: e.created_at })),
+  };
+
   const profile = profiles[userId];
 
   return NextResponse.json({
+    engagement,
     user: {
       ...settings,
       email: profile?.email ?? null,

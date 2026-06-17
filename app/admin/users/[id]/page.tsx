@@ -51,6 +51,19 @@ interface UserDetail {
     listening: { latest: number | null; previous: number | null; count: number };
   };
   recentErrors: ApiLog[];
+  engagement: {
+    available: boolean;
+    totalPageviews: number;
+    distinctPages: number;
+    sessions: number;
+    totalTimeMs: number;
+    firstSeen: string | null;
+    lastSeen: string | null;
+    referrer: string | null;
+    country: string | null;
+    pageBreakdown: [string, number][];
+    milestones: { name: string; at: string }[];
+  };
 }
 
 interface WritingSub {
@@ -137,6 +150,30 @@ const CALL_TYPE_LABELS: Record<string, string> = {
   tts: "Text-to-Speech",
 };
 
+const MILESTONE_LABELS: Record<string, string> = {
+  signup: "Signed up",
+  first_submission: "First submission",
+  free_limit_hit: "Hit free limit",
+  pro_converted: "Converted to Pro",
+};
+
+function formatDuration(ms: number): string {
+  const totalMin = Math.round(ms / 60000);
+  if (totalMin < 1) return "<1m";
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+  return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+
+function Stat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-lg bg-gray-50 p-3">
+      <p className="text-xs text-gray-500">{label}</p>
+      <p className="text-lg font-bold text-gray-900">{value}</p>
+    </div>
+  );
+}
+
 function SubCard({
   label,
   count,
@@ -187,7 +224,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   if (loading) return <p className="text-gray-500">Loading user details...</p>;
   if (!data) return <p className="text-red-500">User not found.</p>;
 
-  const { user, writingSubmissions, speakingSubmissions, readingSubmissions, listeningSubmissions, apiUsage, sessions, usageToday, mistakePatterns, scoreTrend, scoresBySection, recentErrors } = data;
+  const { user, writingSubmissions, speakingSubmissions, readingSubmissions, listeningSubmissions, apiUsage, sessions, usageToday, mistakePatterns, scoreTrend, scoresBySection, recentErrors, engagement } = data;
   const fmt = (n: number) => `$${n.toFixed(4)}`;
 
   const dailyCostData = Object.entries(apiUsage.byDay)
@@ -278,6 +315,86 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                 {usageToday?.writing_count ?? 0}/{usageToday?.speaking_count ?? 0}/{usageToday?.reading_count ?? 0}/{usageToday?.listening_count ?? 0}
               </p>
             </div>
+          </div>
+
+          {/* Site Engagement */}
+          <div className="rounded-lg border border-gray-200 bg-white">
+            <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+              <h3 className="font-medium text-gray-900">Site Engagement</h3>
+              {engagement.available && engagement.country && (
+                <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{engagement.country}</span>
+              )}
+            </div>
+
+            {!engagement.available ? (
+              <p className="px-4 py-4 text-sm text-gray-400">
+                Page analytics aren&apos;t being collected yet. Once the analytics migration is
+                applied and the user browses the site, pageviews, sessions, and time-on-site will appear here.
+              </p>
+            ) : engagement.totalPageviews === 0 ? (
+              <p className="px-4 py-4 text-sm text-gray-400">No page activity recorded for this user yet.</p>
+            ) : (
+              <div className="space-y-5 p-4">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <Stat label="Pageviews" value={engagement.totalPageviews} />
+                  <Stat label="Distinct pages" value={engagement.distinctPages} />
+                  <Stat label="Sessions" value={engagement.sessions} />
+                  <Stat label="Time on site" value={formatDuration(engagement.totalTimeMs)} />
+                </div>
+
+                <dl className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+                  <div>
+                    <dt className="text-gray-500">First seen</dt>
+                    <dd className="font-medium text-gray-900">
+                      {engagement.firstSeen ? new Date(engagement.firstSeen).toLocaleDateString() : "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">Last seen</dt>
+                    <dd className="font-medium text-gray-900">
+                      {engagement.lastSeen ? new Date(engagement.lastSeen).toLocaleString() : "—"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">Referrer</dt>
+                    <dd className="truncate font-medium text-gray-900">{engagement.referrer ?? "Direct"}</dd>
+                  </div>
+                </dl>
+
+                <div>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">Pages visited</p>
+                  <div className="space-y-1">
+                    {engagement.pageBreakdown.map(([path, count]) => {
+                      const max = engagement.pageBreakdown[0][1];
+                      return (
+                        <div key={path} className="flex items-center gap-2 text-sm">
+                          <span className="w-40 shrink-0 truncate font-mono text-xs text-gray-700" title={path}>
+                            {path}
+                          </span>
+                          <div className="h-2 flex-1 rounded bg-gray-100">
+                            <div className="h-2 rounded bg-blue-500" style={{ width: `${(count / max) * 100}%` }} />
+                          </div>
+                          <span className="w-8 shrink-0 text-right text-xs text-gray-500">{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {engagement.milestones.length > 0 && (
+                  <div>
+                    <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">Funnel milestones</p>
+                    <div className="flex flex-wrap gap-2">
+                      {engagement.milestones.map((m, i) => (
+                        <span key={i} className="rounded-full bg-green-50 px-3 py-1 text-xs text-green-700">
+                          {MILESTONE_LABELS[m.name] ?? m.name} · {new Date(m.at).toLocaleDateString()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sessions */}
