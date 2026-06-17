@@ -3,6 +3,7 @@ import { scoreEssay } from "@/lib/ai";
 import { createClient } from "@/lib/supabase/server";
 import { checkWritingUsage, incrementWritingUsage } from "@/lib/usage";
 import { logApiCall } from "@/lib/api-logger";
+import { logMilestoneOnce } from "@/lib/analytics";
 
 export async function POST(request: Request) {
   const { essay, taskType, feedbackLanguage, inputType, promptTopic, promptText, timeUsedSeconds } = await request.json();
@@ -24,6 +25,7 @@ export async function POST(request: Request) {
     if (user) {
       const usage = await checkWritingUsage(supabase, user.id);
       if (!usage.allowed) {
+        void logMilestoneOnce(user.id, "free_limit_hit");
         return NextResponse.json(
           {
             error: "daily_limit_reached",
@@ -109,6 +111,7 @@ export async function POST(request: Request) {
       await incrementWritingUsage(supabase, user.id);
     }
 
+    if (user) void logMilestoneOnce(user.id, "first_submission");
     return NextResponse.json({ ...feedback, submission_id: submissionId });
   } catch (error) {
     console.error("Scoring error:", error);

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { logMilestoneOnce } from "@/lib/analytics";
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!);
@@ -56,6 +57,7 @@ export async function POST(request: Request) {
         console.error("Failed to upgrade user", userId, error);
       } else {
         console.log("User upgraded to pro:", userId);
+        void logMilestoneOnce(userId, "pro_converted");
       }
       break;
     }
