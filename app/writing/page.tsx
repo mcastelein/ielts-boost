@@ -3,10 +3,11 @@
 import { Suspense, useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { WritingPrompt, ChartData } from "@/lib/writing-prompts";
+import type { WritingPrompt, ChartData, ChartType } from "@/lib/writing-prompts";
 import TaskChart from "@/components/TaskChart";
 import { useLanguage } from "@/lib/language-context";
 import GuestBanner from "@/components/GuestBanner";
+import SelectableCard from "@/components/SelectableCard";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
@@ -108,7 +109,6 @@ function WritingPage() {
   const [step, setStep] = useState<PageStep>("setup");
   const [selectedPrompt, setSelectedPrompt] = useState<WritingPrompt | null>(null);
   const [useOwnTopic, setUseOwnTopic] = useState(false);
-  const [showPromptList, setShowPromptList] = useState(false);
   const [pendingSession, setPendingSession] = useState<WritingSession | null>(null);
   const [sessionLoaded, setSessionLoaded] = useState(false);
   const [timerEnabled, setTimerEnabled] = useState(false);
@@ -361,6 +361,16 @@ function WritingPage() {
 
   const filteredPrompts = dbPrompts.filter((p) => p.taskType === taskType);
 
+  // Specific chart-type label shown on Task 1 prompt cards
+  const chartLabels: Record<ChartType, string> = {
+    line: t("writing_chart_line"),
+    bar: t("writing_chart_bar"),
+    pie: t("writing_chart_pie"),
+    table: t("writing_chart_table"),
+    process: t("writing_chart_process"),
+    map: t("writing_chart_map"),
+  };
+
   const activeText = extractedText ?? essay;
   const wordCount = activeText.trim() ? activeText.trim().split(/\s+/).length : 0;
   const isBelowMin = wordCount > 0 && selectedTask != null && wordCount < selectedTask.minWords;
@@ -574,7 +584,6 @@ function WritingPage() {
                 onClick={() => {
                   setTaskType(task.value);
                   setSelectedPrompt(null);
-                  setShowPromptList(false);
                 }}
                 className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                   taskType === task.value
@@ -622,7 +631,6 @@ function WritingPage() {
                   const candidates = available.length > 0 ? available : pool;
                   setSelectedPrompt(candidates[Math.floor(Math.random() * candidates.length)] ?? null);
                   setUseOwnTopic(false);
-                  setShowPromptList(false);
                 }}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
@@ -630,22 +638,8 @@ function WritingPage() {
               </button>
               <button
                 onClick={() => {
-                  setShowPromptList(!showPromptList);
-                  setUseOwnTopic(false);
-                }}
-                className={`rounded-lg px-4 py-2 text-sm font-medium border transition-colors ${
-                  showPromptList
-                    ? "border-blue-600 text-blue-600 bg-blue-50"
-                    : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
-                }`}
-              >
-                {t("writing_browse_prompts")}
-              </button>
-              <button
-                onClick={() => {
                   setUseOwnTopic(true);
                   setSelectedPrompt(null);
-                  setShowPromptList(false);
                 }}
                 className={`rounded-lg px-4 py-2 text-sm font-medium border transition-colors ${
                   useOwnTopic
@@ -657,35 +651,42 @@ function WritingPage() {
               </button>
             </div>
 
-            {/* Prompt list */}
-            {showPromptList && (
-              <div className="max-h-72 overflow-y-auto rounded-lg border border-gray-200 bg-white">
+            {/* Prompt card grid */}
+            {!useOwnTopic && (
+              <div className="grid gap-4 sm:grid-cols-2">
                 {filteredPrompts.map((p, i) => (
-                  <button
+                  <SelectableCard
                     key={i}
+                    selected={selectedPrompt === p}
                     onClick={() => {
                       setSelectedPrompt(p);
-                      setShowPromptList(false);
                       setUseOwnTopic(false);
                     }}
-                    className={`w-full text-left px-4 py-3 text-sm border-b border-gray-100 hover:bg-blue-50 transition-colors ${
-                      selectedPrompt === p ? "bg-blue-50 text-blue-700" : "text-gray-700"
-                    }`}
+                    accent="blue"
                   >
-                    <span className="font-medium">{p.topic}</span>
-                    {completedTopics.has(p.topic) && (
-                      <span className="ml-2 text-xs text-green-600">&#10003;</span>
-                    )}
-                    <p className="mt-0.5 text-xs text-gray-500 line-clamp-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-semibold text-gray-900">{p.topic}</span>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        {p.chart && (
+                          <span className="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+                            {chartLabels[p.chart.type]}
+                          </span>
+                        )}
+                        {completedTopics.has(p.topic) && (
+                          <span className="text-sm text-green-600">&#10003;</span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-600">
                       {p.prompt}
                     </p>
-                  </button>
+                  </SelectableCard>
                 ))}
               </div>
             )}
 
-            {/* Selected prompt preview */}
-            {selectedPrompt && !showPromptList && (
+            {/* Selected prompt preview (full text + chart) */}
+            {selectedPrompt && !useOwnTopic && (
               <div className="space-y-3">
                 <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
                   <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">

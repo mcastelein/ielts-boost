@@ -6,6 +6,7 @@ import Footer from "@/components/footer";
 import { LanguageProvider } from "@/lib/language-context";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import AnalyticsBeacon from "@/components/analytics-beacon";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
         </LanguageProvider>
         <Analytics />
         <SpeedInsights />
+        <AnalyticsBeacon />
       </body>
     </html>
   );

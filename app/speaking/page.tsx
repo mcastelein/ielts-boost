@@ -7,6 +7,7 @@ import AudioRecorder from "@/components/audio-recorder";
 import { useLanguage } from "@/lib/language-context";
 import { createClient } from "@/lib/supabase/client";
 import GuestBanner from "@/components/GuestBanner";
+import SelectableCard from "@/components/SelectableCard";
 
 interface SpeakingFeedback {
   estimated_band: number;
@@ -200,18 +201,21 @@ function SpeakingPage() {
     }
   }, []);
 
-  const pickRandom = () => {
-    // Filter out prompts the user has already completed
-    let available = prompts.filter((p) => !completedPrompts.has(p.question));
-    // If all prompts for this part are done, allow any prompt again
-    if (available.length === 0) available = prompts;
-    const pick = available[Math.floor(Math.random() * available.length)];
-    setCurrentPrompt(pick);
+  const selectPrompt = (p: SpeakingPrompt) => {
+    setCurrentPrompt(p);
     setResponse("");
     setFeedback(null);
     setTranscriptReady(false);
     setDraftId(null);
     setTimerExpired(false);
+  };
+
+  const pickRandom = () => {
+    // Filter out prompts the user has already completed
+    let available = prompts.filter((p) => !completedPrompts.has(p.question));
+    // If all prompts for this part are done, allow any prompt again
+    if (available.length === 0) available = prompts;
+    selectPrompt(available[Math.floor(Math.random() * available.length)]);
   };
 
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -335,17 +339,42 @@ function SpeakingPage() {
         </div>
       )}
 
-      {/* Get prompt button */}
+      {/* Topic selection */}
       {!currentPrompt && (
-        <button
-          onClick={pickRandom}
-          disabled={usageInfo !== null && !usageInfo.allowed}
-          className="mt-6 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {usageInfo && !usageInfo.allowed
-            ? `Daily limit reached (${usageInfo.used}/${usageInfo.limit})`
-            : t("speaking_get_prompt")}
-        </button>
+        <div className="mt-6 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold text-gray-700">{t("speaking_choose_topic")}</h2>
+            <button
+              onClick={pickRandom}
+              disabled={usageInfo !== null && !usageInfo.allowed}
+              className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {t("speaking_random")}
+            </button>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {prompts.map((p, i) => (
+              <SelectableCard
+                key={i}
+                selected={false}
+                disabled={usageInfo !== null && !usageInfo.allowed}
+                onClick={() => selectPrompt(p)}
+                accent="blue"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-semibold text-gray-900">{p.topic}</span>
+                  {completedPrompts.has(p.question) && (
+                    <span className="shrink-0 text-sm text-green-600">&#10003;</span>
+                  )}
+                </div>
+                <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-gray-600">
+                  {p.question}
+                </p>
+              </SelectableCard>
+            ))}
+          </div>
+        </div>
       )}
 
       {/* Timer display + Prompt display */}

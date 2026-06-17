@@ -9,6 +9,7 @@ import {
 } from "@/lib/listening-tracks";
 import { dbRowToTrack } from "@/lib/content-mappers";
 import GuestBanner from "@/components/GuestBanner";
+import SelectableCard from "@/components/SelectableCard";
 import { createClient } from "@/lib/supabase/client";
 
 type Step = "setup" | "loading" | "practice";
@@ -318,15 +319,11 @@ export default function ListeningPage() {
             const isSelected = selectedTrack?.id === track.id;
             const qCount = getTotalListeningQuestions(track);
             return (
-              <button
+              <SelectableCard
                 key={track.id}
-                type="button"
+                selected={isSelected}
                 onClick={() => setSelectedTrack(track)}
-                className={`rounded-xl border-2 p-5 text-left transition-all ${
-                  isSelected
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 bg-white hover:border-blue-200 hover:bg-blue-50/30"
-                }`}
+                accent="purple"
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-semibold text-gray-900">{track.title}</span>
@@ -362,7 +359,7 @@ export default function ListeningPage() {
                     {qCount} {t("listening_questions_count")}
                   </span>
                 </div>
-              </button>
+              </SelectableCard>
             );
           })}
         </div>
