@@ -632,7 +632,11 @@ function WritingPage() {
                   setSelectedPrompt(candidates[Math.floor(Math.random() * candidates.length)] ?? null);
                   setUseOwnTopic(false);
                 }}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                className={`rounded-lg px-4 py-2 text-sm font-medium border transition-colors ${
+                  !useOwnTopic
+                    ? "border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
+                    : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+                }`}
               >
                 {t("writing_random_prompt")}
               </button>
@@ -643,7 +647,7 @@ function WritingPage() {
                 }}
                 className={`rounded-lg px-4 py-2 text-sm font-medium border transition-colors ${
                   useOwnTopic
-                    ? "border-blue-600 text-blue-600 bg-blue-50"
+                    ? "border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
                     : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
                 }`}
               >

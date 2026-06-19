@@ -323,11 +323,11 @@ export default function ListeningPage() {
                 key={track.id}
                 selected={isSelected}
                 onClick={() => setSelectedTrack(track)}
-                accent="purple"
+                accent="blue"
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-semibold text-gray-900">{track.title}</span>
-                  <span className="shrink-0 rounded bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-700">
+                  <span className="shrink-0 rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
                     {t("listening_section_badge")} {track.section}{t("listening_section_badge_suffix")}
                   </span>
                 </div>
@@ -349,7 +349,7 @@ export default function ListeningPage() {
                     {Array.from({ length: 3 }, (_, i) => (
                       <span
                         key={i}
-                        className={i < track.difficulty ? "text-purple-500" : "text-gray-300"}
+                        className={i < track.difficulty ? "text-blue-500" : "text-gray-300"}
                       >
                         ●
                       </span>
@@ -370,7 +370,7 @@ export default function ListeningPage() {
             type="button"
             disabled={!selectedTrack}
             onClick={handleStart}
-            className="rounded-lg bg-purple-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {t("listening_start")}
           </button>
@@ -384,7 +384,7 @@ export default function ListeningPage() {
   if (step === "loading") {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-purple-200 border-t-purple-600" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-200 border-t-blue-600" />
         <p className="mt-4 text-base font-semibold text-gray-900">{t("listening_loading")}</p>
         <p className="mt-1 text-sm text-gray-500">{t("listening_loading_desc")}</p>
       </div>
@@ -429,7 +429,7 @@ export default function ListeningPage() {
       </div>
 
       {/* Situation card */}
-      <div className="rounded-xl border border-purple-200 bg-purple-50 px-5 py-4 text-sm text-purple-900">
+      <div className="rounded-xl border border-blue-200 bg-blue-50 px-5 py-4 text-sm text-blue-900">
         <span className="font-semibold">{t("listening_context_label")} </span>
         {selectedTrack.context}
       </div>
@@ -445,7 +445,7 @@ export default function ListeningPage() {
           <button
             type="button"
             onClick={togglePlay}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
           >
             {isPlaying ? (
               /* Pause icon */
@@ -470,7 +470,7 @@ export default function ListeningPage() {
               step={0.1}
               value={currentTime}
               onChange={handleSeek}
-              className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-purple-600"
+              className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-gray-200 accent-blue-600"
             />
             <div className="flex justify-between text-xs text-gray-400">
               <span>{formatTime(Math.floor(currentTime))}</span>
@@ -534,8 +534,8 @@ export default function ListeningPage() {
                                 onClick={() => handleAnswer(q.id, letter)}
                                 className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
                                   isSelected
-                                    ? "border-purple-500 bg-purple-50 text-purple-900"
-                                    : "border-gray-200 bg-white text-gray-700 hover:border-purple-200 hover:bg-purple-50/30"
+                                    ? "border-blue-500 bg-blue-50 text-blue-900"
+                                    : "border-gray-200 bg-white text-gray-700 hover:border-blue-200 hover:bg-blue-50/30"
                                 }`}
                               >
                                 {opt}
@@ -560,7 +560,7 @@ export default function ListeningPage() {
                           onChange={(e) => handleAnswer(q.id, e.target.value)}
                           disabled={submitting}
                           placeholder={`${t("listening_word_limit")} ${q.wordLimit} ${t("listening_words")}`}
-                          className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
+                          className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
                           spellCheck={false}
                         />
                       </div>
@@ -581,7 +581,7 @@ export default function ListeningPage() {
           type="button"
           disabled={submitting || answeredCount === 0}
           onClick={handleSubmit}
-          className="w-full rounded-lg bg-purple-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="w-full rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {submitting ? t("listening_submitting") : t("listening_submit")}
         </button>
