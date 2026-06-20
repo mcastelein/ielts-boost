@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import ConditionalShell from "@/components/conditional-shell";
 import { LanguageProvider } from "@/lib/language-context";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -36,9 +35,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-gray-50 text-gray-900">
         <LanguageProvider>
-          <Navbar />
-          <main className="flex flex-1 flex-col">{children}</main>
-          <Footer />
+          <ConditionalShell>{children}</ConditionalShell>
         </LanguageProvider>
         <Analytics />
         <SpeedInsights />

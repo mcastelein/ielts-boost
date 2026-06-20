@@ -1,19 +1,22 @@
 import { defineConfig } from "@playwright/test";
 
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3099;
+const BASE_URL = process.env.BASE_URL ?? `http://localhost:${PORT}`;
+
 export default defineConfig({
   testDir: "./e2e",
   timeout: 60_000,
   retries: 0,
   use: {
-    baseURL: "http://localhost:3099",
+    baseURL: BASE_URL,
     headless: true,
     screenshot: "only-on-failure",
   },
   webServer: {
-    command: "npx next dev --port 3099",
-    port: 3099,
+    command: `npx next dev --port ${PORT}`,
+    port: PORT,
     timeout: 30_000,
-    reuseExistingServer: false,
+    reuseExistingServer: true,
   },
   projects: [
     {
