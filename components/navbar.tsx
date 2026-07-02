@@ -100,8 +100,16 @@ export default function Navbar() {
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         {/* Left: Logo + desktop nav */}
         <div className="flex items-center gap-4 md:gap-8">
-          <Link href={user ? "/dashboard" : "/"} className="text-lg font-bold text-gray-900">
-            IELTS<span className="text-blue-600">Boost</span>
+          <Link
+            href={user ? "/dashboard" : "/"}
+            className="flex items-center gap-2 font-display text-lg font-bold text-gray-900"
+          >
+            <span className="grid h-[22px] w-[22px] place-items-center rounded border-2 border-blue-600 font-mono text-[11px] font-semibold text-blue-600">
+              IB
+            </span>
+            <span>
+              IELTS<span className="text-blue-600">Boost</span>
+            </span>
           </Link>
           {/* Desktop nav links */}
           <div className="hidden items-center gap-1 md:flex">

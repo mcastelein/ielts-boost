@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/language-context";
+import BandRuler from "@/components/band-ruler";
 
 interface ScoreCardProps {
   sectionName: string;
@@ -100,24 +101,27 @@ export default function ScoreCard({
       {comingSoon ? (
         <p className="mt-2 text-xs text-gray-400">{t("dashboard_coming_soon_desc")}</p>
       ) : (
-        <div className="mt-3 flex items-end gap-4">
-          <div>
-            <p className="text-2xl font-bold text-blue-600">
-              {latestScore !== null ? latestScore.toFixed(1) : "—"}
-            </p>
-            <p className="text-[10px] text-gray-400">{t("dashboard_latest")}</p>
+        <>
+          <div className="mt-3 flex items-end gap-4">
+            <div>
+              <p className="font-mono text-2xl font-semibold text-blue-600">
+                {latestScore !== null ? latestScore.toFixed(1) : "—"}
+              </p>
+              <p className="text-[10px] text-gray-400">{t("dashboard_latest")}</p>
+            </div>
+            <div>
+              <p className="font-mono text-lg font-semibold text-gray-600">
+                {avgScore !== null ? avgScore.toFixed(1) : "—"}
+              </p>
+              <p className="text-[10px] text-gray-400">{t("dashboard_average")}</p>
+            </div>
+            <div className="ml-auto text-right">
+              <p className="font-mono text-sm font-medium text-gray-500">{submissionCount}</p>
+              <p className="text-[10px] text-gray-400">{t("dashboard_sessions")}</p>
+            </div>
           </div>
-          <div>
-            <p className="text-lg font-semibold text-gray-600">
-              {avgScore !== null ? avgScore.toFixed(1) : "—"}
-            </p>
-            <p className="text-[10px] text-gray-400">{t("dashboard_average")}</p>
-          </div>
-          <div className="ml-auto text-right">
-            <p className="text-sm font-medium text-gray-500">{submissionCount}</p>
-            <p className="text-[10px] text-gray-400">{t("dashboard_sessions")}</p>
-          </div>
-        </div>
+          <BandRuler score={latestScore} className="mt-3" />
+        </>
       )}
 
       {!comingSoon && <div className="mt-2"><TrendIndicator trend={trend} /></div>}

@@ -24,11 +24,11 @@ interface SubScoreBarChartProps {
   height?: number;
 }
 
-const BAR_COLORS = ["#2563eb", "#7c3aed", "#0891b2", "#16a34a"];
+const BAR_COLORS = ["#1e3fae", "#4c3daf", "#0891b2", "#0e9f6e"];
 
 function bandColor(score: number): string {
-  if (score >= 7) return "#16a34a";
-  if (score >= 6) return "#2563eb";
+  if (score >= 7) return "#0e9f6e";
+  if (score >= 6) return "#1e3fae";
   if (score >= 5) return "#d97706";
   return "#dc2626";
 }

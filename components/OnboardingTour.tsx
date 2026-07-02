@@ -210,7 +210,7 @@ export default function OnboardingTour() {
         {/* ---- Welcome ---- */}
         {step === 0 && (
           <>
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 pt-10 pb-8 text-white text-center">
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-8 pt-10 pb-8 text-white text-center">
               <div className="text-5xl mb-4">👋</div>
               <h2 className="text-2xl font-bold leading-tight">{t("onboarding_welcome_title")}</h2>
               <p className="mt-2 text-blue-100 text-sm">{t("onboarding_intro_value")}</p>
@@ -447,7 +447,7 @@ export default function OnboardingTour() {
         {/* ---- Offer a feature tour ---- */}
         {step === SURVEY_STEPS + 1 && (
           <>
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 pt-10 pb-8 text-white text-center">
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-8 pt-10 pb-8 text-white text-center">
               <div className="text-5xl mb-4">🧭</div>
               <h2 className="text-2xl font-bold leading-tight">{t("onboarding_offer_tour_title")}</h2>
               <p className="mt-2 text-blue-100 text-sm">{t("onboarding_offer_tour_body")}</p>

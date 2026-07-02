@@ -18,7 +18,7 @@ export default function SpeakingDetail({ data }: SpeakingDetailProps) {
   return (
     <div className="space-y-6 rounded-xl border border-gray-200 bg-white p-5">
       <div className="grid gap-6 lg:grid-cols-2">
-        <ScoreTrendChart data={data.trendData} title={t("dashboard_estimated_band_over_time")} color="#7c3aed" />
+        <ScoreTrendChart data={data.trendData} title={t("dashboard_estimated_band_over_time")} color="#4c3daf" />
         <SubScoreBarChart scores={data.latestSubScores} title={t("dashboard_latest_sub_scores")} />
       </div>
 

@@ -18,12 +18,12 @@ import {
 import type { ChartData } from "@/lib/writing-prompts";
 
 const COLORS = [
-  "#2563eb", "#dc2626", "#16a34a", "#d97706", "#7c3aed",
+  "#1e3fae", "#dc2626", "#0e9f6e", "#d97706", "#4c3daf",
   "#0891b2", "#be185d", "#65a30d",
 ];
 
 const PIE_COLORS = [
-  "#2563eb", "#dc2626", "#16a34a", "#d97706", "#7c3aed",
+  "#1e3fae", "#dc2626", "#0e9f6e", "#d97706", "#4c3daf",
   "#0891b2", "#be185d", "#65a30d",
 ];
 

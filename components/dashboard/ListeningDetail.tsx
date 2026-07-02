@@ -21,7 +21,7 @@ export default function ListeningDetail({ data }: ListeningDetailProps) {
         <ScoreTrendChart
           data={data.trendData}
           title={t("dashboard_band_over_time")}
-          color="#7c3aed"
+          color="#4c3daf"
         />
         <SubScoreBarChart
           scores={data.latestSubScores}

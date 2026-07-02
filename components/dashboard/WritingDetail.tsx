@@ -18,7 +18,7 @@ export default function WritingDetail({ data }: WritingDetailProps) {
   return (
     <div className="space-y-6 rounded-xl border border-gray-200 bg-white p-5">
       <div className="grid gap-6 lg:grid-cols-2">
-        <ScoreTrendChart data={data.trendData} title={t("dashboard_band_over_time")} color="#2563eb" />
+        <ScoreTrendChart data={data.trendData} title={t("dashboard_band_over_time")} color="#1e3fae" />
         <SubScoreBarChart scores={data.latestSubScores} title={t("dashboard_latest_sub_scores")} />
       </div>
 

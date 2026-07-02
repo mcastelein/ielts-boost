@@ -485,7 +485,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                   <YAxis domain={[0, 9]} tick={{ fontSize: 12 }} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="overall" stroke="#3b82f6" strokeWidth={2} name="Overall" />
+                  <Line type="monotone" dataKey="overall" stroke="#1e3fae" strokeWidth={2} name="Overall" />
                   <Line type="monotone" dataKey="task" stroke="#10b981" strokeWidth={1} name="Task" dot={false} />
                   <Line type="monotone" dataKey="coherence" stroke="#f59e0b" strokeWidth={1} name="Coherence" dot={false} />
                   <Line type="monotone" dataKey="lexical" stroke="#8b5cf6" strokeWidth={1} name="Lexical" dot={false} />
@@ -705,7 +705,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `$${v}`} />
                   <Tooltip formatter={(v) => [`$${Number(v).toFixed(4)}`, "Cost"]} />
-                  <Line type="monotone" dataKey="cost" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="cost" stroke="#1e3fae" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>

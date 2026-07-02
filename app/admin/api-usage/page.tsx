@@ -129,7 +129,7 @@ export default function ApiUsagePage() {
       }));
   }, [summary, profiles]);
 
-  const PIE_COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#6366f1"];
+  const PIE_COLORS = ["#1e3fae", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#14b8a6", "#4c3daf"];
 
   return (
     <div className="space-y-6">
@@ -211,7 +211,7 @@ export default function ApiUsagePage() {
                   <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 12 }} tickFormatter={(v) => `$${v}`} />
                   <Tooltip formatter={(v) => [`$${Number(v).toFixed(4)}`, "Cost"]} />
-                  <Line type="monotone" dataKey="cost" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="cost" stroke="#1e3fae" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>

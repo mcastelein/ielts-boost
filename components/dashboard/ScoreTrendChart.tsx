@@ -25,7 +25,7 @@ interface ScoreTrendChartProps {
 
 export default function ScoreTrendChart({
   data,
-  color = "#2563eb",
+  color = "#1e3fae",
   title,
   height = 250,
 }: ScoreTrendChartProps) {

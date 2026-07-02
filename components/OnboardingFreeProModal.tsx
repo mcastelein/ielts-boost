@@ -69,7 +69,7 @@ export default function OnboardingFreeProModal({ onClose }: Props) {
 
           {/* Pro */}
           <div className="rounded-xl border-2 border-blue-500 p-5 flex flex-col relative bg-blue-50/30">
-            <div className="absolute -top-px left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-t-xl" />
+            <div className="absolute -top-px left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-t-xl" />
             <div className="flex items-center justify-between">
               <div className="text-xs font-semibold text-blue-600 uppercase tracking-wide">
                 {t("onboarding_plan_pro_label")}
