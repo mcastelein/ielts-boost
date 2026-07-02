@@ -7,6 +7,8 @@ const COST_RATES: Record<string, { input: number; output: number }> = {
   "claude-sonnet-4-6": { input: 3 / 1_000_000, output: 15 / 1_000_000 },
   // Legacy key kept so historical log rows still resolve a cost
   "claude-sonnet-4-20250514": { input: 3 / 1_000_000, output: 15 / 1_000_000 },
+  // Claude Opus: $5/M input, $25/M output — used for reading passage generation
+  "claude-opus-4-8": { input: 5 / 1_000_000, output: 25 / 1_000_000 },
   // Whisper: ~$0.006 per minute, estimated via duration
   "whisper-1": { input: 0, output: 0 },
   // TTS: $15/M chars
@@ -20,7 +22,8 @@ export type ApiCallType =
   | "transcribe"
   | "tts"
   | "reading_score"
-  | "listening_score";
+  | "listening_score"
+  | "reading_generate";
 
 interface LogApiCallParams {
   supabase: SupabaseClient;

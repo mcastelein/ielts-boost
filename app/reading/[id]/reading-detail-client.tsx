@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
 import type { ReadingPassage } from "@/lib/reading-passages";
 import type { ScoredResults } from "@/lib/reading-scoring";
-import { PARAGRAPH_LABELS } from "@/components/reading/PassageViewer";
+import ReadingResultsView from "@/components/reading/ReadingResultsView";
 
 interface SubmissionData {
   id: string;
@@ -37,8 +37,6 @@ export default function ReadingDetailClient({ submission, feedback, passage }: P
     const sec = s % 60;
     return `${m}:${sec.toString().padStart(2, "0")}`;
   };
-
-  let questionCounter = 0;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
@@ -113,84 +111,8 @@ export default function ReadingDetailClient({ submission, feedback, passage }: P
         </div>
       </div>
 
-      {/* Question-by-question results */}
-      <div className="mt-8 space-y-6">
-        {passage.questionGroups.map((group, gi) => (
-          <div key={gi}>
-            <div className="rounded-t-lg border border-blue-100 bg-blue-50 px-4 py-3">
-              <p className="text-xs font-medium text-blue-800">{group.instruction}</p>
-            </div>
-
-            <div className="divide-y divide-gray-100 rounded-b-lg border border-t-0 border-gray-200 bg-white">
-              {group.questions.map((q, qi) => {
-                questionCounter++;
-                const result = feedback.questionResults[q.id];
-                if (!result) return null;
-
-                return (
-                  <div
-                    key={q.id}
-                    className={`p-4 ${
-                      result.correct ? "bg-green-50/30" : "bg-red-50/30"
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <span
-                        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                          result.correct
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {result.correct ? "✓" : "✗"}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm text-gray-800">
-                          <span className="mr-1.5 font-semibold text-gray-500">
-                            {questionCounter}.
-                          </span>
-                          {q.type === "matching_headings"
-                            ? `Paragraph ${(q as { paragraphLabel: string }).paragraphLabel}`
-                            : "text" in q
-                            ? q.text
-                            : ""}
-                        </p>
-
-                        <div className="mt-2 flex flex-wrap gap-4 text-xs">
-                          <span
-                            className={`font-medium ${
-                              result.correct ? "text-green-700" : "text-red-600"
-                            }`}
-                          >
-                            {t("reading_your_answer")}:{" "}
-                            <span className="font-mono">
-                              {result.user_answer || "—"}
-                            </span>
-                          </span>
-                          {!result.correct && (
-                            <span className="font-medium text-gray-700">
-                              {t("reading_correct_answer")}:{" "}
-                              <span className="font-mono text-green-700">
-                                {result.correct_answer}
-                              </span>
-                            </span>
-                          )}
-                        </div>
-
-                        {!result.correct && result.explanation && (
-                          <p className="mt-2 text-xs text-gray-500 italic">
-                            {result.explanation}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* Question-by-question results with answer-location review */}
+      <ReadingResultsView passage={passage} results={feedback.questionResults} />
 
       {/* Action buttons */}
       <div className="mt-8 flex gap-3">

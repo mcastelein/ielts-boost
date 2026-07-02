@@ -45,3 +45,5 @@ playwright-report/
 PETER_TASK.md
 
 .playwright-mcp/
+
+.claude/settings.local.json

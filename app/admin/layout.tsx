@@ -10,6 +10,7 @@ const adminLinks = [
   { href: "/admin", label: "Dashboard", exact: true },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/submissions", label: "Submissions" },
+  { href: "/admin/content", label: "Content" },
   { href: "/admin/api-usage", label: "API Usage" },
   { href: "/admin/feedback", label: "Feedback" },
   { href: "/admin/audit-log", label: "Audit Log" },
