@@ -515,15 +515,15 @@ export const translations = {
 
   // Landing — Hero
   landing_hero_headline: {
-    en: "Build the confidence to take the IELTS exam — with instant AI feedback in English or 中文.",
+    en: "Build the confidence to take the IELTS exam, with instant AI feedback in English or 中文.",
     zh: "以英语或中文获得即时 AI 反馈，建立参加雅思考试的信心。",
   },
   landing_hero_subhead: {
-    en: "Practice all four IELTS sections — Listening, Reading, Writing, Speaking — and get scored against the official band criteria in seconds.",
+    en: "Practice all four IELTS sections (Listening, Reading, Writing, Speaking) and get scored against the official band criteria in seconds.",
     zh: "练习雅思的全部四个部分——听力、阅读、写作、口语，并在几秒钟内获得依据官方评分标准的评估。",
   },
   landing_hero_cta_primary: {
-    en: "Start free — 2 essays/day, no credit card",
+    en: "Start free. 2 essays/day, no credit card",
     zh: "免费开始——每天 2 篇作文，无需信用卡",
   },
   landing_hero_image_alt: {
@@ -557,7 +557,7 @@ export const translations = {
     zh: "每天练习，却没人帮你批改",
   },
   landing_personas_daily_body: {
-    en: "Submit any essay and get feedback in seconds — at any hour.",
+    en: "Submit any essay and get feedback in seconds, at any hour.",
     zh: "随时提交作文，秒级获得反馈——任何时间都可以。",
   },
 
@@ -565,7 +565,7 @@ export const translations = {
   landing_guide_title: { en: "A quick IELTS primer", zh: "雅思简明指南" },
   landing_guide_cta: { en: "Read the Free Guide", zh: "阅读免费指南" },
   landing_guide_blurb: {
-    en: "New to IELTS? Our free guide covers everything you need to know — the four skills, how band scores work, and what examiners are really looking for.",
+    en: "New to IELTS? Our free guide covers everything you need to know: the four skills, how band scores work, and what examiners are really looking for.",
     zh: "初次接触雅思？我们的免费指南涵盖所有基础知识——四项技能、分数如何计算，以及考官真正在评估什么。",
   },
   landing_guide_what_title: { en: "What is IELTS?", zh: "什么是雅思？" },
@@ -627,7 +627,7 @@ export const translations = {
   // Landing — Personal story
   landing_story_eyebrow: { en: "Why we built this", zh: "我们为什么做这个" },
   landing_story_body: {
-    en: "I built IELTSBoost for my wife. She was studying for the IELTS exam, and we couldn't believe how expensive Chinese IELTS tutors had become — hundreds of yuan per hour for the kind of feedback an AI can now give in seconds. She used IELTSBoost to go from a 6.5 to a 7.5. I built this so anyone can have the same kind of help, without the price tag.",
+    en: "I built IELTSBoost for my wife. She was studying for the IELTS exam, and we couldn't believe how expensive Chinese IELTS tutors had become: hundreds of yuan per hour for the kind of feedback an AI can now give in seconds. She used IELTSBoost to go from a 6.5 to a 7.5. I built this so anyone can have the same kind of help, without the price tag.",
     zh: "我为我妻子做了 IELTSBoost。她当时正在准备雅思考试，而中国雅思辅导的价格让我们难以置信——每小时几百块人民币，而 AI 现在几秒钟就能给出同样质量的反馈。她用 IELTSBoost 把分数从 6.5 提到了 7.5。我希望任何人都能获得同样的帮助——没有那高昂的价格。",
   },
   landing_story_signature: { en: "— Michael", zh: "— Michael" },
@@ -655,14 +655,14 @@ export const translations = {
   landing_compare_cost_zh_platforms: { en: "Mostly subscription", zh: "多为订阅制" },
   landing_compare_speed_us: { en: "Seconds", zh: "数秒" },
   landing_compare_speed_tutor: { en: "Days", zh: "数天" },
-  landing_compare_speed_books: { en: "N/A — no feedback", zh: "无——书本不提供反馈" },
+  landing_compare_speed_books: { en: "N/A (no feedback)", zh: "无——书本不提供反馈" },
   landing_compare_speed_chatgpt: { en: "Seconds", zh: "数秒" },
-  landing_compare_speed_zh_platforms: { en: "Varies — sample answers, not your essay", zh: "因平台而异，多为参考答案而非批改你的文章" },
+  landing_compare_speed_zh_platforms: { en: "Varies (sample answers, not your essay)", zh: "因平台而异，多为参考答案而非批改你的文章" },
 
   // Landing — Pricing
   landing_pricing_title: { en: "Pricing", zh: "价格" },
   landing_pricing_subtitle: {
-    en: "Free is genuinely useful. Pro is for power users — no pressure either way.",
+    en: "Free is genuinely useful. Pro is for power users. No pressure either way.",
     zh: "免费版本就足够好用。Pro 是给高频用户准备的——没有压力。",
   },
   landing_pricing_free_title: { en: "Free", zh: "免费版" },
@@ -689,7 +689,7 @@ export const translations = {
   landing_faq_title: { en: "Frequently asked questions", zh: "常见问题" },
   landing_faq_q1: { en: "Is the AI scoring accurate?", zh: "AI 评分准确吗？" },
   landing_faq_a1: {
-    en: "We use the official IELTS band descriptors as the scoring rubric and calibrate against published example essays. Like any AI grader, scores are an estimate — but they're consistent enough to track real improvement over time.",
+    en: "We use the official IELTS band descriptors as the scoring rubric and calibrate against published example essays. Like any AI grader, scores are an estimate, but they're consistent enough to track real improvement over time.",
     zh: "我们使用官方雅思评分描述作为评分标准，并根据公开的样本作文进行校准。和任何 AI 评分一样，分数是估计值——但足够一致，能够真实反映你随时间的进步。",
   },
   landing_faq_q2: { en: "Can I use this from China?", zh: "我在中国能用吗？" },
@@ -699,7 +699,7 @@ export const translations = {
   },
   landing_faq_q3: { en: "Do you cover all four sections?", zh: "四个部分都覆盖吗？" },
   landing_faq_a3: {
-    en: "Yes — Writing, Speaking, Reading, and Listening are all available today.",
+    en: "Yes. Writing, Speaking, Reading, and Listening are all available today.",
     zh: "是的——写作、口语、阅读和听力都已上线。",
   },
   landing_faq_q4: { en: "Can I cancel Pro anytime?", zh: "Pro 版可以随时取消吗？" },
@@ -709,7 +709,7 @@ export const translations = {
   },
   landing_faq_q5: { en: "How does the bilingual feedback work?", zh: "中英文反馈是怎么实现的？" },
   landing_faq_a5: {
-    en: "You can independently set the UI language and the feedback language. Many learners prefer Chinese explanations even while studying English — both are first-class.",
+    en: "You can independently set the UI language and the feedback language. Many learners prefer Chinese explanations even while studying English. Both are first-class.",
     zh: "你可以分别设置界面语言和反馈语言。许多学习者在学习英文的同时偏好中文讲解——两者都是同等重要的体验。",
   },
   landing_faq_q6: { en: "Is my data private?", zh: "我的数据是隐私的吗？" },
@@ -720,7 +720,7 @@ export const translations = {
 
   // Landing — Mission strip
   landing_mission_body: {
-    en: "We built IELTSBoost to help every learner build the confidence to take the IELTS exam — whether you upgrade or not.",
+    en: "We built IELTSBoost to help every learner build the confidence to take the IELTS exam, whether you upgrade or not.",
     zh: "我们做 IELTSBoost，是为了帮助每一位学习者建立参加雅思考试的信心——无论你是否升级 Pro。",
   },
 
