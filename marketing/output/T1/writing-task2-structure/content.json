@@ -1,0 +1,42 @@
+{
+  "post_meta": {
+    "template": "T1",
+    "topic": "Writing Task 2 essay structure mistakes",
+    "slug": "writing-task2-structure"
+  },
+  "slides": {
+    "slide1_hook": {
+      "headline": "{P}90%{/P}的雅思考生\n都在结构上{H}丢分{/H}！",
+      "sublabel": "⚠ 这3个错误正在拉低你的分数"
+    },
+    "slide2_error1": {
+      "headline": "立场{H}不明确{/H}",
+      "problem_desc": "考官看不出你支持还是反对",
+      "card_body": "{Y}Some people support{/Y} this view, while {Y}others disagree{/Y} with it.",
+      "speech_bubble": "你到底站哪边？"
+    },
+    "slide3_error2": {
+      "headline": "主题句{H}缺失{/H}",
+      "problem_desc": "段落没有清晰的中心思想",
+      "card_body": "First, technology is {Y}everywhere{/Y}. We use phones {Y}every day{/Y}.",
+      "speech_bubble": "重点是什么？"
+    },
+    "slide4_error3": {
+      "pill_label": "错误③",
+      "headline": "结尾{H}重复{/H}开头",
+      "card_body": "In conclusion, technology has {Y}both advantages and disadvantages{/Y}.",
+      "speech_bubble": "完全没新意！"
+    },
+    "slide5_fix": {
+      "headline": "立刻{H}提分{/H}！",
+      "icon1_label": "立场",
+      "icon2_label": "主题句",
+      "icon3_label": "升华",
+      "card_body": "Body paragraphs open with {Y}clear claims{/Y} and end with {Y}insight{/Y}.",
+      "speech_bubble": "这才是 7+！"
+    },
+    "slide6_cta": {
+      "headline": "想知道你的答案\n{H}能拿几分？{/H}"
+    }
+  }
+}

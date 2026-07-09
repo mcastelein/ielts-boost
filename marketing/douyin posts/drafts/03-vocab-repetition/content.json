@@ -1,0 +1,42 @@
+{
+  "post_meta": {
+    "template": "T1",
+    "topic": "Vocabulary repetition traps killing your Lexical Resource score",
+    "slug": "vocab-repetition"
+  },
+  "slides": {
+    "slide1_hook": {
+      "headline": "{P}词汇重复{/P}\n直接{H}卡在6分{/H}！",
+      "sublabel": "⚠ 这3个高频词正在毁掉你的作文"
+    },
+    "slide2_error1": {
+      "headline": "{H}good{/H} 写到死",
+      "problem_desc": "全篇都是 good / very good",
+      "card_body": "It is {Y}good{/Y} for health, {Y}good{/Y} for economy and {Y}very good{/Y} for society.",
+      "speech_bubble": "再说 good 给你判6！"
+    },
+    "slide3_error2": {
+      "headline": "{H}I think{/H} 不停说",
+      "problem_desc": "每个观点都用 I think 开头",
+      "card_body": "{Y}I think{/Y} A is right. {Y}I think{/Y} B is wrong. {Y}I think{/Y} we should...",
+      "speech_bubble": "换个说法吧！"
+    },
+    "slide4_error3": {
+      "pill_label": "错误③",
+      "headline": "{H}many{/H} 一用到底",
+      "card_body": "{Y}Many{/Y} people have {Y}many{/Y} problems with {Y}many{/Y} things in life.",
+      "speech_bubble": "词汇0变化！"
+    },
+    "slide5_fix": {
+      "headline": "立刻{H}升级{/H}词汇！",
+      "icon1_label": "good",
+      "icon2_label": "I think",
+      "icon3_label": "many",
+      "card_body": "Swap in {Y}beneficial / in my view / numerous{/Y}. Variety = higher band.",
+      "speech_bubble": "这才是 7+！"
+    },
+    "slide6_cta": {
+      "headline": "想知道你的词汇\n{H}能拿几分？{/H}"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "post_meta": {
+    "template": "T1",
+    "topic": "Article mistakes (a/an/the) costing Grammar Range points",
+    "slug": "article-grammar"
+  },
+  "slides": {
+    "slide1_hook": {
+      "headline": "{P}冠词{/P}用错\n语法分{H}直接掉{/H}！",
+      "sublabel": "⚠ 中国考生最常犯的3个冠词错误"
+    },
+    "slide2_error1": {
+      "headline": "{H}漏冠词{/H}",
+      "problem_desc": "可数单数前必须有 a/an/the",
+      "card_body": "I want to be {Y}∅ doctor{/Y} because I love {Y}∅ science{/Y}.",
+      "speech_bubble": "缺a！"
+    },
+    "slide3_error2": {
+      "headline": "{H}the{/H} 滥用",
+      "problem_desc": "泛指概念前不加 the",
+      "card_body": "{Y}The{/Y} people love {Y}the{/Y} music and {Y}the{/Y} sports very much.",
+      "speech_bubble": "全删掉！"
+    },
+    "slide4_error3": {
+      "pill_label": "错误③",
+      "headline": "{H}a / an{/H} 不分",
+      "card_body": "I saw {Y}a elephant{/Y} and {Y}an university{/Y} on my trip.",
+      "speech_bubble": "看发音不看字母！"
+    },
+    "slide5_fix": {
+      "headline": "立刻{H}冠词无错{/H}！",
+      "icon1_label": "可数",
+      "icon2_label": "特指",
+      "icon3_label": "发音",
+      "card_body": "Countable singular = {Y}a/an/the{/Y}, specific thing = {Y}the{/Y}, vowel sound = {Y}an{/Y}.",
+      "speech_bubble": "这才是 7+！"
+    },
+    "slide6_cta": {
+      "headline": "想知道你的语法\n{H}能拿几分？{/H}"
+    }
+  }
+}
