@@ -1,0 +1,42 @@
+{
+  "post_meta": {
+    "template": "T1",
+    "topic": "Writing Task 1 Academic overview paragraph mistakes",
+    "slug": "task1-overview"
+  },
+  "slides": {
+    "slide1_hook": {
+      "headline": "{P}Task 1{/P}总分低\n都是{H}overview{/H} 拖的！",
+      "sublabel": "⚠ 这3个 overview 错误正在丢分"
+    },
+    "slide2_error1": {
+      "headline": "{H}没有{/H} overview",
+      "problem_desc": "直接堆数据没总结",
+      "card_body": "In 2020 it was 30%. In 2021 it was 50%. In 2022 it was {Y}80%{/Y}.",
+      "speech_bubble": "总趋势呢？"
+    },
+    "slide3_error2": {
+      "headline": "overview 里{H}写数据{/H}",
+      "problem_desc": "细节数字应该放正文",
+      "card_body": "Overall, sales rose from {Y}23.4%{/Y} to {Y}67.8%{/Y} between 2015 and 2020.",
+      "speech_bubble": "数字别放这！"
+    },
+    "slide4_error3": {
+      "pill_label": "错误③",
+      "headline": "overview {H}藏在结尾{/H}",
+      "card_body": "...and the figure went up. {Y}Overall, the trend is upward.{/Y} (last sentence)",
+      "speech_bubble": "放最前面！"
+    },
+    "slide5_fix": {
+      "headline": "立刻{H}拿7+{/H}！",
+      "icon1_label": "位置",
+      "icon2_label": "内容",
+      "icon3_label": "句式",
+      "card_body": "2nd paragraph, {Y}2 key trends{/Y}, no numbers. Start with {Y}Overall{/Y}.",
+      "speech_bubble": "这才是 7+！"
+    },
+    "slide6_cta": {
+      "headline": "想知道你的 Task 1\n{H}能拿几分？{/H}"
+    }
+  }
+}

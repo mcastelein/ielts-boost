@@ -1,0 +1,42 @@
+{
+  "post_meta": {
+    "template": "T1",
+    "topic": "Common Chinglish phrases that tank your IELTS score",
+    "slug": "chinglish-traps"
+  },
+  "slides": {
+    "slide1_hook": {
+      "headline": "{P}中式英语{/P}\n正在悄悄{H}拉分{/H}！",
+      "sublabel": "⚠ 这3个中式表达千万别再用"
+    },
+    "slide2_error1": {
+      "headline": "{H}直译{/H}思维太重",
+      "problem_desc": "中文逻辑套英文句式",
+      "card_body": "{Y}As we all know{/Y}, the people live in cities are very {Y}busy busy{/Y}.",
+      "speech_bubble": "母语者不这么说！"
+    },
+    "slide3_error2": {
+      "headline": "{H}very{/H} 用到死",
+      "problem_desc": "全篇都是 very + 形容词",
+      "card_body": "It is {Y}very very{/Y} important and {Y}very{/Y} good for {Y}very{/Y} many people.",
+      "speech_bubble": "词汇太单一！"
+    },
+    "slide4_error3": {
+      "pill_label": "错误③",
+      "headline": "万能{H}套话{/H}开头",
+      "card_body": "{Y}With the development of society{/Y}, the problem of... is becoming serious.",
+      "speech_bubble": "考官看烦了！"
+    },
+    "slide5_fix": {
+      "headline": "立刻{H}地道{/H}起来！",
+      "icon1_label": "换词",
+      "icon2_label": "换句式",
+      "icon3_label": "去套话",
+      "card_body": "Swap {Y}very important{/Y} for {Y}crucial / vital{/Y}, ditch generic openers.",
+      "speech_bubble": "这才是 7+！"
+    },
+    "slide6_cta": {
+      "headline": "想知道你写的\n是不是{H}中式英语？{/H}"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "post_meta": {
+    "template": "T1",
+    "topic": "Speaking Part 2 fluency killers",
+    "slug": "speaking-part2-fluency"
+  },
+  "slides": {
+    "slide1_hook": {
+      "headline": "{P}80%{/P}的口语考生\n在Part 2{H}卡壳{/H}！",
+      "sublabel": "⚠ 这3个流畅度杀手正在拖累你"
+    },
+    "slide2_error1": {
+      "headline": "频繁{H}停顿{/H}找词",
+      "problem_desc": "考官认为你词汇量不够",
+      "card_body": "I think... uhh... it was... {Y}you know{/Y}... a kind of... {Y}thing{/Y}.",
+      "speech_bubble": "话别断！"
+    },
+    "slide3_error2": {
+      "headline": "{H}背模板{/H}痕迹太重",
+      "problem_desc": "听起来像在朗读不是聊天",
+      "card_body": "{Y}First of all{/Y}, I would like to talk about... {Y}Last but not least{/Y}...",
+      "speech_bubble": "太机械了！"
+    },
+    "slide4_error3": {
+      "pill_label": "错误③",
+      "headline": "答案{H}太短{/H}没细节",
+      "card_body": "It was a good trip. I had fun. {Y}I liked it{/Y}. That's all.",
+      "speech_bubble": "再多说点！"
+    },
+    "slide5_fix": {
+      "headline": "立刻{H}更流畅{/H}！",
+      "icon1_label": "拖延词",
+      "icon2_label": "举例子",
+      "icon3_label": "讲细节",
+      "card_body": "Use {Y}well, actually, to be honest{/Y} to think, then add {Y}who/where/why{/Y}.",
+      "speech_bubble": "这才是 7+！"
+    },
+    "slide6_cta": {
+      "headline": "想知道你的口语\n{H}能拿几分？{/H}"
+    }
+  }
+}

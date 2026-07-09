@@ -1,0 +1,174 @@
+{
+  "template": "T1",
+  "size": [1024, 1536],
+  "fonts": {
+    "heavy": "fonts/SourceHanSansSC-Heavy.otf",
+    "medium": "fonts/SourceHanSansSC-Medium.otf"
+  },
+  "colors": {
+    "near_black": "#1A1A2E",
+    "purple": "#3A2E8C",
+    "white": "#FFFFFF",
+    "red": "#E63946",
+    "green": "#06D6A0",
+    "yellow": "#FFD93D"
+  },
+  "slides": {
+    "slide1_hook": {
+      "template_file": "slide1_hook.png",
+      "regions": {
+        "headline": {
+          "anchor": "tc", "x": 512, "y": 140,
+          "max_width": 920, "max_height": 300,
+          "font": "heavy", "size": 110, "color": "near_black",
+          "line_spacing": 1.0, "auto_fit": true
+        },
+        "sublabel": {
+          "anchor": "mc", "x": 385, "y": 744,
+          "max_width": 530, "max_height": 90,
+          "font": "heavy", "size": 38, "color": "white",
+          "auto_fit": true
+        }
+      }
+    },
+    "slide2_error1": {
+      "template_file": "slide2_error1.png",
+      "regions": {
+        "headline": {
+          "anchor": "tc", "x": 512, "y": 250,
+          "max_width": 920, "max_height": 160,
+          "font": "heavy", "size": 92, "color": "near_black",
+          "line_spacing": 1.0, "auto_fit": true
+        },
+        "problem_desc": {
+          "anchor": "ml", "x": 250, "y": 446,
+          "max_width": 660, "max_height": 60,
+          "font": "medium", "size": 30, "color": "near_black",
+          "auto_fit": true
+        },
+        "card_body": {
+          "anchor": "mc", "x": 500, "y": 720,
+          "max_width": 800, "max_height": 240,
+          "font": "heavy", "size": 42, "color": "near_black",
+          "line_spacing": 1.25, "auto_fit": true
+        },
+        "speech_bubble": {
+          "anchor": "mc", "x": 215, "y": 1175,
+          "max_width": 200, "max_height": 90,
+          "font": "medium", "size": 28, "color": "near_black",
+          "line_spacing": 1.1, "auto_fit": true
+        }
+      }
+    },
+    "slide3_error2": {
+      "template_file": "slide3_error2.png",
+      "regions": {
+        "headline": {
+          "anchor": "tc", "x": 512, "y": 250,
+          "max_width": 920, "max_height": 160,
+          "font": "heavy", "size": 92, "color": "near_black",
+          "line_spacing": 1.0, "auto_fit": true
+        },
+        "problem_desc": {
+          "anchor": "ml", "x": 250, "y": 446,
+          "max_width": 660, "max_height": 60,
+          "font": "medium", "size": 30, "color": "near_black",
+          "auto_fit": true
+        },
+        "card_body": {
+          "anchor": "mc", "x": 500, "y": 720,
+          "max_width": 800, "max_height": 240,
+          "font": "heavy", "size": 42, "color": "near_black",
+          "line_spacing": 1.25, "auto_fit": true
+        },
+        "speech_bubble": {
+          "anchor": "mc", "x": 199, "y": 1130,
+          "max_width": 200, "max_height": 90,
+          "font": "medium", "size": 28, "color": "near_black",
+          "line_spacing": 1.1, "auto_fit": true
+        }
+      }
+    },
+    "slide4_error3": {
+      "template_file": "slide4_error3.png",
+      "regions": {
+        "pill_label": {
+          "anchor": "mc", "x": 605, "y": 145,
+          "max_width": 200, "max_height": 65,
+          "font": "heavy", "size": 44, "color": "white",
+          "auto_fit": true
+        },
+        "headline": {
+          "anchor": "tc", "x": 512, "y": 320,
+          "max_width": 920, "max_height": 160,
+          "font": "heavy", "size": 92, "color": "near_black",
+          "line_spacing": 1.0, "auto_fit": true
+        },
+        "card_body": {
+          "anchor": "tl", "x": 110, "y": 790,
+          "max_width": 520, "max_height": 280,
+          "font": "heavy", "size": 34, "color": "near_black",
+          "line_spacing": 1.2, "auto_fit": true
+        },
+        "speech_bubble": {
+          "anchor": "mc", "x": 261, "y": 1166,
+          "max_width": 220, "max_height": 90,
+          "font": "medium", "size": 28, "color": "near_black",
+          "line_spacing": 1.1, "auto_fit": true
+        }
+      }
+    },
+    "slide5_fix": {
+      "template_file": "slide5_fix.png",
+      "regions": {
+        "headline": {
+          "anchor": "tc", "x": 512, "y": 200,
+          "max_width": 920, "max_height": 140,
+          "font": "heavy", "size": 96, "color": "near_black",
+          "line_spacing": 1.0, "auto_fit": true
+        },
+        "icon1_label": {
+          "anchor": "tc", "x": 220, "y": 680,
+          "max_width": 240, "max_height": 60,
+          "font": "heavy", "size": 38, "color": "near_black",
+          "auto_fit": true
+        },
+        "icon2_label": {
+          "anchor": "tc", "x": 510, "y": 680,
+          "max_width": 240, "max_height": 60,
+          "font": "heavy", "size": 38, "color": "near_black",
+          "auto_fit": true
+        },
+        "icon3_label": {
+          "anchor": "tc", "x": 800, "y": 680,
+          "max_width": 240, "max_height": 60,
+          "font": "heavy", "size": 38, "color": "near_black",
+          "auto_fit": true
+        },
+        "card_body": {
+          "anchor": "mc", "x": 380, "y": 1080,
+          "max_width": 620, "max_height": 200,
+          "font": "heavy", "size": 34, "color": "near_black",
+          "line_spacing": 1.2, "auto_fit": true
+        },
+        "speech_bubble": {
+          "anchor": "mc", "x": 240, "y": 1360,
+          "max_width": 220, "max_height": 90,
+          "font": "medium", "size": 26, "color": "near_black",
+          "line_spacing": 1.1, "auto_fit": true
+        }
+      }
+    },
+    "slide6_cta": {
+      "template_file": "slide6_cta.png",
+      "regions": {
+        "headline": {
+          "anchor": "tc", "x": 512, "y": 175,
+          "max_width": 920, "max_height": 280,
+          "font": "heavy", "size": 96, "color": "near_black",
+          "line_spacing": 1.0, "auto_fit": true
+        }
+      }
+    }
+  }
+}
