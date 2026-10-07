@@ -86,7 +86,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-lg font-semibold text-gray-900">8. Cookie</h2>
             <p className="mt-2">
-              我们使用必要的Cookie来维护您的登录会话和语言偏好。我们不使用第三方跟踪Cookie或广告Cookie。
+              我们使用必要的Cookie来维护您的登录会话和语言偏好。我们还使用产品分析工具 PostHog，了解用户如何使用网站（例如点击了哪些按钮、访问了哪些页面），以便改进产品。您在输入框中填写的内容（例如作文和口语回答）不会被记录。我们不使用广告Cookie，也不出售您的数据。
             </p>
           </section>
 
@@ -188,7 +188,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-lg font-semibold text-gray-900">8. Cookies</h2>
           <p className="mt-2">
-            We use essential cookies to maintain your login session and language preferences. We do not use third-party tracking cookies or advertising cookies.
+            We use essential cookies to maintain your login session and language preferences. We also use PostHog, a product analytics tool, to understand how people use the site (for example, which buttons they click and which pages they visit) so we can improve it. Text you type into input fields, such as essays and speaking answers, is not recorded. We do not use advertising cookies and we never sell your data.
           </p>
         </section>
 

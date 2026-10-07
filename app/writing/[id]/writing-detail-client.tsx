@@ -287,7 +287,8 @@ export default function WritingDetailClient({ submission, feedback, isPro, isOnb
         {/* Original essay */}
         <div className="mt-4 rounded-xl border border-gray-200 bg-white p-5">
           <h3 className="font-semibold">{t("feedback_your_essay")}</h3>
-          <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-gray-600">
+          {/* ph-no-capture: keep the essay out of PostHog session replays */}
+          <p className="ph-no-capture mt-2 whitespace-pre-wrap text-sm leading-relaxed text-gray-600">
             {submission.final_text}
           </p>
         </div>

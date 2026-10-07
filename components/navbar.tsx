@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState, useRef } from "react";
 import type { User } from "@supabase/supabase-js";
+import posthog from "posthog-js";
 import { useLanguage } from "@/lib/language-context";
 import type { TranslationKey } from "@/lib/translations";
 import LanguageDropdown from "@/components/language-dropdown";
@@ -47,9 +48,17 @@ export default function Navbar() {
           .single();
         setIsAdmin(settings?.role === "admin");
         setPlanType(settings?.plan_type ?? "free");
+        posthog.identify(nextUser.id, {
+          email: nextUser.email,
+          plan_type: settings?.plan_type ?? "free",
+          is_admin: settings?.role === "admin",
+          signed_up_at: nextUser.created_at,
+        });
       } else {
         setIsAdmin(false);
         setPlanType("free");
+        // Logged out: start a fresh anonymous id so the next person on this device isn't merged in.
+        if (posthog._isIdentified()) posthog.reset();
       }
     };
 
