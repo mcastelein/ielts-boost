@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { track } from "@/lib/track";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import type { TranslationKey } from "@/lib/translations";
@@ -153,6 +154,7 @@ export default function OnboardingTour() {
         timerEnabled: false,
       })
     );
+    track("onboarding_completed");
     await saveOnboarding(buildPayload());
   };
 
@@ -191,6 +193,7 @@ export default function OnboardingTour() {
 
   const skip = async () => {
     setClosed(true);
+    track("onboarding_skipped");
     await saveOnboarding(buildPayload());
   };
 

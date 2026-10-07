@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { track } from "@/lib/track";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -34,6 +35,7 @@ export default function SignupPage() {
       return;
     }
 
+    track("signup_submitted", { method: "email" });
     const supabase = createClient();
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -44,6 +46,7 @@ export default function SignupPage() {
     });
 
     if (error) {
+      track("signup_failed", { reason: error.code ?? error.message });
       if (
         error.message.toLowerCase().includes("already registered") ||
         error.message.toLowerCase().includes("already been registered") ||
@@ -65,6 +68,7 @@ export default function SignupPage() {
     }
 
     // Otherwise show "check your email" message
+    track("signup_needs_confirmation", { method: "email" });
     setSuccess(true);
     setLoading(false);
   };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { track } from "@/lib/track";
 import { useLanguage } from "@/lib/language-context";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
@@ -149,6 +150,7 @@ export default function UpgradePage() {
 
           <a
             href={stripeUrl}
+            onClick={() => track("upgrade_clicked", { method: "stripe" })}
             className="mt-auto block rounded-lg bg-blue-600 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700"
           >
             {t("upgrade_subscribe")}

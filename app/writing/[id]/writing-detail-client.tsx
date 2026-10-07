@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/lib/language-context";
+import { useTrackOnce } from "@/lib/track";
 import { formatElapsed } from "@/lib/time-format";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
@@ -47,6 +48,7 @@ interface Props {
 export default function WritingDetailClient({ submission, feedback, isPro, isOnboarding }: Props) {
   const { t } = useLanguage();
   const fb = feedback.feedback_json;
+  useTrackOnce("feedback_viewed", { section: "writing", band: feedback.overall_band });
   const [showFreePro, setShowFreePro] = useState(false);
 
   useEffect(() => {

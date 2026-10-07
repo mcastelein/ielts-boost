@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { track } from "@/lib/track";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import {
@@ -128,6 +129,8 @@ export default function ReadingPage() {
     setSubmitting(true);
     setError(null);
 
+    track("submission_sent", { section: "reading" });
+
     try {
       const res = await fetch("/api/reading", {
         method: "POST",
@@ -144,8 +147,10 @@ export default function ReadingPage() {
 
       if (!res.ok) {
         if (res.status === 429) {
+          track("limit_hit", { section: "reading", where: "submit" });
           setError(t("reading_daily_limit_desc"));
         } else {
+          track("submission_failed", { section: "reading", status: res.status });
           setError(data.error || t("common_error"));
         }
         setSubmitting(false);
@@ -153,6 +158,7 @@ export default function ReadingPage() {
       }
 
       if (data.submission_id) {
+        track("submission_scored", { section: "reading" });
         router.push(`/reading/${data.submission_id}`);
       } else {
         // Unauthenticated — store result in sessionStorage and redirect to inline results

@@ -3,6 +3,7 @@
 import { Suspense, useState, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { track } from "@/lib/track";
 import type { WritingPrompt, ChartData, ChartType } from "@/lib/writing-prompts";
 import TaskChart from "@/components/TaskChart";
 import { useLanguage } from "@/lib/language-context";
@@ -204,6 +205,7 @@ function WritingPage() {
       const used = usage?.writing_count ?? 0;
       const limit = 3;
       setUsageInfo({ allowed: used < limit, used, limit });
+      if (used >= limit) track("limit_hit", { section: "writing", where: "page_load" });
     };
     checkUsage();
   }, []);
@@ -294,6 +296,7 @@ function WritingPage() {
     if (!selectedTask) return;
     const now = Date.now();
     startTimeRef.current = now;
+    track("practice_started", { section: "writing", timed: timerEnabled });
     setStep("writing");
     if (timerEnabled) {
       const endTime = now + selectedTask.timeMinutes * 60 * 1000;
@@ -430,6 +433,7 @@ function WritingPage() {
       formData.append("file", file);
       if (fileUrl) formData.append("fileUrl", fileUrl);
 
+      track("file_uploaded", { section: "writing", file_type: file.type });
       const res = await fetch("/api/ocr", {
         method: "POST",
         body: formData,
@@ -439,10 +443,12 @@ function WritingPage() {
       if (data.text) {
         setExtractedText(data.text);
       } else {
+        track("ocr_failed", { status: res.status });
         alert("Could not extract text from this file. Please try typing instead.");
       }
     } catch (err) {
       console.error("Extraction failed:", err);
+      track("ocr_failed", { status: "network" });
       alert("Extraction failed. Please try again.");
     } finally {
       setIsExtracting(false);
@@ -463,6 +469,14 @@ function WritingPage() {
       ? Math.round((Date.now() - startTimeRef.current) / 1000)
       : null;
 
+    track("submission_sent", {
+      section: "writing",
+      task_type: taskType,
+      input_type: extractedText ? "image" : "text",
+      word_count: textToSubmit.trim().split(/\s+/).length,
+      timed: timerEnabled,
+    });
+
     try {
       const res = await fetch("/api/score", {
         method: "POST",
@@ -481,19 +495,23 @@ function WritingPage() {
       const data = await res.json();
 
       if (res.status === 429) {
+        track("limit_hit", { section: "writing", where: "submit" });
         setError(data.message);
         return;
       }
+      if (!res.ok) track("submission_failed", { section: "writing", status: res.status });
 
       clearSession();
 
       if (data.submission_id) {
+        track("submission_scored", { section: "writing", task_type: taskType });
         router.push(`/writing/${data.submission_id}${isOnboarding ? "?onboarding=1" : ""}`);
         return;
       }
       setResult(data);
     } catch (err) {
       console.error("Submission failed:", err);
+      track("submission_failed", { section: "writing", status: "network" });
     } finally {
       setIsSubmitting(false);
     }

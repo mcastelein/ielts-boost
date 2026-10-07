@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { track } from "@/lib/track";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/language-context";
 import {
@@ -233,6 +234,8 @@ export default function ListeningPage() {
     setSubmitting(true);
     setError(null);
 
+    track("submission_sent", { section: "listening" });
+
     try {
       const res = await fetch("/api/listening", {
         method: "POST",
@@ -248,8 +251,10 @@ export default function ListeningPage() {
 
       if (!res.ok) {
         if (res.status === 429) {
+          track("limit_hit", { section: "listening", where: "submit" });
           setError(t("listening_daily_limit_desc"));
         } else {
+          track("submission_failed", { section: "listening", status: res.status });
           setError(data.error || t("common_error"));
         }
         setSubmitting(false);
@@ -257,6 +262,7 @@ export default function ListeningPage() {
       }
 
       if (data.submission_id) {
+        track("submission_scored", { section: "listening" });
         router.push(`/listening/${data.submission_id}`);
       } else {
         sessionStorage.setItem(

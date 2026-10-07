@@ -6,6 +6,7 @@ import type { SpeakingPrompt } from "@/lib/speaking-prompts";
 import AudioRecorder from "@/components/audio-recorder";
 import { useLanguage } from "@/lib/language-context";
 import { createClient } from "@/lib/supabase/client";
+import { track } from "@/lib/track";
 import GuestBanner from "@/components/GuestBanner";
 import SelectableCard from "@/components/SelectableCard";
 
@@ -142,6 +143,7 @@ function SpeakingPage() {
       const used = usage?.speaking_count ?? 0;
       const limit = 3;
       setUsageInfo({ allowed: used < limit, used, limit });
+      if (used >= limit) track("limit_hit", { section: "speaking", where: "page_load" });
     };
     init();
   }, []);
@@ -227,6 +229,8 @@ function SpeakingPage() {
     setSaveWarning(false);
     setSubmitError(null);
 
+    track("submission_sent", { section: "speaking", part: selectedPart });
+
     try {
       const res = await fetch("/api/speaking", {
         method: "POST",
@@ -243,11 +247,13 @@ function SpeakingPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        track(res.status === 429 ? "limit_hit" : "submission_failed", { section: "speaking", status: res.status, where: "submit" });
         setSubmitError(data.message || data.error || "Failed to evaluate response. Please try again.");
         return;
       }
 
       if (data.submission_id) {
+        track("submission_scored", { section: "speaking", part: selectedPart });
         router.push(`/speaking/${data.submission_id}`);
         return;
       }
@@ -261,6 +267,7 @@ function SpeakingPage() {
       }
     } catch (err) {
       console.error("Speaking submission failed:", err);
+      track("submission_failed", { section: "speaking", status: "network" });
       setSubmitError("Network error. Please check your connection and try again.");
     } finally {
       setIsSubmitting(false);

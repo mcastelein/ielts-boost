@@ -54,6 +54,17 @@ export default function Navbar() {
           is_admin: settings?.role === "admin",
           signed_up_at: nextUser.created_at,
         });
+        // First time we see a brand-new account: count it as a signup (email or Google).
+        try {
+          const key = `ib_signed_up_${nextUser.id}`;
+          const isNew = Date.now() - new Date(nextUser.created_at).getTime() < 24 * 60 * 60 * 1000;
+          if (isNew && !localStorage.getItem(key)) {
+            localStorage.setItem(key, "1");
+            posthog.capture("signed_up", { provider: nextUser.app_metadata?.provider ?? "email" });
+          }
+        } catch {
+          // Storage can be blocked; skip the signup event rather than break the navbar.
+        }
       } else {
         setIsAdmin(false);
         setPlanType("free");

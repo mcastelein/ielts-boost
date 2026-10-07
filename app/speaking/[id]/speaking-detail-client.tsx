@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useRef, useCallback } from "react";
 import { useLanguage } from "@/lib/language-context";
+import { useTrackOnce } from "@/lib/track";
 
 interface SpeakingFeedback {
   estimated_band: number;
@@ -33,6 +34,7 @@ export default function SpeakingDetailClient({
   feedback: SpeakingFeedback;
 }) {
   const { t } = useLanguage();
+  useTrackOnce("feedback_viewed", { section: "speaking" });
   const [isSpeaking, setIsSpeaking] = useState(false);
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
 
